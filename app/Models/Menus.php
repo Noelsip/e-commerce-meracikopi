@@ -25,6 +25,6 @@ class Menus extends Model
 
     public function orderItems()
     {
-        return $this->hashMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class);
     }
 }

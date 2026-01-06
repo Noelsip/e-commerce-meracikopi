@@ -23,15 +23,15 @@ class Payments extends Model
         'paid_at',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'amount' => 'decimal:2',
         'status' => StatusPayments::class,
         'payload' => 'array',
         'paid_at' => 'datetime',
     ];
 
-    public function orders()
+    public function order()
     {
-        return $this->belongTo(Orders::class);
+        return $this->belongsTo(Orders::class, 'order_id');
     }
 }

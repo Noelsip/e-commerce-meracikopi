@@ -32,36 +32,36 @@ class Orders extends Model
 
     public function user()
     {
-        return $this->belongTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function tables()
     {
-        return $this->belongTo(Tables::class);
+        return $this->belongsTo(Tables::class);
     }
 
     public function order_items()
     {
-        return $this->hashMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class);
     }
 
     public function order_logs()
     {
-        return $this->hashMany(OrderLogs::class);
+        return $this->hasMany(OrderLogs::class);
     }
 
     public function order_addresses()
     {
-        return $this->hashMany(OrderAddresses::class);
+        return $this->hasMany(OrderAddresses::class);
     }
 
     public function payments()
     {
-        return $this->hashMany(Payments::class);
+        return $this->hasMany(Payments::class);
     }
 
     public function deliveries()
     {
-        return $this->hashMany(Deliveries::class);
+        return $this->hasMany(Deliveries::class);
     }
 }

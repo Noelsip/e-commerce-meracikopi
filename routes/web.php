@@ -3,11 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Controllers\Admin\AuthAdminController;
+use App\Http\Controllers\Admin\DashboardAdminController;
 
 Route::get('/', function () {
     return view('welcome');
 })->name('home');   
 
+// Customer Routes
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -31,3 +34,18 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
+// Admin Routes
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::get('/login', [AuthAdminController::class, 'showLoginForm'])
+        ->name('login');
+
+    Route::post('/login', [AuthAdminController::class, 'login']);
+
+    Route::middleware('admin.auth')->group(function () {
+        Route::get('/dashboard', [DashboardAdminController::class, 'index'])
+            ->name('dashboard');
+        
+        Route::post('/logout', [AuthAdminController::class, 'logout'])
+            ->name('logout');
+    });
+});

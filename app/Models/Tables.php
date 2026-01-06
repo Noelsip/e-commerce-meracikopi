@@ -22,6 +22,6 @@ class Tables extends Model
 
     public function orders()
     {
-        return $this->hashMany(Orders::class);
+        return $this->hasMany(Orders::class);
     }
 }

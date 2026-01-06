@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Orders;
 use App\Models\Menus;
 
-class OrderTypes extends Model
+class OrderItems extends Model
 {
     use HasFactory;
 
@@ -24,12 +24,12 @@ class OrderTypes extends Model
 
     public function order()
     {
-        return $this->belongsTo(Orders::class);
+        return $this->belongsTo(Orders::class, 'order_id');
     }
 
-    public function menus()
+    public function menu()
     {
-        return $this->belongsTo(Menus::class);
+        return $this->belongsTo(Menus::class, 'menu_id');
     }
 
 }

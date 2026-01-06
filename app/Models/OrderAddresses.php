@@ -12,7 +12,7 @@ class OrderAddresses extends Model
 
     protected $fillable = [
         'order_id',
-        'receive_name',
+        'receiver_name',
         'phone',
         'full_address',
         'city',
@@ -20,8 +20,8 @@ class OrderAddresses extends Model
         'notes'
     ];
 
-    public function orders()
+    public function order()
     {
-        return $this->belongTo(Orders::class);
+        return $this->belongsTo(Orders::class, 'order_id');
     }
 }

@@ -18,12 +18,12 @@ class OrderLogs extends Model
         'note',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'status' => OrderStatus::class
     ];
 
-    public function orders()
+    public function order()
     {
-        return $this->belongTo(OrderLogs::class);
+        return $this->belongsTo(Order::class, 'order_id');
     }
 }

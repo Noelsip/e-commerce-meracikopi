@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Enums\StatusDelivery;
+use App\Models\Orders;
 
 class Deliveries extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'order_id',
         'courier_name',
@@ -25,4 +26,9 @@ class Deliveries extends Model
         'price' => 'decimal:2',
         'raw_response' => 'array',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Orders::class);
+    }
 }
