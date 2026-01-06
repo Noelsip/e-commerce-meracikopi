@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Enums\StatusDelivery;
 
 class Deliveries extends Model
 {
+    use HasFactory;
+    
     protected $fillable = [
         'order_id',
         'courier_name',

@@ -6,22 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Orders;
 
-class Tables extends Model
+class OrderAddresses extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'table_number',
-        'qr_code_path',
-        'is_active',
-    ];
-
-    protected $casts = [
-        'is_active' => 'boolean',
+        'order_id',
+        'receive_name',
+        'phone',
+        'full_address',
+        'city',
+        'postal_code',
+        'notes'
     ];
 
     public function orders()
     {
-        return $this->hashMany(Orders::class);
+        return $this->belongTo(Orders::class);
     }
 }
