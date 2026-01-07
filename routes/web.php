@@ -37,21 +37,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-// Customer API Routes
-Route::prefix('api')->group(function () {
-    // Public routes
-    Route::get('/menus', [MenuController::class, 'index']);
-    Route::get('/menus/{id}', [MenuController::class, 'show']);
+/**
+ * Customer Routes
+ */
 
-    // Protected routes (requires Bearer token)
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::get('/orders', [OrderController::class, 'index']);
-        Route::post('/orders', [OrderController::class, 'store']);
-        Route::get('/orders/{id}', [OrderController::class, 'show']);
-    });
-});
+// Catalogs
+Route::get('/catalogs', [MenuController::class, 'index'])->name('catalogs.index');
+Route::get('/catalogs/{id}', [MenuController::class, 'show'])->name('catalogs.show');
 
-// Admin Routes 
+// Orders
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
+/**
+ * Admin Routes
+ */
 Route::prefix('admin')->name('admin.')->group(function () {
     
     // Auth Routes (Guest)
