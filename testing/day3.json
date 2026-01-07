@@ -1,0 +1,1197 @@
+{
+    "info": {
+        "_postman_id": "e-commerce-meracikopi-api-v2",
+        "name": "E-Commerce Meracikopi API",
+        "description": "API Collection lengkap untuk testing E-Commerce Meracikopi\n\n## Endpoint yang tersedia:\n- Authentication (Admin Login/Logout)\n- Public API (v1) untuk Customer\n- Admin API untuk Admin Panel\n\n## Cara Penggunaan:\n1. Import Environment 'Meracikopi Local'\n2. Jalankan 'Get CSRF Token' terlebih dahulu\n3. Jalankan 'Admin Login'\n4. Testing endpoint lainnya",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000"
+        },
+        {
+            "key": "api_url",
+            "value": "http://127.0.0.1:8000/api"
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "description": "Endpoint untuk autentikasi Admin",
+            "item": [
+                {
+                    "name": "Get CSRF Token",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Ambil CSRF token dari cookie",
+                                    "var xsrfCookie = pm.cookies.get('XSRF-TOKEN');",
+                                    "if (xsrfCookie) {",
+                                    "    pm.environment.set('csrf_token', decodeURIComponent(xsrfCookie));",
+                                    "    console.log('CSRF Token saved:', decodeURIComponent(xsrfCookie));",
+                                    "}",
+                                    "",
+                                    "pm.test('CSRF Token retrieved', function() {",
+                                    "    pm.expect(xsrfCookie).to.not.be.undefined;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/sanctum/csrf-cookie",
+                            "host": ["{{base_url}}"],
+                            "path": ["sanctum", "csrf-cookie"]
+                        },
+                        "description": "Mendapatkan CSRF token untuk autentikasi. Jalankan ini PERTAMA sebelum login."
+                    }
+                },
+                {
+                    "name": "Admin Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login successful', function() {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200 || pm.response.code === 302) {",
+                                    "    console.log('Login berhasil!');",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-XSRF-TOKEN",
+                                "value": "{{csrf_token}}"
+                            },
+                            {
+                                "key": "Referer",
+                                "value": "{{base_url}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "login"]
+                        },
+                        "description": "Login sebagai Admin. Pastikan sudah menjalankan 'Get CSRF Token' terlebih dahulu."
+                    }
+                },
+                {
+                    "name": "Admin Login (Form URL Encoded)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Login successful', function() {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/x-www-form-urlencoded"
+                            },
+                            {
+                                "key": "X-XSRF-TOKEN",
+                                "value": "{{csrf_token}}"
+                            },
+                            {
+                                "key": "Referer",
+                                "value": "{{base_url}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "urlencoded",
+                            "urlencoded": [
+                                {
+                                    "key": "email",
+                                    "value": "{{admin_email}}",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "password",
+                                    "value": "{{admin_password}}",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "login"]
+                        },
+                        "description": "Login sebagai Admin menggunakan form URL encoded (alternatif)"
+                    }
+                },
+                {
+                    "name": "Admin Logout",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Logout successful', function() {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                                    "});",
+                                    "",
+                                    "// Clear environment variables",
+                                    "pm.environment.unset('csrf_token');"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "X-XSRF-TOKEN",
+                                "value": "{{csrf_token}}"
+                            },
+                            {
+                                "key": "Referer",
+                                "value": "{{base_url}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/logout",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "logout"]
+                        },
+                        "description": "Logout dari admin panel"
+                    }
+                },
+                {
+                    "name": "Check Auth Status",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Check auth status', function() {",
+                                    "    // 200 = authenticated, 302/401 = not authenticated",
+                                    "    console.log('Status:', pm.response.code);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/admin/dashboard",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "dashboard"]
+                        },
+                        "description": "Cek apakah user sudah login atau belum"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Public API (Customer)",
+            "description": "API untuk customer tanpa authentication",
+            "item": [
+                {
+                    "name": "List All Menus",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has data', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('data');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/v1/menus",
+                            "host": ["{{api_url}}"],
+                            "path": ["v1", "menus"]
+                        },
+                        "description": "Mendapatkan semua menu untuk ditampilkan ke customer"
+                    }
+                },
+                {
+                    "name": "List Menus - Search",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/v1/menus?search=latte",
+                            "host": ["{{api_url}}"],
+                            "path": ["v1", "menus"],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "latte"
+                                }
+                            ]
+                        },
+                        "description": "Mencari menu berdasarkan nama"
+                    }
+                },
+                {
+                    "name": "List Menus - Available Only",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/v1/menus?is_available=1",
+                            "host": ["{{api_url}}"],
+                            "path": ["v1", "menus"],
+                            "query": [
+                                {
+                                    "key": "is_available",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Mendapatkan menu yang tersedia saja"
+                    }
+                },
+                {
+                    "name": "Get Menu Detail",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has menu data', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "    pm.expect(jsonData.data).to.have.property('price');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/v1/menus/1",
+                            "host": ["{{api_url}}"],
+                            "path": ["v1", "menus", "1"]
+                        },
+                        "description": "Mendapatkan detail menu berdasarkan ID"
+                    }
+                },
+                {
+                    "name": "Get Menu Detail - Not Found",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has error message', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('message');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/v1/menus/999",
+                            "host": ["{{api_url}}"],
+                            "path": ["v1", "menus", "999"]
+                        },
+                        "description": "Testing response 404 untuk menu yang tidak ada"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin API - Menu",
+            "description": "CRUD Menu untuk Admin Panel",
+            "item": [
+                {
+                    "name": "List All Menus",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has pagination', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('current_page');",
+                                    "    pm.expect(jsonData.data).to.have.property('data');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"]
+                        },
+                        "description": "Mendapatkan semua menu dengan pagination"
+                    }
+                },
+                {
+                    "name": "List Menus - Search by Name",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus?search=espresso",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "espresso"
+                                }
+                            ]
+                        },
+                        "description": "Mencari menu berdasarkan nama"
+                    }
+                },
+                {
+                    "name": "List Menus - Filter Available",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus?is_available=1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"],
+                            "query": [
+                                {
+                                    "key": "is_available",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Filter menu yang tersedia (is_available = 1)"
+                    }
+                },
+                {
+                    "name": "List Menus - Filter Not Available",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus?is_available=0",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"],
+                            "query": [
+                                {
+                                    "key": "is_available",
+                                    "value": "0"
+                                }
+                            ]
+                        },
+                        "description": "Filter menu yang tidak tersedia (is_available = 0)"
+                    }
+                },
+                {
+                    "name": "List Menus - Search + Filter",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus?search=coffee&is_available=1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"],
+                            "query": [
+                                {
+                                    "key": "search",
+                                    "value": "coffee"
+                                },
+                                {
+                                    "key": "is_available",
+                                    "value": "1"
+                                }
+                            ]
+                        },
+                        "description": "Kombinasi search dan filter"
+                    }
+                },
+                {
+                    "name": "List Menus - Pagination",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus?page=2",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "2"
+                                }
+                            ]
+                        },
+                        "description": "Mendapatkan halaman ke-2"
+                    }
+                },
+                {
+                    "name": "Get Menu by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has menu data', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "    pm.expect(jsonData.data).to.have.property('price');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1"]
+                        },
+                        "description": "Mendapatkan detail menu berdasarkan ID"
+                    }
+                },
+                {
+                    "name": "Get Menu by ID - Not Found",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has error message', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('not');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/999",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "999"]
+                        },
+                        "description": "Testing response 404 untuk menu yang tidak ada"
+                    }
+                },
+                {
+                    "name": "Create Menu",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('Created');",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has menu data', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data.name).to.equal('Espresso');",
+                                    "});",
+                                    "",
+                                    "// Save menu ID for later use",
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.data && jsonData.data.id) {",
+                                    "    pm.environment.set('last_menu_id', jsonData.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Espresso\",\n    \"description\": \"Kopi espresso single shot\",\n    \"price\": 20000,\n    \"image_path\": \"/images/espresso.jpg\",\n    \"is_available\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"]
+                        },
+                        "description": "Membuat menu baru dengan semua field"
+                    }
+                },
+                {
+                    "name": "Create Menu - Minimal",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function() {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Americano\",\n    \"price\": 18000,\n    \"image_path\": \"/images/americano.jpg\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"]
+                        },
+                        "description": "Membuat menu dengan data minimal (tanpa description)"
+                    }
+                },
+                {
+                    "name": "Create Menu - Validation Error",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 422', function() {",
+                                    "    pm.response.to.have.status(422);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has validation errors', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('errors');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"description\": \"Menu tanpa nama dan harga\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus"]
+                        },
+                        "description": "Testing validation error - field required tidak diisi"
+                    }
+                },
+                {
+                    "name": "Update Menu - Full",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('Updated');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Espresso Double Shot\",\n    \"description\": \"Kopi espresso double shot yang kuat\",\n    \"price\": 28000,\n    \"image_path\": \"/images/espresso-double.jpg\",\n    \"is_available\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1"]
+                        },
+                        "description": "Update semua field menu"
+                    }
+                },
+                {
+                    "name": "Update Menu - Price Only",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"price\": 25000\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1"]
+                        },
+                        "description": "Update hanya harga menu"
+                    }
+                },
+                {
+                    "name": "Update Menu - Not Found",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test\",\n    \"price\": 10000\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/999",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "999"]
+                        },
+                        "description": "Testing update menu yang tidak ada"
+                    }
+                },
+                {
+                    "name": "Update Availability - Set False",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Menu is now unavailable', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.is_available).to.be.false;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"is_available\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1/availability",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1", "availability"]
+                        },
+                        "description": "Menonaktifkan menu"
+                    }
+                },
+                {
+                    "name": "Update Availability - Set True",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Menu is now available', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.is_available).to.be.true;",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"is_available\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1/availability",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1", "availability"]
+                        },
+                        "description": "Mengaktifkan menu"
+                    }
+                },
+                {
+                    "name": "Update Availability - Not Found",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"is_available\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/999/availability",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "999", "availability"]
+                        },
+                        "description": "Testing update availability menu yang tidak ada"
+                    }
+                },
+                {
+                    "name": "Delete Menu",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function() {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has success message', function() {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('Deleted');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/1",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "1"]
+                        },
+                        "description": "Menghapus menu (soft delete)"
+                    }
+                },
+                {
+                    "name": "Delete Menu - Not Found",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 404', function() {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{api_url}}/admin/menus/999",
+                            "host": ["{{api_url}}"],
+                            "path": ["admin", "menus", "999"]
+                        },
+                        "description": "Testing delete menu yang tidak ada"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -6,9 +6,10 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 
+// Guest Routes
 Route::get('/', function () {
     return view('welcome');
-})->name('home');   
+})->name('home');
 
 // Customer Routes
 Route::view('dashboard', 'dashboard')
@@ -34,18 +35,35 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
-// Admin Routes
+// Admin Routes 
 Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // Auth Routes (Guest)
     Route::get('/login', [AuthAdminController::class, 'showLoginForm'])
         ->name('login');
-
     Route::post('/login', [AuthAdminController::class, 'login']);
 
+    // Protected Routes (Logged In)
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');
         
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');
+
+        // Katalog Views
+        Route::get('/katalog', function () {
+            return view('admin.katalog.index');
+        })->name('katalog.index');
+
+        Route::get('/katalog/create', function () {
+            return view('admin.katalog.add-katalog');
+        })->name('katalog.create');
+
+        Route::get('/katalog/{id}/edit', function ($id) {
+            return view('admin.katalog.edit-katalog', compact('id'));
+        })->name('katalog.edit');
     });
 });
+
+require __DIR__.'/auth.php';
