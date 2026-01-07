@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\OrderItems;
 
 class Menus extends Model
 {
@@ -21,4 +22,9 @@ class Menus extends Model
         'price' => 'decimal:2',
         'is_available' => 'boolean',
     ];
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItems::class);
+    }
 }
