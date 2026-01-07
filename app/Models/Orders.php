@@ -16,6 +16,7 @@ use App\Models\Tables;
 class Orders extends Model
 {
     protected $fillable = [
+        'user_id',
         'order_type',
         'table_id',
         'customer_name',
