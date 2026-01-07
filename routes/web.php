@@ -5,6 +5,7 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Admin\MenuAdminController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
 
@@ -60,6 +61,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');
+
+        Route::resource('menus', MenuAdminController::class);
 
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');

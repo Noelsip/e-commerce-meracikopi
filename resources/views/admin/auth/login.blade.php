@@ -1,84 +1,74 @@
-<x-layout title="Admin Login - Meracikopi">
-    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <div>
-                <div class="flex justify-center">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Admin Login - Meracikopi</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+
+<body class="font-sans antialiased" style="background-color: #3a2a1f;">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <!-- Logo & Title -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
                     <x-app-logo-icon class="h-12 w-12" />
                 </div>
-                <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-                    Admin Login
-                </h2>
-                <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-                    Masuk ke Dashboard Admin Meracikopi
-                </p>
+                <h2 class="text-2xl font-bold" style="color: #f0f2bd;">Admin Login</h2>
+                <p class="mt-2 text-sm" style="color: #f0f2bd;">Masuk ke Dashboard Admin Meracikopi</p>
             </div>
 
             @if($errors->any())
-                <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <div class="text-sm text-red-700 dark:text-red-300">
-                                <ul class="list-disc pl-5 space-y-1">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                <div class="rounded-lg p-4 mb-6" style="background-color: #4B352A;">
+                    <ul class="text-sm list-disc list-inside" style="color: #f0f2bd;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 
-            <form class="mt-8 space-y-6" method="POST" action="{{ route('admin.login') }}">
+            <form method="POST" action="{{ route('admin.login') }}" class="space-y-5">
                 @csrf
-                <div class="space-y-4">
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                        <input 
-                            id="email" 
-                            name="email" 
-                            type="email" 
-                            autocomplete="email" 
-                            required 
-                            value="{{ old('email') }}"
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:text-white sm:text-sm"
-                            placeholder="admin@meracikopi.com"
-                        >
-                    </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Password</label>
-                        <input 
-                            id="password" 
-                            name="password" 
-                            type="password" 
-                            autocomplete="current-password" 
-                            required 
-                            class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-zinc-800 dark:text-white sm:text-sm"
-                            placeholder="••••••••"
-                        >
-                    </div>
-                </div>
 
+                <!-- Email -->
                 <div>
-                    <button 
-                        type="submit" 
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Sign in
-                    </button>
+                    <label for="email" class="block text-sm font-medium mb-2" style="color: #f0f2bd;">Email</label>
+                    <input type="email" id="email" name="email" required value="{{ old('email') }}"
+                        class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        style="background-color: #5a4032; border: 1px solid #6b4d3a; color: #f0f2bd;"
+                        placeholder="admin@meracikopi.com">
                 </div>
 
-                <div class="text-center">
-                    <a href="{{ route('home') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
-                        ← Kembali ke Home
-                    </a>
+                <!-- Password -->
+                <div>
+                    <label for="password" class="block text-sm font-medium mb-2"
+                        style="color: #f0f2bd;">Password</label>
+                    <input type="password" id="password" name="password" required
+                        class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                        style="background-color: #5a4032; border: 1px solid #6b4d3a; color: #f0f2bd;"
+                        placeholder="••••••••">
                 </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="w-full py-3 rounded-lg font-semibold transition-colors hover:opacity-90"
+                    style="background-color: #6b4d3a; color: #f0f2bd;">
+                    Sign in
+                </button>
             </form>
+
+            <div class="mt-6 text-center">
+                <a href="{{ route('home') }}" class="text-sm hover:underline" style="color: #f0f2bd;">
+                    ← Kembali ke Home
+                </a>
+            </div>
         </div>
     </div>
-</x-layout>
+</body>
+
+</html>
