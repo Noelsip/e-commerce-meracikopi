@@ -74,7 +74,8 @@
                 </a>
 
                 <!-- Users -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="{{ route('admin.users.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,7 +85,8 @@
                 </a>
 
                 <!-- Settings -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="{{ route('admin.profile.edit') }}" 
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.profile.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

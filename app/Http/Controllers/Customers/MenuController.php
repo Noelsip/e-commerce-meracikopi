@@ -8,14 +8,21 @@ use Illuminate\Http\Request;
 
 class MenuController extends Controller
 {
+    /**
+     * GET /catalogs
+     */
     public function index(Request $request)
     {
         $query = Menus::query();
 
         if ($request->has('is_available')) {
-            $query->where('is_available', $request->boolean('is_available'));
+            $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isAvailable !== null) {
+                $query->where('is_available', $isAvailable);
+            }
         }
 
+        // Search by name
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
@@ -31,15 +38,20 @@ class MenuController extends Controller
                 'image' => $menu->image_path,
                 'is_available' => $menu->is_available,
             ])
-        ]);
+        ], 200);
     }
 
+    /**
+     * GET /catalogs/{id}
+     */
     public function show($id)
     {
         $menu = Menus::find($id);
 
         if (!$menu) {
-            return response()->json(['message' => 'Menu not found'], 404);
+            return response()->json([
+                'message' => 'Menu not found'
+            ], 404);
         }
 
         return response()->json([
@@ -51,6 +63,6 @@ class MenuController extends Controller
                 'image' => $menu->image_path,
                 'is_available' => $menu->is_available,
             ]
-        ]);
+        ], 200);
     }
 }
