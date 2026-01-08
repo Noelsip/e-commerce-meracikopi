@@ -52,8 +52,8 @@
                 </a>
 
                 <!-- Table -->
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="{{ route('admin.tables.index') }}"
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.tables.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -63,8 +63,8 @@
                 </a>
 
                 <!-- Orders -->
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="{{ route('admin.orders.index') }}" 
+                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -74,8 +74,7 @@
                 </a>
 
                 <!-- Users -->
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,8 +84,7 @@
                 </a>
 
                 <!-- Settings -->
-                <a href="#"
-                    class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
+                <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-[#3e302b]/50"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -102,9 +100,9 @@
             <div class="p-4 mt-auto">
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit"
-                        class="flex items-center gap-3 px-4 py-3 rounded-lg w-full transition-all duration-200 hover:bg-red-700 hover:shadow-lg group"
-                        style="color: #f0f2bd;">
+                    <button type="submit" 
+                        class="logout-btn flex items-center gap-3 px-4 py-3 rounded-lg w-full transition-all duration-200"
+                        style="color: #dc2626;">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -113,6 +111,15 @@
                     </button>
                 </form>
             </div>
+            <style>
+                .logout-btn:hover {
+                    background-color: rgba(220, 38, 38, 0.15);
+                }
+                .header-logout-btn:hover {
+                    background-color: rgba(220, 38, 38, 0.2);
+                    color: #ef4444 !important;
+                }
+            </style>
         </aside>
 
         <!-- Main Content -->
@@ -144,11 +151,13 @@
                         <div class="w-10 h-10 rounded-full" style="background-color: #6b4d3a;"></div>
                         <div class="text-right">
                             <p class="font-medium" style="color: #f0f2bd;">{{ Auth::user()->name ?? 'Admin' }}</p>
-                            <p class="text-xs" style="color: #f0f2bd;">{{ Auth::user()->email ?? 'admin@meracikopi.com' }}</p>
+                            <p class="text-xs" style="color: #f0f2bd;">{{ Auth::user()->email ?? 'admin@meracikopi.com'
+                                }}</p>
                         </div>
                         <form method="POST" action="{{ route('admin.logout') }}" class="ml-2">
                             @csrf
-                            <button type="submit" class="text-sm transition-colors hover:opacity-80" style="color: #f0f2bd;">
+                            <button type="submit" class="header-logout-btn text-sm px-3 py-1 rounded transition-all duration-200"
+                                style="color: #f0f2bd;">
                                 Logout
                             </button>
                         </form>

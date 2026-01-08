@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +12,10 @@ return new class extends Migration
     {
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
-            $table->string('table_number');
-            $table->string('qr_code_path');
+            $table->string('table_number')->unique();
+            $table->integer('capacity')->default(2);
+            $table->enum('status', ['available', 'occupied', 'reserved'])->default('available');
+            $table->string('qr_code_path')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

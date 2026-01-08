@@ -6,6 +6,8 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\MenuAdminController;
+use App\Http\Controllers\Admin\TableAdminController;
+use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
 
@@ -63,6 +65,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('dashboard');
 
         Route::resource('menus', MenuAdminController::class);
+        Route::resource('tables', TableAdminController::class);
+        Route::patch('/tables/{table}/status', [TableAdminController::class, 'updateStatus'])
+            ->name('tables.updateStatus');
+
+        Route::resource('orders', OrderAdminController::class)->except(['create', 'store']);
+        Route::patch('/orders/{order}/status', [OrderAdminController::class, 'updateStatus'])
+            ->name('orders.updateStatus');
 
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');
