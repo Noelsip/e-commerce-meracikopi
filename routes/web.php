@@ -3,10 +3,17 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+
+// Admin Controller
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
-use App\Http\Controllers\Customers\MenuController;
-use App\Http\Controllers\Customers\OrderController;
+use App\Http\Controllers\Admin\AdminMenuController;
+
+// Customer Controllers
+use App\Http\Controllers\Customers\MenuController as CustomerMenuController;
+use App\Http\Controllers\Customers\OrderController as CustomerOrderController;
+use App\Http\Controllers\Customers\CartController;
+use App\Http\Controllers\Customers\CartItemController;
 
 // Guest Routes
 Route::get('/', function () {
@@ -17,6 +24,7 @@ Route::get('/', function () {
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -40,14 +48,23 @@ Route::middleware(['auth'])->group(function () {
 /**
  * Customer Routes
  */
+// Route::prefix('customer')
+//     ->middleware('guest.token')
+//     ->group(function() {
+//         // Catalogs
+//         Route::get('/catalogs', [MenuController::class, 'index'])->name('catalogs.index');
+//         Route::get('/catalogs/{id}', [MenuController::class, 'show'])->name('catalogs.show');     
+        
+//         // Cart
+//         Route::get('/cart', [CartController::class, 'show']);
+//         Route::post('/cart/items', [CartItemController::class, 'store']);
+//         Route::put('/cart/items/{id}', [CartItemController::class, 'update']);
+//         Route::delete('/cart/items/{id}', [CartItemController::class, 'destroy']);
 
-// Catalogs
-Route::get('/catalogs', [MenuController::class, 'index'])->name('catalogs.index');
-Route::get('/catalogs/{id}', [MenuController::class, 'show'])->name('catalogs.show');
-
-// Orders
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+//         // Order
+//         Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+//         Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+//     });
 
 /**
  * Admin Routes
@@ -55,11 +72,13 @@ Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show'
 Route::prefix('admin')->name('admin.')->group(function () {
     
     // Auth Routes (Guest)
-    Route::get('/login', [AuthAdminController::class, 'showLoginForm'])
-        ->name('login');
-    Route::post('/login', [AuthAdminController::class, 'login']);
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [AuthAdminController::class, 'showLoginForm'])
+            ->name('login');
+        Route::post('/login', [AuthAdminController::class, 'login']);
+    });
 
-    // Protected Routes (Logged In)
+    // Protected Routes (Logged In Admin)
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');

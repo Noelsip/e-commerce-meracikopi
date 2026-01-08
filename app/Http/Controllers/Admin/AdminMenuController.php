@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+// use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Menus;
@@ -25,10 +26,18 @@ class AdminMenuController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $menu = $query->paginate(10);
+        $menus = $query->paginate(10);
 
         return response()->json([
-            'data' => $menu
+            'data' => $menus->map(fn($menu) => [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'description' => $menu->description,
+                'price' => (int) $menu->price,
+                'image_path' => $menu->image_path,
+                'is_available' => (bool) $menu->is_available,
+                'created_at' => $menu->created_at->toIso8601String(),
+            ])
         ], 200);
     }
 
@@ -48,7 +57,16 @@ class AdminMenuController extends Controller
 
         // Jika ditemukan
         return response()->json([
-            'data' => $menu
+            'data' => [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'description' => $menu->description,
+                'price' => (int) $menu->price,
+                'image_path' => $menu->image_path,
+                'is_available' => (bool) $menu->is_available,
+                'created_at' => $menu->created_at->toIso8601String(),
+                'updated_at' => $menu->updated_at->toIso8601String(),
+            ]
         ], 200);
     }
 
@@ -68,6 +86,9 @@ class AdminMenuController extends Controller
         $validated['is_available'] = $validated['is_available'] ?? true;
 
         $menu = Menus::create($validated);
+
+        // Clear Cache ketika menu dibuat
+        // Cache::tags(['menus'])->flush();
 
         return response()->json([
             'message' => 'Menu Created',
@@ -111,7 +132,7 @@ class AdminMenuController extends Controller
                 'id' => $menu->id,
                 'name' => $menu->name,
                 'description' => $menu->description,
-                'price' => $menu->price,
+                'price' => (int) $menu->price,
                 'image_path' => $menu->image_path,
                 'is_available' => $menu->is_available,
             ]
@@ -162,6 +183,9 @@ class AdminMenuController extends Controller
         }
 
         $menu->delete();
+
+        // Clear Cache ketika menu dihapus
+        // Cache::tags(['menus'])->flush();
 
         return response()->json([
             'message' => 'Menu Deleted Successfully'

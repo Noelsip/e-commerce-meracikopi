@@ -13,7 +13,8 @@ class MenuController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Menus::query();
+        // Hanya menampilkan menu yang belum dihapus
+        $query = Menus::whereNull('deleted_at');
 
         if ($request->has('is_available')) {
             $isAvailable = filter_var($request->is_available, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -36,7 +37,7 @@ class MenuController extends Controller
                 'description' => $menu->description,
                 'price' => (int) $menu->price,
                 'image' => $menu->image_path,
-                'is_available' => $menu->is_available,
+                'is_available' => (bool) $menu->is_available,
             ])
         ], 200);
     }
@@ -46,6 +47,7 @@ class MenuController extends Controller
      */
     public function show($id)
     {
+        // Menampilkan menu yang belum dihapus
         $menu = Menus::find($id);
 
         if (!$menu) {
@@ -61,7 +63,7 @@ class MenuController extends Controller
                 'description' => $menu->description,
                 'price' => (int) $menu->price,
                 'image' => $menu->image_path,
-                'is_available' => $menu->is_available,
+                'is_available' => (bool) $menu->is_available,
             ]
         ], 200);
     }
