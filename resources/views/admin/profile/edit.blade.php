@@ -101,7 +101,7 @@
 
                 <div class="flex items-center justify-end">
                     <button type="submit"
-                        class="px-6 py-2.5 rounded-lg font-bold shadow-lg transition-all hover:opacity-90 active:scale-95"
+                        class="px-6 py-2 rounded-lg font-bold shadow-lg transition-all hover:opacity-90 active:scale-95 tracking-wide"
                         style="background-color: #D4A574; color: #1e1715;">
                         Simpan Perubahan
                     </button>

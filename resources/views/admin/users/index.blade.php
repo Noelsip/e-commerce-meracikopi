@@ -1,4 +1,4 @@
-<x-layouts.admin :title="'User Management'">
+    <x-layouts.admin :title="'User Management'">
     <div class="mb-6 flex justify-between items-center">
         <h2 class="text-xl font-bold" style="color: #f0f2bd;">Daftar User</h2>
         <a href="{{ route('admin.users.create') }}"

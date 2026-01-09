@@ -15,7 +15,7 @@ use App\Http\Controllers\Customers\OrderController;
 
 // Guest Routes
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.guest.welcome');
 })->name('home');
 
 // Customer Routes

@@ -1,5 +1,5 @@
 <x-layouts.admin :title="'Edit Menu'">
-    <div class="mb-6 flex justify-between items-center">
+    <div class="mb-6 flex justify-between items-center max-w-2xl mx-auto">
         <h2 class="text-xl font-bold" style="color: #f0f2bd;">Edit Menu: {{ $menu->name }}</h2>
         <a href="{{ route('admin.menus.index') }}"
             class="px-4 py-2 rounded-lg font-semibold transition-colors hover:bg-white/10"
@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <div class="rounded-xl border p-6 max-w-2xl" style="background-color: #2b211e; border-color: #3e302b;">
+    <div class="rounded-xl border p-6 max-w-2xl mx-auto" style="background-color: #2b211e; border-color: #3e302b;">
         <form action="{{ route('admin.menus.update', $menu->id) }}" method="POST" enctype="multipart/form-data"
             class="space-y-6">
             @csrf
@@ -51,8 +51,7 @@
 
             <!-- Image -->
             <div>
-                <label for="image" class="block text-sm font-medium mb-2" style="color: #f0f2bd;">Foto Menu
-                    (Opsional)</label>
+                <label class="block text-sm font-medium mb-2" style="color: #f0f2bd;">Foto Menu</label>
                 @if($menu->image_path)
                     <div class="mb-2">
                         <img src="{{ asset($menu->image_path) }}" alt="Current Image"
@@ -60,10 +59,17 @@
                         <p class="text-xs mt-1 opacity-60" style="color: #f0f2bd;">Foto saat ini</p>
                     </div>
                 @endif
-                <input type="file" id="image" name="image" accept="image/*"
-                    class="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-500 file:text-white hover:file:bg-amber-600"
-                    style="color: #f0f2bd;">
-                <p class="text-xs mt-1 opacity-60" style="color: #f0f2bd;">Biarkan kosong jika tidak ingin mengubah
+                <div class="flex items-center gap-3">
+                    <label for="image"
+                        class="inline-block py-2 px-4 rounded-full text-sm font-semibold cursor-pointer transition-opacity hover:opacity-90"
+                        style="background-color: #D4A574; color: #1e1715;">
+                        Pilih File
+                    </label>
+                    <span id="file-name" class="text-sm" style="color: #f0f2bd;">Tidak ada file dipilih</span>
+                    <input type="file" id="image" name="image" accept="image/*" class="hidden"
+                        onchange="document.getElementById('file-name').textContent = this.files[0] ? this.files[0].name : 'Tidak ada file dipilih'">
+                </div>
+                <p class="text-xs mt-2 opacity-60" style="color: #f0f2bd;">Biarkan kosong jika tidak ingin mengubah
                     foto.</p>
                 @error('image')
                     <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
