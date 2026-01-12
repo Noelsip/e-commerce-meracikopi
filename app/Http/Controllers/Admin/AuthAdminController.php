@@ -19,32 +19,16 @@ class AuthAdminController extends Controller
     // Menerima Input User
     public function login(Request $request)
     {
-        $request->validate([
+        $creadentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Email Tidak Terdaftar'
-                ], 401);
-            }
+        if (!Auth::guard('admin')->attempt($creadentials)) {
             return back()->withErrors([
-                'email' => 'Email Tidak Terdaftar'
-            ])->withInput();
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Password Salah'
-                ], 401);
-            }
-            return back()->withErrors([
-                'password' => 'Password Salah'
+                'email' => 'Email atau Password Salah'
             ])->withInput();
         }
 

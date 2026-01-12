@@ -76,11 +76,11 @@ class AdminMenuController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:100',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'image_path' => 'string|max:255',
-            'is_available' => 'boolean',
+            'is_available' => 'boolean'
         ]);
 
         $validated['is_available'] = $validated['is_available'] ?? true;

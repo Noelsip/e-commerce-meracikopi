@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Customers;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Cart;
 use App\Models\Orders;
 use App\Models\OrderItems;
 use App\Models\OrderAddresses;
 use App\Models\OrderLogs;
-use App\Models\Menus;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -207,5 +206,79 @@ class OrderController extends Controller
                 ]),
             ]
         ], 200);
+    }
+
+    public function checkout(Request $request)
+    {
+        return DB::transaction(function () use ($request) {
+            $cart = Cart::with('items.menu')
+                ->where('guest_token', $request->attributes->get('guest_token'))
+                ->where('status', 'active')
+                ->lockForUpdate()
+                ->firstOrFail();
+                
+            // Validasi cart tidak kosong
+            if ($cart->items->isEmpty()) {
+                abort(422, 'Cart is empty');
+            }
+
+            // Menghitung total harga dari server
+            $totalPrice = 0;
+
+            foreach ($cart->items as $item) {
+                if (!$item->menu->is_available) {
+                    abort(422, "Menu '{$item->menu->name}' is not available");
+                }
+
+                $totalPrice += $item->menu->price * $item->quantity;
+            }
+
+            // Membuat order
+            $order = Orders::create([
+                'guest_token' => $cart->guest_token,
+                'order_type' => OrderType::TAKE_AWAY->value,
+                'status' => OrderStatus::PENDING_PAYMENT->value,
+                'total_price' => $totalPrice,
+                'note' => $request->note,
+            ]);
+
+            // Copy cart_items ke order_items
+            foreach ($cart->items as $item) {
+                OrderItems::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $item->menu_id,
+                    'quantity' => $item->quantity,
+                    'price' => $item->menu->price,
+                ]);
+            }
+
+            // Menyimpan address jika delivery
+            if ($order->order_type === OrderType::DELIVERY) {
+                OrderAddresses::create([
+                    'order_id' => $order->id,
+                    'receiver_name' => $request->address['receiver_name'],
+                    'phone' => $request->address['phone'],
+                    'full_address' => $request->address['full_address'],
+                    'city' => $request->address['city'],
+                    'postal_code' => $request->address['postal_code'],
+                    'notes' => $request->address['notes'] ?? null,
+                ]);
+            }
+
+            // Membuat oder log pertama
+            OrderLogs::create([
+                'order_id' => $order->id,
+                'status' => OrderStatus::PENDING_PAYMENT->value,
+                'note' => $request->note,
+            ]);
+
+            // Update cart status
+            $cart->update(['status' => 'checked_out']);
+
+            return response()->json([
+                'message' => 'Order created succesfully',
+                'data' => $order
+            ], 201);
+        });
     }
 }
