@@ -42,7 +42,7 @@
                         <!-- Image -->
                         <div style="aspect-ratio: 1; background-color: #F0F2BD; overflow: hidden;">
                             @if($menu->image_path)
-                                <img src="{{ asset('storage/' . $menu->image_path) }}" 
+                                <img src="{{ asset($menu->image_path) }}" 
                                      alt="{{ $menu->name }}"
                                      style="width: 100%; height: 100%; object-fit: cover;">
                             @else

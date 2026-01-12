@@ -75,6 +75,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::resource('menus', MenuAdminController::class);
         Route::resource('tables', TableAdminController::class);
+        Route::patch('/menus/{menu}/toggle-visibility', [MenuAdminController::class, 'toggleVisibility'])
+            ->name('menus.toggleVisibility');
         Route::patch('/tables/{table}/status', [TableAdminController::class, 'updateStatus'])
             ->name('tables.updateStatus');
 

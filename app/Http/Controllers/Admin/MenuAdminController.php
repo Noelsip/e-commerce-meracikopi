@@ -88,4 +88,13 @@ class MenuAdminController extends Controller
 
         return redirect()->route('admin.menus.index')->with('success', 'Menu deleted successfully.');
     }
+
+    public function toggleVisibility(Menus $menu)
+    {
+        $menu->is_available = !$menu->is_available;
+        $menu->save();
+
+        $status = $menu->is_available ? 'visible' : 'hidden';
+        return back()->with('success', "Menu is now {$status}.");
+    }
 }

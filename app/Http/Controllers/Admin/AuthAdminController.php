@@ -19,32 +19,17 @@ class AuthAdminController extends Controller
     // Menerima Input User
     public function login(Request $request)
     {
-        $request->validate([
+        $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
+        // Check if user exists and is admin
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Email Tidak Terdaftar'
-                ], 401);
-            }
             return back()->withErrors([
-                'email' => 'Email Tidak Terdaftar'
-            ])->withInput();
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Password Salah'
-                ], 401);
-            }
-            return back()->withErrors([
-                'password' => 'Password Salah'
+                'email' => 'Email atau Password Salah'
             ])->withInput();
         }
 
@@ -55,11 +40,17 @@ class AuthAdminController extends Controller
                 ], 403);
             }
             return back()->withErrors([
-                'email' => 'Anda Tidak Memiliki Akses'
+                'email' => 'Anda Tidak Memiliki Akses Admin'
             ])->withInput();
         }
 
-        Auth::login($user);
+        // Attempt login with web guard
+        if (!Auth::attempt($credentials)) {
+            return back()->withErrors([
+                'email' => 'Email atau Password Salah'
+            ])->withInput();
+        }
+
         $request->session()->regenerate();
 
         if ($request->expectsJson()) {

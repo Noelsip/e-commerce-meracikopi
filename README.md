@@ -243,20 +243,10 @@ POST /api/orders
 
 ```json
 {
-  "order_type": "delivery",        // "dine_in" | "take_away" | "delivery"
-  "table_id": 3,                   // hanya untuk "dine_in"
-  "items": [
-    {
-      "menu_id": 1,
-      "quantity": 2
-    },
-    {
-      "menu_id": 5,
-      "quantity": 1
-    }
-  ],
+  "order_type": "delivery",
+  "table_id": 3,
   "note": "Less sugar",
-  "address": {                     // wajib jika order_type = "delivery"
+  "address": {
     "receiver_name": "Budi",
     "phone": "08123456789",
     "full_address": "Jl. Mawar No. 1",

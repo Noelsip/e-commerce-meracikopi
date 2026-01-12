@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark h-full">
 
 <head>
     <meta charset="utf-8">
@@ -12,12 +12,22 @@
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
 </head>
 
-<body class="font-sans antialiased" style="background-color: #3a2a1f;">
-    <div class="min-h-screen flex">
+<body class="font-sans antialiased h-full" style="background-color: #3a2a1f;">
+    <div class="h-full flex overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 flex flex-col" style="background-color: #2b211e; border-right: 1px solid #3e302b;">
+        <aside class="w-64 flex-shrink-0 flex flex-col transition-all duration-300"
+            style="background-color: #2b211e; border-right: 1px solid #3e302b;">
 
             <!-- Logo -->
             <div class="p-6">
@@ -28,7 +38,7 @@
             </div>
 
             <!-- Navigation -->
-            <nav class="flex-1 px-4 space-y-1">
+            <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
                 <!-- Home -->
                 <a href="{{ route('admin.dashboard') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.dashboard') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
@@ -63,7 +73,7 @@
                 </a>
 
                 <!-- Orders -->
-                <a href="{{ route('admin.orders.index') }}" 
+                <a href="{{ route('admin.orders.index') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.orders.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,7 +84,7 @@
                 </a>
 
                 <!-- Users -->
-                <a href="{{ route('admin.users.index') }}" 
+                <a href="{{ route('admin.users.index') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.users.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +95,7 @@
                 </a>
 
                 <!-- Settings -->
-                <a href="{{ route('admin.profile.edit') }}" 
+                <a href="{{ route('admin.profile.edit') }}"
                     class="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors {{ request()->routeIs('admin.profile.*') ? 'bg-[#3e302b]' : 'hover:bg-[#3e302b]/50' }}"
                     style="color: #f0f2bd;">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +112,7 @@
             <div class="p-4 mt-auto">
                 <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
-                    <button type="submit" 
+                    <button type="submit"
                         class="logout-btn flex items-center gap-3 px-4 py-3 rounded-lg w-full transition-all duration-200"
                         style="color: #dc2626;">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,6 +127,7 @@
                 .logout-btn:hover {
                     background-color: rgba(220, 38, 38, 0.15);
                 }
+
                 .header-logout-btn:hover {
                     background-color: rgba(220, 38, 38, 0.2);
                     color: #ef4444 !important;
@@ -124,10 +135,10 @@
             </style>
         </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col">
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
-            <header class="px-6 py-3" style="background-color: #2b211e;">
+            <header class="px-6 py-3 flex-shrink-0 z-10 shadow-sm" style="background-color: #2b211e;">
                 <div class="flex items-center justify-between">
                     <!-- Title -->
                     <h1 class="text-xl font-semibold" style="color: #f0f2bd;">
@@ -158,7 +169,8 @@
                         </div>
                         <form method="POST" action="{{ route('admin.logout') }}" class="ml-2">
                             @csrf
-                            <button type="submit" class="header-logout-btn text-sm px-3 py-1 rounded transition-all duration-200"
+                            <button type="submit"
+                                class="header-logout-btn text-sm px-3 py-1 rounded transition-all duration-200"
                                 style="color: #f0f2bd;">
                                 Logout
                             </button>
@@ -168,7 +180,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 p-6" style="background-color: #1e1715;">
+            <main class="flex-1 overflow-y-auto p-6 scroll-smooth" style="background-color: #1e1715;">
                 {{ $slot }}
             </main>
         </div>

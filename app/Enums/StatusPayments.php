@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-enum StatusPayments : string
+enum StatusDelivery: string
 {
-    case PENDING = 'pending';
-    case PAID = 'paid';
-    case FAILED = 'failed';
-    case EXPIRED = 'expired';
-    case REFUNDED = 'refunded';
+    case REQUESTED = 'requested';
+    case ASSIGNED = 'assigned';
+    case ON_DELIVERY = 'on_delivery';
+    case DELIVERED = 'delivered';
+    case CANCELLED = 'cancelled';
 }

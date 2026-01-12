@@ -15,7 +15,7 @@
                 <div style="width: 50%; min-width: 300px;">
                     <div style="aspect-ratio: 1; background-color: #F0F2BD;">
                         @if($menu->image_path)
-                            <img src="{{ asset('storage/' . $menu->image_path) }}" 
+                            <img src="{{ asset($menu->image_path) }}" 
                                  alt="{{ $menu->name }}"
                                  style="width: 100%; height: 100%; object-fit: cover;">
                         @else
@@ -81,7 +81,7 @@
                            style="background: white; border-radius: 12px; overflow: hidden; text-decoration: none; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                             <div style="aspect-ratio: 1; background-color: #F0F2BD; overflow: hidden;">
                                 @if($related->image_path)
-                                    <img src="{{ asset('storage/' . $related->image_path) }}" 
+                                    <img src="{{ asset($related->image_path) }}" 
                                          alt="{{ $related->name }}"
                                          style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
