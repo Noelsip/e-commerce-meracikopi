@@ -1,0 +1,896 @@
+{
+    "info": {
+        "name": "E-Commerce MeracikOpi - Fixed API Testing",
+        "description": "Fixed Postman collection for testing all endpoints",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Admin Authentication",
+            "item": [
+                {
+                    "name": "Admin Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200 or 302', function () {",
+                                    "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                                    "});",
+                                    "",
+                                    "if (pm.response.code === 200) {",
+                                    "    try {",
+                                    "        const jsonData = pm.response.json();",
+                                    "        if (jsonData.data && jsonData.data.token) {",
+                                    "            pm.environment.set('admin_token', jsonData.data.token);",
+                                    "        }",
+                                    "    } catch (e) {",
+                                    "        console.log('Response is not JSON, possibly redirect');",
+                                    "    }",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"{{admin_email}}\",\n    \"password\": \"{{admin_password}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/admin/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["admin", "login"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Admin Menu Management",
+            "item": [
+                {
+                    "name": "Create Menu",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Menu Created', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Menu Created');",
+                                    "    if (jsonData.data && jsonData.data.id) {",
+                                    "        pm.environment.set('menu_id', jsonData.data.id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Kopi Susu Gula Aren\",\n    \"description\": \"Kopi susu dengan gula aren premium\",\n    \"price\": 28000,\n    \"image_path\": \"/images/kopi-susu.jpg\",\n    \"is_available\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Menus",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('data');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Menus - Filter Available",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('All menus are available', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.length > 0) {",
+                                    "        jsonData.data.forEach(menu => {",
+                                    "            pm.expect(menu.is_available).to.eql(true);",
+                                    "        });",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus?is_available=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus"],
+                            "query": [{"key": "is_available", "value": "1"}]
+                        }
+                    }
+                },
+                {
+                    "name": "Search Menu by Name",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus?search=kopi",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus"],
+                            "query": [{"key": "search", "value": "kopi"}]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Menu by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has menu data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus/{{menu_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus", "{{menu_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Menu",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Menu Updated', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Menu Updated');",
+                                    "});",
+                                    "",
+                                    "pm.test('Price is updated', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.price).to.eql(30000);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Kopi Susu Gula Aren Premium\",\n    \"price\": 30000\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus/{{menu_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus", "{{menu_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Menu Availability",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Availability Updated', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Menu Availability Updated');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"is_available\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus/{{menu_id}}/availability",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus", "{{menu_id}}", "availability"]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Menu",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Menu Deleted', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Menu Deleted Successfully');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/menus/{{menu_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "admin", "menus", "{{menu_id}}"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Customer Catalogs",
+            "item": [
+                {
+                    "name": "Get All Catalogs",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('data');",
+                                    "    if (jsonData.data && jsonData.data.length > 0) {",
+                                    "        pm.environment.set('catalog_menu_id', jsonData.data[0].id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/catalogs",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "catalogs"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Available Catalogs Only",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('All catalogs are available', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    if (jsonData.data && jsonData.data.length > 0) {",
+                                    "        jsonData.data.forEach(menu => {",
+                                    "            pm.expect(menu.is_available).to.eql(true);",
+                                    "        });",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/catalogs?is_available=1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "catalogs"],
+                            "query": [{"key": "is_available", "value": "1"}]
+                        }
+                    }
+                },
+                {
+                    "name": "Search Catalog by Name",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/catalogs?search=kopi",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "catalogs"],
+                            "query": [{"key": "search", "value": "kopi"}]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Catalog Detail by ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has catalog data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('name');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/catalogs/{{catalog_menu_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "catalogs", "{{catalog_menu_id}}"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. Customer Cart Management",
+            "item": [
+                {
+                    "name": "Add Item to Cart",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Item added to cart', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Item added to cart');",
+                                    "});",
+                                    "",
+                                    "// Save guest token from header",
+                                    "const guestToken = pm.response.headers.get('X-GUEST-TOKEN');",
+                                    "if (guestToken) {",
+                                    "    pm.environment.set('guest_token', guestToken);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"menu_id\": 1,\n    \"quantity\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/cart/items",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "cart", "items"]
+                        }
+                    }
+                },
+                {
+                    "name": "Add Another Item to Cart",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Item added to cart', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Item added to cart');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"menu_id\": 2,\n    \"quantity\": 1\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/cart/items",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "cart", "items"]
+                        }
+                    }
+                },
+                {
+                    "name": "View Cart",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has cart data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('items');",
+                                    "    pm.expect(jsonData.data).to.have.property('total');",
+                                    "    if (jsonData.data.items && jsonData.data.items.length > 0) {",
+                                    "        pm.environment.set('cart_item_id', jsonData.data.items[0].id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/cart",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "cart"]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Cart Item Quantity",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Cart item updated', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Cart item updated');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"quantity\": 3\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/cart/items/{{cart_item_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "cart", "items", "{{cart_item_id}}"]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Cart Item",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Item removed from cart', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Item removed from cart');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/cart/items/{{cart_item_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "cart", "items", "{{cart_item_id}}"]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Customer Orders",
+            "item": [
+                {
+                    "name": "Create Order - Take Away",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test('Order Created', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.eql('Order Created');",
+                                    "    if (jsonData.data && jsonData.data.id) {",
+                                    "        pm.environment.set('order_id', jsonData.data.id);",
+                                    "    }",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"order_type\": \"take_away\",\n    \"items\": [\n        {\n            \"menu_id\": 1,\n            \"quantity\": 2\n        }\n    ],\n    \"note\": \"Less sugar please\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders"]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Order - Dine In",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"order_type\": \"dine_in\",\n    \"table_id\": 1,\n    \"items\": [\n        {\n            \"menu_id\": 1,\n            \"quantity\": 2\n        },\n        {\n            \"menu_id\": 2,\n            \"quantity\": 1\n        }\n    ],\n    \"note\": \"Extra hot\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders"]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Order - Delivery",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 201', function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"order_type\": \"delivery\",\n    \"items\": [\n        {\n            \"menu_id\": 1,\n            \"quantity\": 2\n        }\n    ],\n    \"note\": \"Ring the doorbell twice\",\n    \"address\": {\n        \"receiver_name\": \"John Doe\",\n        \"phone\": \"08123456789\",\n        \"full_address\": \"Jl. Merdeka No. 123\",\n        \"city\": \"Jakarta Selatan\",\n        \"postal_code\": \"12345\",\n        \"notes\": \"House with red gate\"\n    }\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Orders",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData).to.have.property('data');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Orders by Status",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders?status=pending",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders"],
+                            "query": [{"key": "status", "value": "pending"}]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Order Detail",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "pm.test('Status code is 200', function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test('Response has order data', function () {",
+                                    "    const jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data).to.have.property('id');",
+                                    "    pm.expect(jsonData.data).to.have.property('order_type');",
+                                    "    pm.expect(jsonData.data).to.have.property('status');",
+                                    "});"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Accept", "value": "application/json"},
+                            {"key": "X-GUEST-TOKEN", "value": "{{guest_token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/customer/orders/{{order_id}}",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "customer", "orders", "{{order_id}}"]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {"key": "base_url", "value": "http://127.0.0.1:8000"},
+        {"key": "admin_email", "value": "admin@meracikopi.com"},
+        {"key": "admin_password", "value": "password"},
+        {"key": "admin_token", "value": ""},
+        {"key": "guest_token", "value": ""},
+        {"key": "menu_id", "value": "1"},
+        {"key": "catalog_menu_id", "value": "1"},
+        {"key": "cart_item_id", "value": "1"},
+        {"key": "order_id", "value": "1"}
+    ]
+}

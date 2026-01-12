@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+
+// Admin Controller
 use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\MenuAdminController;
@@ -15,13 +17,14 @@ use App\Http\Controllers\Customers\OrderController;
 
 // Guest Routes
 Route::get('/', function () {
-    return view('pages.guest.welcome');
+    return view('welcome');
 })->name('home');
 
 // Customer Routes
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

@@ -17,7 +17,16 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Orders::where('user_id', $request->user()->id);
+        $guestToken = $request->attributes->get('guest_token');
+        
+        $query = Orders::query();
+
+        // Filter by guest token or user_id
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        } else {
+            $query->where('guest_token', $guestToken);
+        }
 
         if ($request->has('status')) {
             $query->where('status', $request->status);
@@ -28,12 +37,12 @@ class OrderController extends Controller
         return response()->json([
             'data' => $orders->map(fn($order) => [
                 'id' => $order->id,
-                'order_type' => $order->order_type->value,
-                'status' => $order->status->value,
+                'order_type' => $order->order_type,
+                'status' => $order->status,
                 'total_price' => (int) $order->total_price,
                 'created_at' => $order->created_at->toIso8601String(),
             ])
-        ]);
+        ], 200);
     }
 
     public function store(Request $request)
@@ -60,6 +69,13 @@ class OrderController extends Controller
 
             foreach ($request->items as $item) {
                 $menu = Menus::find($item['menu_id']);
+                
+                if (!$menu || !$menu->is_available) {
+                    return response()->json([
+                        'message' => "Menu '{$menu->name}' is not available"
+                    ], 400);
+                }
+
                 $subtotal = $menu->price * $item['quantity'];
                 $totalPrice += $subtotal;
 
@@ -71,11 +87,14 @@ class OrderController extends Controller
                 ];
             }
 
+            $guestToken = $request->attributes->get('guest_token');
+
             $order = Orders::create([
-                'user_id' => $request->user()->id,
+                'user_id' => auth()->id(),
+                'guest_token' => auth()->check() ? null : $guestToken,
                 'order_type' => $request->order_type,
                 'table_id' => $request->table_id,
-                'status' => OrderStatus::PENDING,
+                'status' => OrderStatus::PENDING->value,
                 'total_price' => $totalPrice,
             ]);
 
@@ -102,7 +121,7 @@ class OrderController extends Controller
 
             OrderLogs::create([
                 'order_id' => $order->id,
-                'status' => OrderStatus::PENDING,
+                'status' => OrderStatus::PENDING->value,
                 'note' => $request->note,
             ]);
 
@@ -110,8 +129,8 @@ class OrderController extends Controller
                 'message' => 'Order Created',
                 'data' => [
                     'id' => $order->id,
-                    'order_type' => $order->order_type->value,
-                    'status' => 'pending_payment',
+                    'order_type' => $order->order_type,
+                    'status' => $order->status,
                     'total_price' => (int) $order->total_price,
                     'items' => $orderItems,
                 ]
@@ -121,10 +140,25 @@ class OrderController extends Controller
 
     public function show(Request $request, $id)
     {
-        $order = Orders::with(['order_items.menu', 'order_addresses', 'deliveries', 'payments', 'order_logs', 'user', 'tables'])
-            ->where('id', $id)
-            ->where('user_id', $request->user()->id)
-            ->first();
+        $guestToken = $request->attributes->get('guest_token');
+
+        $query = Orders::with([
+            'order_items.menu',
+            'order_addresses',
+            'deliveries',
+            'payments',
+            'order_logs',
+            'user',
+            'tables'
+        ])->where('id', $id);
+
+        if (auth()->check()) {
+            $query->where('user_id', auth()->id());
+        } else {
+            $query->where('guest_token', $guestToken);
+        }
+
+        $order = $query->first();
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
@@ -133,8 +167,8 @@ class OrderController extends Controller
         return response()->json([
             'data' => [
                 'id' => $order->id,
-                'order_type' => $order->order_type->value,
-                'status' => $order->status->value,
+                'order_type' => $order->order_type,
+                'status' => $order->status,
                 'total_price' => (int) $order->total_price,
                 'user' => $order->user ? [
                     'id' => $order->user->id,
@@ -156,26 +190,22 @@ class OrderController extends Controller
                     'full_address' => $order->order_addresses->first()->full_address,
                     'city' => $order->order_addresses->first()->city,
                     'postal_code' => $order->order_addresses->first()->postal_code,
+                    'notes' => $order->order_addresses->first()->notes,
                 ] : null,
                 'delivery' => $order->deliveries->first() ? [
-                    'courier' => $order->deliveries->first()->courier_name,
-                    'tracking_number' => $order->deliveries->first()->courier_order_id,
-                    'delivery_status' => $order->deliveries->first()->status->value,
+                    'status' => $order->deliveries->first()->status,
                 ] : null,
                 'payments' => $order->payments->map(fn($payment) => [
-                    'id' => $payment->id,
-                    'payment_gateway' => $payment->payment_gateway,
-                    'payment_method' => $payment->payment_method,
                     'amount' => (int) $payment->amount,
-                    'status' => $payment->status->value,
+                    'status' => $payment->status,
                     'paid_at' => $payment->paid_at?->toIso8601String(),
                 ]),
                 'logs' => $order->order_logs->map(fn($log) => [
-                    'status' => $log->status->value,
+                    'status' => $log->status,
                     'note' => $log->note,
                     'created_at' => $log->created_at->toIso8601String(),
                 ]),
             ]
-        ]);
+        ], 200);
     }
 }
