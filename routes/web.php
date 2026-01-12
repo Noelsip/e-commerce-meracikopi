@@ -14,10 +14,11 @@ use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
+use App\Http\Controllers\Customers\CatalogController;
 
 // Guest Routes
 Route::get('/', function () {
-    return view('welcome');
+    return view('pages.guest.welcome');
 })->name('home');
 
 // Customer Routes
@@ -49,9 +50,9 @@ Route::middleware(['auth'])->group(function () {
  * Customer Routes
  */
 
-// Catalogs
-Route::get('/catalogs', [MenuController::class, 'index'])->name('catalogs.index');
-Route::get('/catalogs/{id}', [MenuController::class, 'show'])->name('catalogs.show');
+// Catalogs (Web Views - Public)
+Route::get('/customer/catalogs', [CatalogController::class, 'index'])->name('catalogs.index');
+Route::get('/customer/catalogs/{id}', [CatalogController::class, 'show'])->name('catalogs.show');
 
 // Orders
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
