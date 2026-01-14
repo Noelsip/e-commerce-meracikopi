@@ -11,27 +11,33 @@ class AdminAuth
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Cek apakah user sudah login dan role admin
-        if (!Auth::check()) {
-            // Jika request mengharapkan JSON (API), return JSON response
-            if ($request->expectsJson() || $request->is('api/*')) {
+        // Untuk API request, cek Sanctum token
+        if ($request->is('api/*')) {
+            $user = Auth::guard('sanctum')->user();
+            
+            if (!$user) {
                 return response()->json([
                     'message' => 'Unauthenticated. Please login first.'
                 ], 401);
             }
             
-            // Jika web request, redirect ke login page
-            return redirect()->route('admin.login');
-        }
-
-        // Cek role admin
-        if (Auth::user()->role !== 'admin') {
-            if ($request->expectsJson() || $request->is('api/*')) {
+            if ($user->role !== 'admin') {
                 return response()->json([
                     'message' => 'Unauthorized. Admin access only.'
                 ], 403);
             }
             
+            // Set authenticated user
+            Auth::setUser($user);
+            return $next($request);
+        }
+
+        // Untuk web request, cek session
+        if (!Auth::check()) {
+            return redirect()->route('admin.login');
+        }
+
+        if (Auth::user()->role !== 'admin') {
             return redirect()->route('admin.login')
                 ->with('error', 'Anda tidak memiliki akses admin.');
         }

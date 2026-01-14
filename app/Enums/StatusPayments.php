@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum StatusDelivery: string
+enum StatusPayments: string
 {
     case REQUESTED = 'requested';
     case ASSIGNED = 'assigned';

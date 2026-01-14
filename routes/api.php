@@ -2,19 +2,29 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminMenuController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\AuthAdminController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\CartController;
 use App\Http\Controllers\Customers\CartItemController;
 use App\Http\Controllers\Customers\OrderController;
+use App\Http\Controllers\Customers\PaymentController;
 
-// Admin API (Untuk Admin Panel)
-Route::prefix('admin')->group(function () {
+// Admin Login (no auth required)
+Route::post('/admin/login', [AuthAdminController::class, 'login']);
+
+// Admin API - /api/admin/*
+Route::prefix('admin')->middleware('admin.auth')->group(function () {
     Route::get('/menus', [AdminMenuController::class, 'index'])->name('menus.index');
-    Route::get('/menus/{id}', [AdminMenuController::class, 'show'])->name('menus.show');
     Route::post('/menus', [AdminMenuController::class, 'store'])->name('menus.store');
+    Route::get('/menus/{id}', [AdminMenuController::class, 'show'])->name('menus.show');
     Route::put('/menus/{id}', [AdminMenuController::class, 'update'])->name('menus.update');
-    Route::patch('/menus/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menus.availability');
     Route::delete('/menus/{id}', [AdminMenuController::class, 'destroy'])->name('menus.destroy');
+    Route::patch('/menus/{id}/availability', [AdminMenuController::class, 'updateAvailability'])->name('menus.availability');
+
+    Route::get('/orders', [AdminOrderController::class, 'index']);
+    Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
+    Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
 });
 
 // Customer API - Catalogs (Public)
@@ -30,28 +40,20 @@ Route::prefix('customer')->group(function () {
 
 // Customer API - Cart & Orders (Guest Token Required)
 Route::prefix('customer')->middleware('guest.token')->group(function () {
-
     // Cart Management
-    // GET /api/customer/cart - View Cart
     Route::get('/cart', [CartController::class, 'show'])->name('customer.cart.show');
-
-    // POST /api/customer/cart/items - Add Item to Cart
     Route::post('/cart/items', [CartItemController::class, 'store'])->name('customer.cart.items.store');
-
-    // PUT /api/customer/cart/items/{id} - Update Cart Item Quantity
     Route::put('/cart/items/{id}', [CartItemController::class, 'update'])->name('customer.cart.items.update');
-
-    // DELETE /api/customer/cart/items/{id} - Delete Cart Item
     Route::delete('/cart/items/{id}', [CartItemController::class, 'destroy'])->name('customer.cart.items.destroy');
 
     // Orders
-    // GET /api/customer/orders - Get All Orders
-    // GET /api/customer/orders?status=pending - Get Orders by Status
     Route::get('/orders', [OrderController::class, 'index'])->name('customer.orders.index');
-
-    // POST /api/customer/orders - Create Order (Take Away, Dine In, Delivery)
     Route::post('/orders', [OrderController::class, 'store'])->name('customer.orders.store');
-
-    // GET /api/customer/orders/{id} - Get Order Detail
     Route::get('/orders/{id}', [OrderController::class, 'show'])->name('customer.orders.show');
+
+    // Payment
+    Route::post('/orders/{orderId}/pay', [PaymentController::class, 'pay']);
 });
+
+// Midtrans webhook
+Route::post('/webhooks/midtrans', [PaymentController::class, 'midtransWebhook']);

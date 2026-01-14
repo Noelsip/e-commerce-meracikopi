@@ -104,6 +104,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/katalog/{id}/edit', function ($id) {
             return view('admin.katalog.edit-katalog', compact('id'));
         })->name('katalog.edit');
+
+        // Order Management
+        Route::get('/orders', [AdminOrderController::class, 'index']);
+        Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
+        Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
     });
 });
 

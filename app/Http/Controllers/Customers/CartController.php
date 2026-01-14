@@ -51,8 +51,7 @@ class CartController extends Controller
 
         return response()->json([
             'data' => [
-                'items' => $items,
-                'total_price' => $totalPrice
+                'items' => $items,                'total' => $totalPrice,                'total_price' => $totalPrice
             ]
         ]);
     }
