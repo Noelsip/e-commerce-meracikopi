@@ -531,7 +531,7 @@
                         style="color: #fff4d6; font-size: 42px; font-weight: 700; line-height: 1.2; margin-bottom: 30px; max-width: 400px;">
                         Lihat biji kopi yang kami jual
                     </h2>
-                    <a href="#" class="highlight-btn" style="
+                    <a href="{{ url('/customer/catalogs?category=coffee_beans') }}" class="highlight-btn" style="
                         color: #fff4d6;
                         padding: 14px 28px;
                         border-radius: 50px;
@@ -566,7 +566,7 @@
                             style="color: #fff4d6; font-size: 28px; font-weight: 700; margin-bottom: 20px;">
                             Lihat makanan yang kami jual
                         </h3>
-                        <a href="#" class="highlight-btn" style="
+                        <a href="{{ url('/customer/catalogs?category=food') }}" class="highlight-btn" style="
                             color: #fff4d6;
                             padding: 10px 24px;
                             border-radius: 50px;
@@ -600,7 +600,7 @@
                             style="color: #fff4d6; font-size: 28px; font-weight: 700; margin-bottom: 20px;">
                             Lihat minuman yang kami jual
                         </h3>
-                        <a href="#" class="highlight-btn" style="
+                        <a href="{{ url('/customer/catalogs?category=drink') }}" class="highlight-btn" style="
                             color: #fff4d6;
                             padding: 10px 24px;
                             border-radius: 50px;
