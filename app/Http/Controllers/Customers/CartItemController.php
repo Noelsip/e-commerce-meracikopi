@@ -19,6 +19,7 @@ class CartItemController extends Controller
         $request->validate([
             'menu_id' => 'required|exists:menus,id',
             'quantity' => 'required|integer|min:1',
+            'note' => 'nullable|string|max:255',
         ]);
 
         // Mengambil guest token
@@ -29,7 +30,7 @@ class CartItemController extends Controller
             ->where('is_available', true)
             ->first();
 
-        if(!$menu){
+        if (!$menu) {
             return response()->json([
                 'message' => 'Menu not available'
             ], 404);
@@ -44,17 +45,19 @@ class CartItemController extends Controller
         $item = CartItem::where('cart_id', $cart->id)
             ->where('menu_id', $menu->id)
             ->first();
-        
-        if($item){
+
+        if ($item) {
             // menambah qty
             $item->quantity += $request->quantity;
+            $item->note = $request->note; // Update note if provided
             $item->save();
-        } else{
+        } else {
             // Membuat item baru
             CartItem::create([
                 'cart_id' => $cart->id,
                 'menu_id' => $menu->id,
-                'quantity' => $request->quantity
+                'quantity' => $request->quantity,
+                'note' => $request->note
             ]);
         }
 
