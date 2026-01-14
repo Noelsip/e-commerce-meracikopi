@@ -45,19 +45,19 @@
         <div class="rounded-xl border p-4" style="background-color: #2b211e; border-color: #3e302b;">
             <p class="text-sm font-medium" style="color: #f0f2bd;">Pending</p>
             <p class="text-2xl font-bold mt-1" style="color: #eab308;">
-                {{ $orders->where('status', App\Enums\OrderStatus::PENDING)->count() }}
+                {{ $orders->whereIn('status', [App\Enums\OrderStatus::CREATED, App\Enums\OrderStatus::PENDING_PAYMENT])->count() }}
             </p>
         </div>
         <div class="rounded-xl border p-4" style="background-color: #2b211e; border-color: #3e302b;">
             <p class="text-sm font-medium" style="color: #f0f2bd;">Proses</p>
             <p class="text-2xl font-bold mt-1" style="color: #3b82f6;">
-                {{ $orders->where('status', App\Enums\OrderStatus::PROCESS)->count() }}
+                {{ $orders->whereIn('status', [App\Enums\OrderStatus::PAID, App\Enums\OrderStatus::PROCESSING, App\Enums\OrderStatus::READY, App\Enums\OrderStatus::ON_DELIVERY])->count() }}
             </p>
         </div>
         <div class="rounded-xl border p-4" style="background-color: #2b211e; border-color: #3e302b;">
             <p class="text-sm font-medium" style="color: #f0f2bd;">Selesai</p>
             <p class="text-2xl font-bold mt-1" style="color: #22c55e;">
-                {{ $orders->where('status', App\Enums\OrderStatus::DONE)->count() }}
+                {{ $orders->where('status', App\Enums\OrderStatus::COMPLETED)->count() }}
             </p>
         </div>
         <div class="rounded-xl border p-4" style="background-color: #2b211e; border-color: #3e302b;">
@@ -100,17 +100,30 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-sm">
+                            @php
+                                $statusColors = [
+                                    'created' => '#eab308',
+                                    'pending_payment' => '#eab308',
+                                    'paid' => '#3b82f6',
+                                    'processing' => '#3b82f6',
+                                    'ready' => '#22c55e',
+                                    'on_delivery' => '#f97316',
+                                    'completed' => '#22c55e',
+                                    'cancelled' => '#ef4444',
+                                ];
+                                $currentColor = $statusColors[$order->status->value] ?? '#f0f2bd';
+                            @endphp
                             <select onchange="updateOrderStatus({{ $order->id }}, this.value)"
                                 class="px-2 py-1 rounded text-xs cursor-pointer"
-                                style="background-color: #3e302b; border: none;
-                                        color: {{ $order->status->value == 'pending' ? '#eab308' : ($order->status->value == 'process' ? '#3b82f6' : ($order->status->value == 'done' ? '#22c55e' : '#ef4444')) }};">
-                                <option value="pending" {{ $order->status->value == 'pending' ? 'selected' : '' }}>Pending
-                                </option>
-                                <option value="process" {{ $order->status->value == 'process' ? 'selected' : '' }}>Proses
-                                </option>
-                                <option value="done" {{ $order->status->value == 'done' ? 'selected' : '' }}>Selesai</option>
-                                <option value="cancelled" {{ $order->status->value == 'cancelled' ? 'selected' : '' }}>Batal
-                                </option>
+                                style="background-color: #3e302b; border: none; color: {{ $currentColor }};">
+                                <option value="created" {{ $order->status->value == 'created' ? 'selected' : '' }}>Dibuat</option>
+                                <option value="pending_payment" {{ $order->status->value == 'pending_payment' ? 'selected' : '' }}>Menunggu Pembayaran</option>
+                                <option value="paid" {{ $order->status->value == 'paid' ? 'selected' : '' }}>Dibayar</option>
+                                <option value="processing" {{ $order->status->value == 'processing' ? 'selected' : '' }}>Diproses</option>
+                                <option value="ready" {{ $order->status->value == 'ready' ? 'selected' : '' }}>Siap</option>
+                                <option value="on_delivery" {{ $order->status->value == 'on_delivery' ? 'selected' : '' }}>Diantar</option>
+                                <option value="completed" {{ $order->status->value == 'completed' ? 'selected' : '' }}>Selesai</option>
+                                <option value="cancelled" {{ $order->status->value == 'cancelled' ? 'selected' : '' }}>Batal</option>
                             </select>
                         </td>
                         <td class="px-4 py-3 text-sm font-medium" style="color: #22c55e;">

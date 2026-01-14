@@ -20,14 +20,115 @@
             margin: 0;
             overflow: hidden;
         }
+
+        /* ========== ADMIN RESPONSIVE STYLES ========== */
+
+        /* Mobile Menu Button */
+        .admin-mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            color: #f0f2bd;
+        }
+
+        /* Sidebar Overlay */
+        .admin-sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 40;
+        }
+
+        .admin-sidebar-overlay.active {
+            display: block;
+        }
+
+        /* Responsive Rules */
+        @media (max-width: 768px) {
+
+            /* Show mobile menu button */
+            .admin-mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Sidebar as drawer */
+            .admin-sidebar {
+                position: fixed !important;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+                z-index: 50;
+                transition: left 0.3s ease;
+                width: 280px !important;
+            }
+
+            .admin-sidebar.active {
+                left: 0;
+            }
+
+            /* Header adjustments */
+            .admin-header-search {
+                display: none !important;
+            }
+
+            .admin-header-user-details {
+                display: none !important;
+            }
+
+            .admin-header-logout-desktop {
+                display: none !important;
+            }
+
+            /* Main content full width */
+            .admin-main-wrapper {
+                width: 100% !important;
+            }
+
+            /* Header title smaller */
+            .admin-header-title {
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-content {
+                padding: 1rem !important;
+            }
+        }
+
+        /* Table responsive */
+        .admin-table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
 
 <body class="font-sans antialiased h-full" style="background-color: #3a2a1f;">
+    <!-- Mobile Sidebar Overlay -->
+    <div class="admin-sidebar-overlay" id="adminSidebarOverlay" onclick="toggleAdminSidebar()"></div>
+
     <div class="h-full flex overflow-hidden">
         <!-- Sidebar -->
-        <aside class="w-64 flex-shrink-0 flex flex-col transition-all duration-300"
+        <aside id="adminSidebar" class="admin-sidebar w-64 flex-shrink-0 flex flex-col transition-all duration-300"
             style="background-color: #2b211e; border-right: 1px solid #3e302b;">
+
+            <!-- Mobile Close Button -->
+            <button class="admin-mobile-menu-btn" onclick="toggleAdminSidebar()"
+                style="position: absolute; top: 16px; right: 16px; z-index: 51;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
 
             <!-- Logo -->
             <div class="p-6">
@@ -136,17 +237,27 @@
         </aside>
 
         <!-- Main Content Wrapper -->
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div class="admin-main-wrapper flex-1 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
             <header class="px-6 py-3 flex-shrink-0 z-10 shadow-sm" style="background-color: #2b211e;">
                 <div class="flex items-center justify-between">
+                    <!-- Mobile Menu Button -->
+                    <button class="admin-mobile-menu-btn" onclick="toggleAdminSidebar()" style="margin-right: 12px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <line x1="3" y1="12" x2="21" y2="12"></line>
+                            <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                    </button>
+
                     <!-- Title -->
-                    <h1 class="text-xl font-semibold" style="color: #f0f2bd;">
+                    <h1 class="admin-header-title text-xl font-semibold" style="color: #f0f2bd;">
                         {{ $title ?? 'Dashboard' }}
                     </h1>
 
                     <!-- Search Bar -->
-                    <div class="flex-1 max-w-md mx-8">
+                    <div class="admin-header-search flex-1 max-w-md mx-8">
                         <div class="relative flex items-center">
                             <svg class="absolute w-5 h-5" style="left: 16px; color: #f0f2bd;" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
@@ -162,12 +273,13 @@
                     <!-- User Info -->
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full" style="background-color: #6b4d3a;"></div>
-                        <div class="text-right">
+                        <div class="admin-header-user-details text-right">
                             <p class="font-medium" style="color: #f0f2bd;">{{ Auth::user()->name ?? 'Admin' }}</p>
                             <p class="text-xs" style="color: #f0f2bd;">{{ Auth::user()->email ?? 'admin@meracikopi.com'
                                 }}</p>
                         </div>
-                        <form method="POST" action="{{ route('admin.logout') }}" class="ml-2">
+                        <form method="POST" action="{{ route('admin.logout') }}"
+                            class="admin-header-logout-desktop ml-2">
                             @csrf
                             <button type="submit"
                                 class="header-logout-btn text-sm px-3 py-1 rounded transition-all duration-200"
@@ -180,11 +292,21 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-1 overflow-y-auto p-6 scroll-smooth" style="background-color: #1e1715;">
+            <main class="admin-content flex-1 overflow-y-auto p-6 scroll-smooth" style="background-color: #1e1715;">
                 {{ $slot }}
             </main>
         </div>
     </div>
+
+    <script>
+        function toggleAdminSidebar() {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('adminSidebarOverlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+    </script>
 </body>
 
 </html>

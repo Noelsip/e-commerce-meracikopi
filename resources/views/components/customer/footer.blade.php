@@ -1,10 +1,12 @@
-<footer
+<footer class="footer-container"
     style="background-color: #231812; padding: 80px 80px 40px 80px; color: white; border-top: 1px solid rgba(255,255,255,0.05);">
     <div style="max-width: 1200px; margin: 0 auto;">
-        <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 60px;">
+        <div class="footer-grid"
+            style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 60px;">
             <!-- Brand Column -->
-            <div>
-                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <div class="footer-brand">
+                <div class="footer-brand-inner"
+                    style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
                     <!-- Logo Placeholder -->
                     <div style="width: 60px; height: 60px; background-color: white; border-radius: 50%;"></div>
                     <div>
@@ -14,7 +16,7 @@
                     </div>
                 </div>
                 <!-- Social Icons -->
-                <div style="display: flex; gap: 15px;">
+                <div class="footer-social" style="display: flex; gap: 15px;">
                     <!-- Instagram -->
                     <a href="#" style="color: white; text-decoration: none;">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -52,7 +54,7 @@
             </div>
 
             <!-- Quick Links -->
-            <div>
+            <div class="footer-section">
                 <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">Quick Links</h4>
                 <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
                     <li><a href="#"
@@ -70,7 +72,7 @@
             </div>
 
             <!-- Contact Info -->
-            <div>
+            <div class="footer-section">
                 <h4 style="font-size: 18px; font-weight: 600; margin-bottom: 24px;">Contact Info</h4>
                 <div style="display: flex; flex-direction: column; gap: 12px;">
                     <p style="color: #a89890; font-size: 14px; margin: 0; line-height: 1.6;">
