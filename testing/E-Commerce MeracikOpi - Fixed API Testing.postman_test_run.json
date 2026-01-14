@@ -1,0 +1,880 @@
+{
+	"id": "43960830-2e4b-4be3-b0d2-54154ea19ac5",
+	"name": "E-Commerce MeracikOpi - Fixed API Testing",
+	"timestamp": "2026-01-08T10:01:22.754Z",
+	"collection_id": "42895512-5cfad36f-3663-4603-9742-3a36c9cfc5f0",
+	"folder_id": 0,
+	"environment_id": "42895512-e1baf391-f439-4001-994e-b6c65896413a",
+	"totalPass": 24,
+	"delay": "100",
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2026-01-08T10:00:46.601Z",
+	"totalFail": 19,
+	"results": [
+		{
+			"id": "406b7850-8a6d-4866-b7b3-1f257d459fb5",
+			"name": "Admin Login",
+			"url": "http://127.0.0.1:8000/admin/login",
+			"time": 1968,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 or 302": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200 or 302": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1968
+			],
+			"allTests": [
+				{
+					"Status code is 200 or 302": true
+				}
+			]
+		},
+		{
+			"id": "26b213a3-ae71-4f51-8b31-175e78da0f30",
+			"name": "Create Menu",
+			"url": "http://127.0.0.1:8000/api/admin/menus",
+			"time": 1168,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 201": false,
+				"Menu Created": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Menu Created": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1168
+			],
+			"allTests": [
+				{
+					"Status code is 201": false,
+					"Menu Created": false
+				}
+			]
+		},
+		{
+			"id": "6925cafe-5e32-4a46-9b29-ce5c5d0f1d28",
+			"name": "Get All Menus",
+			"url": "http://127.0.0.1:8000/api/admin/menus",
+			"time": 1135,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Response has data": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response has data": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1135
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Response has data": false
+				}
+			]
+		},
+		{
+			"id": "833d62fa-f3a6-4cdb-91a2-8a914f93cd44",
+			"name": "Get All Menus - Filter Available",
+			"url": "http://127.0.0.1:8000/api/admin/menus?is_available=1",
+			"time": 1146,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"All menus are available": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"All menus are available": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1146
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"All menus are available": true
+				}
+			]
+		},
+		{
+			"id": "0fe1caaf-9c2a-4fd4-afb7-16bbdbe09d6a",
+			"name": "Search Menu by Name",
+			"url": "http://127.0.0.1:8000/api/admin/menus?search=kopi",
+			"time": 1150,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1150
+			],
+			"allTests": [
+				{
+					"Status code is 200": false
+				}
+			]
+		},
+		{
+			"id": "0c1fcce0-41f6-4bbe-b5c7-59af5cff4236",
+			"name": "Get Menu by ID",
+			"url": "http://127.0.0.1:8000/api/admin/menus/9",
+			"time": 1265,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Response has menu data": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response has menu data": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1265
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Response has menu data": false
+				}
+			]
+		},
+		{
+			"id": "5df756fe-a856-4544-8a40-4d0f3bfe43f8",
+			"name": "Update Menu",
+			"url": "http://127.0.0.1:8000/api/admin/menus/9",
+			"time": 1191,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Menu Updated": false,
+				"Price is updated": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Menu Updated": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Price is updated": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1191
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Menu Updated": false,
+					"Price is updated": false
+				}
+			]
+		},
+		{
+			"id": "4cb06834-3604-47d0-a140-e11669f2e3fb",
+			"name": "Update Menu Availability",
+			"url": "http://127.0.0.1:8000/api/admin/menus/9/availability",
+			"time": 1230,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Availability Updated": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Availability Updated": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1230
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Availability Updated": false
+				}
+			]
+		},
+		{
+			"id": "fc34502c-1aa6-4817-9f93-799cbcbebcf3",
+			"name": "Delete Menu",
+			"url": "http://127.0.0.1:8000/api/admin/menus/9",
+			"time": 1162,
+			"responseCode": {
+				"code": 401,
+				"name": "Unauthorized"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Menu Deleted": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Menu Deleted": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1162
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Menu Deleted": false
+				}
+			]
+		},
+		{
+			"id": "95ba8b63-b256-44a1-af5c-9b5cacda6173",
+			"name": "Get All Catalogs",
+			"url": "http://127.0.0.1:8000/api/customer/catalogs",
+			"time": 1230,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response has data": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has data": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1230
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response has data": true
+				}
+			]
+		},
+		{
+			"id": "b170b036-9961-4407-92c9-a4f8221e63fe",
+			"name": "Get Available Catalogs Only",
+			"url": "http://127.0.0.1:8000/api/customer/catalogs?is_available=1",
+			"time": 1156,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"All catalogs are available": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"All catalogs are available": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1156
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"All catalogs are available": true
+				}
+			]
+		},
+		{
+			"id": "4528088b-98e0-476a-8efe-70de724d6a78",
+			"name": "Search Catalog by Name",
+			"url": "http://127.0.0.1:8000/api/customer/catalogs?search=kopi",
+			"time": 1183,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1183
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "d79ecd7c-c0b6-4272-99fb-8ca0dcd4341c",
+			"name": "Get Catalog Detail by ID",
+			"url": "http://127.0.0.1:8000/api/customer/catalogs/1",
+			"time": 1240,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response has catalog data": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has catalog data": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1240
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response has catalog data": true
+				}
+			]
+		},
+		{
+			"id": "526c653a-2bb0-41b3-b366-f4b66a45834d",
+			"name": "Add Item to Cart",
+			"url": "http://127.0.0.1:8000/api/customer/cart/items",
+			"time": 1477,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Item added to cart": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Item added to cart": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1477
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Item added to cart": true
+				}
+			]
+		},
+		{
+			"id": "29ffc127-d51e-4e54-921c-96f9f33e3467",
+			"name": "Add Another Item to Cart",
+			"url": "http://127.0.0.1:8000/api/customer/cart/items",
+			"time": 1288,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Item added to cart": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Item added to cart": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1288
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Item added to cart": true
+				}
+			]
+		},
+		{
+			"id": "a3f80ba9-0a4a-4f27-8a29-01309ef05150",
+			"name": "View Cart",
+			"url": "http://127.0.0.1:8000/api/customer/cart",
+			"time": 1222,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response has cart data": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has cart data": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1222
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response has cart data": false
+				}
+			]
+		},
+		{
+			"id": "9b71d6ba-d1fe-4626-bd11-2a6f14a20cf8",
+			"name": "Update Cart Item Quantity",
+			"url": "http://127.0.0.1:8000/api/customer/cart/items/2",
+			"time": 1168,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Cart item updated": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Cart item updated": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1168
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Cart item updated": true
+				}
+			]
+		},
+		{
+			"id": "a564e390-ab60-4d04-a68d-3227fdd73104",
+			"name": "Delete Cart Item",
+			"url": "http://127.0.0.1:8000/api/customer/cart/items/2",
+			"time": 1032,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Item removed from cart": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Item removed from cart": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1032
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Item removed from cart": true
+				}
+			]
+		},
+		{
+			"id": "1d1d27cf-349f-4eca-bf68-248618ee6868",
+			"name": "Create Order - Take Away",
+			"url": "http://127.0.0.1:8000/api/customer/orders",
+			"time": 1812,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true,
+				"Order Created": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Order Created": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1812
+			],
+			"allTests": [
+				{
+					"Status code is 201": true,
+					"Order Created": true
+				}
+			]
+		},
+		{
+			"id": "0f0c7843-bd0b-41e9-a9cb-fb69f987ce9b",
+			"name": "Create Order - Dine In",
+			"url": "http://127.0.0.1:8000/api/customer/orders",
+			"time": 1344,
+			"responseCode": {
+				"code": 500,
+				"name": "Internal Server Error"
+			},
+			"tests": {
+				"Status code is 201": false
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1344
+			],
+			"allTests": [
+				{
+					"Status code is 201": false
+				}
+			]
+		},
+		{
+			"id": "3d09e968-fdde-47da-9eb2-b23eb03cfb18",
+			"name": "Create Order - Delivery",
+			"url": "http://127.0.0.1:8000/api/customer/orders",
+			"time": 1348,
+			"responseCode": {
+				"code": 201,
+				"name": "Created"
+			},
+			"tests": {
+				"Status code is 201": true
+			},
+			"testPassFailCounts": {
+				"Status code is 201": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1348
+			],
+			"allTests": [
+				{
+					"Status code is 201": true
+				}
+			]
+		},
+		{
+			"id": "e6c0225e-098b-4aa9-8eed-8e612db47db4",
+			"name": "Get All Orders",
+			"url": "http://127.0.0.1:8000/api/customer/orders",
+			"time": 1355,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response has data": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has data": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1355
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response has data": true
+				}
+			]
+		},
+		{
+			"id": "aa47ca3c-e43c-48c3-ae75-6f90f510dc51",
+			"name": "Get Orders by Status",
+			"url": "http://127.0.0.1:8000/api/customer/orders?status=pending",
+			"time": 1198,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				1198
+			],
+			"allTests": [
+				{
+					"Status code is 200": true
+				}
+			]
+		},
+		{
+			"id": "03751852-996b-440e-904a-51ad222c6bc3",
+			"name": "Get Order Detail",
+			"url": "http://127.0.0.1:8000/api/customer/orders/1",
+			"time": 1290,
+			"responseCode": {
+				"code": 500,
+				"name": "Internal Server Error"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Response has order data": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response has order data": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				1290
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Response has order data": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 30758,
+	"collection": {
+		"requests": [
+			{
+				"id": "406b7850-8a6d-4866-b7b3-1f257d459fb5",
+				"method": "POST"
+			},
+			{
+				"id": "26b213a3-ae71-4f51-8b31-175e78da0f30",
+				"method": "POST"
+			},
+			{
+				"id": "6925cafe-5e32-4a46-9b29-ce5c5d0f1d28",
+				"method": "GET"
+			},
+			{
+				"id": "833d62fa-f3a6-4cdb-91a2-8a914f93cd44",
+				"method": "GET"
+			},
+			{
+				"id": "0fe1caaf-9c2a-4fd4-afb7-16bbdbe09d6a",
+				"method": "GET"
+			},
+			{
+				"id": "0c1fcce0-41f6-4bbe-b5c7-59af5cff4236",
+				"method": "GET"
+			},
+			{
+				"id": "5df756fe-a856-4544-8a40-4d0f3bfe43f8",
+				"method": "PUT"
+			},
+			{
+				"id": "4cb06834-3604-47d0-a140-e11669f2e3fb",
+				"method": "PATCH"
+			},
+			{
+				"id": "fc34502c-1aa6-4817-9f93-799cbcbebcf3",
+				"method": "DELETE"
+			},
+			{
+				"id": "95ba8b63-b256-44a1-af5c-9b5cacda6173",
+				"method": "GET"
+			},
+			{
+				"id": "b170b036-9961-4407-92c9-a4f8221e63fe",
+				"method": "GET"
+			},
+			{
+				"id": "4528088b-98e0-476a-8efe-70de724d6a78",
+				"method": "GET"
+			},
+			{
+				"id": "d79ecd7c-c0b6-4272-99fb-8ca0dcd4341c",
+				"method": "GET"
+			},
+			{
+				"id": "526c653a-2bb0-41b3-b366-f4b66a45834d",
+				"method": "POST"
+			},
+			{
+				"id": "29ffc127-d51e-4e54-921c-96f9f33e3467",
+				"method": "POST"
+			},
+			{
+				"id": "a3f80ba9-0a4a-4f27-8a29-01309ef05150",
+				"method": "GET"
+			},
+			{
+				"id": "9b71d6ba-d1fe-4626-bd11-2a6f14a20cf8",
+				"method": "PUT"
+			},
+			{
+				"id": "a564e390-ab60-4d04-a68d-3227fdd73104",
+				"method": "DELETE"
+			},
+			{
+				"id": "1d1d27cf-349f-4eca-bf68-248618ee6868",
+				"method": "POST"
+			},
+			{
+				"id": "0f0c7843-bd0b-41e9-a9cb-fb69f987ce9b",
+				"method": "POST"
+			},
+			{
+				"id": "3d09e968-fdde-47da-9eb2-b23eb03cfb18",
+				"method": "POST"
+			},
+			{
+				"id": "e6c0225e-098b-4aa9-8eed-8e612db47db4",
+				"method": "GET"
+			},
+			{
+				"id": "aa47ca3c-e43c-48c3-ae75-6f90f510dc51",
+				"method": "GET"
+			},
+			{
+				"id": "03751852-996b-440e-904a-51ad222c6bc3",
+				"method": "GET"
+			}
+		]
+	}
+}
