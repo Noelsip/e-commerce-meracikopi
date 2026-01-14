@@ -17,20 +17,22 @@ class MenuAdminController extends Controller
 
     public function create()
     {
-        return view('admin.menus.create');
+        $categories = Menus::CATEGORIES;
+        return view('admin.menus.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'category' => 'required|in:food,drink,coffee_beans',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_available' => 'boolean',
         ]);
 
-        $data = $request->only(['name', 'description', 'price']);
+        $data = $request->only(['name', 'category', 'description', 'price']);
         $data['is_available'] = $request->has('is_available');
 
         if ($request->hasFile('image')) {
@@ -45,20 +47,22 @@ class MenuAdminController extends Controller
 
     public function edit(Menus $menu)
     {
-        return view('admin.menus.edit', compact('menu'));
+        $categories = Menus::CATEGORIES;
+        return view('admin.menus.edit', compact('menu', 'categories'));
     }
 
     public function update(Request $request, Menus $menu)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'category' => 'required|in:food,drink,coffee_beans',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_available' => 'boolean',
         ]);
 
-        $data = $request->only(['name', 'description', 'price']);
+        $data = $request->only(['name', 'category', 'description', 'price']);
         $data['is_available'] = $request->has('is_available');
 
         if ($request->hasFile('image')) {

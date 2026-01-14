@@ -26,6 +26,22 @@
                 @enderror
             </div>
 
+            <!-- Category -->
+            <div>
+                <label for="category" class="block text-sm font-medium mb-2" style="color: #f0f2bd;">Kategori</label>
+                <select id="category" name="category" required
+                    class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    style="background-color: #3e302b; border: 1px solid #5a4032; color: #f0f2bd;">
+                    @foreach($categories as $value => $label)
+                        <option value="{{ $value }}" {{ old('category', $menu->category) == $value ? 'selected' : '' }}>
+                            {{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('category')
+                    <p class="text-red-400 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
             <!-- Description -->
             <div>
                 <label for="description" class="block text-sm font-medium mb-2"

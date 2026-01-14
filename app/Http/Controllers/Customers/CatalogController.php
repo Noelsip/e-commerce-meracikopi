@@ -20,6 +20,11 @@ class CatalogController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
+        // Filter by category
+        if ($request->has('category') && $request->category) {
+            $query->where('category', $request->category);
+        }
+
         $menus = $query->orderBy('name')->get();
 
         return view('pages.guest.catalogs.index', compact('menus'));

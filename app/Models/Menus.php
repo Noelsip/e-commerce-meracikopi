@@ -14,6 +14,7 @@ class Menus extends Model
     protected $table = 'menus';
     protected $fillable = [
         'name',
+        'category',
         'description',
         'price',
         'image_path',
@@ -23,6 +24,12 @@ class Menus extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'is_available' => 'boolean',
+    ];
+
+    public const CATEGORIES = [
+        'food' => 'Food',
+        'drink' => 'Drink',
+        'coffee_beans' => 'Coffee Beans',
     ];
 
     public function orderItems()
