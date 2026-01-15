@@ -1,0 +1,633 @@
+{
+  "info": {
+    "name": "E-Commerce MeracikOpi - Complete with Discount & Delivery",
+    "_postman_id": "meracikopi-v2-2026",
+    "description": "Complete API collection for E-Commerce MeracikOpi with discount and delivery fee features",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Customer API",
+      "item": [
+        {
+          "name": "Catalog",
+          "item": [
+            {
+              "name": "Get All Menus (with Discount)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/catalogs",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "catalogs"]
+                },
+                "description": "Get all menus with discount information"
+              }
+            },
+            {
+              "name": "Get Menu Detail",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/catalogs/{{menu_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "catalogs", "{{menu_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Search Menus",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/catalogs?search=kopi",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "catalogs"],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "kopi"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Filter by Category",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/catalogs?category=drink",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "catalogs"],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "drink"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cart",
+          "item": [
+            {
+              "name": "View Cart",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/cart",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "cart"]
+                }
+              }
+            },
+            {
+              "name": "Add Item to Cart",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"menu_id\": 1,\n  \"quantity\": 2,\n  \"note\": \"Less sugar\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/cart/items",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "cart", "items"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Cart Item",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 3,\n  \"note\": \"Extra hot\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/cart/items/{{cart_item_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "cart", "items", "{{cart_item_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Remove Cart Item",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/cart/items/{{cart_item_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "cart", "items", "{{cart_item_id}}"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delivery",
+          "item": [
+            {
+              "name": "Calculate Delivery Fee",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 200) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set(\"delivery_fee\", response.data.delivery_fee);",
+                      "    console.log(\"Delivery fee saved:\", response.data.delivery_fee);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"destination\": {\n    \"latitude\": -6.175110,\n    \"longitude\": 106.865036,\n    \"address\": \"Jl. Gatot Subroto No. 123, Jakarta Selatan\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/delivery/calculate-fee",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "delivery", "calculate-fee"]
+                },
+                "description": "Calculate delivery fee based on destination coordinates"
+              }
+            },
+            {
+              "name": "Get Delivery Options",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/delivery/options",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "delivery", "options"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Orders",
+          "item": [
+            {
+              "name": "Checkout - Dine In",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set(\"order_id\", response.data.id);",
+                      "    console.log(\"Order ID saved:\", response.data.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_name\": \"John Doe\",\n  \"customer_phone\": \"08123456789\",\n  \"order_type\": \"dine_in\",\n  \"table_id\": 1,\n  \"notes\": \"Less sugar untuk semua minuman\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders"]
+                },
+                "description": "Create order for dine in (no delivery fee)"
+              }
+            },
+            {
+              "name": "Checkout - Take Away",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set(\"order_id\", response.data.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_name\": \"John Doe\",\n  \"customer_phone\": \"08123456789\",\n  \"order_type\": \"take_away\",\n  \"notes\": \"Tolong siapkan sebelum jam 12\"\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Checkout - Delivery (with Fee)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set(\"order_id\", response.data.id);",
+                      "    ",
+                      "    // Verify calculation",
+                      "    const data = response.data;",
+                      "    const expectedFinal = data.total_price + data.delivery_fee - data.discount_amount;",
+                      "    pm.test(\"Final price calculation correct\", () => {",
+                      "        pm.expect(data.final_price).to.eql(expectedFinal);",
+                      "    });",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"customer_name\": \"John Doe\",\n  \"customer_phone\": \"08123456789\",\n  \"order_type\": \"delivery\",\n  \"delivery_fee\": {{delivery_fee}},\n  \"notes\": \"Jangan pakai bawang putih\",\n  \"address\": {\n    \"receiver_name\": \"John Doe\",\n    \"phone\": \"08123456789\",\n    \"full_address\": \"Jl. Sudirman No. 123, RT 01/RW 05\",\n    \"city\": \"Jakarta\",\n    \"postal_code\": \"12190\",\n    \"notes\": \"Rumah warna hijau, nomor 123\"\n  }\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders"]
+                },
+                "description": "Create delivery order with calculated delivery fee"
+              }
+            },
+            {
+              "name": "Get All Orders",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders"]
+                }
+              }
+            },
+            {
+              "name": "Get Order Detail",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders/{{order_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders", "{{order_id}}"]
+                }
+              }
+            },
+            {
+              "name": "Filter Orders by Status",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "X-Guest-Token",
+                    "value": "{{guest_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/customer/orders?status=pending_payment",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "customer", "orders"],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "pending_payment"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin API",
+      "item": [
+        {
+          "name": "Menus",
+          "item": [
+            {
+              "name": "Create Menu - Discount Percentage",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cappuccino Special\",\n  \"category\": \"drink\",\n  \"description\": \"Cappuccino with special foam\",\n  \"price\": 35000,\n  \"discount_percentage\": 15,\n  \"discount_price\": 0,\n  \"is_available\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus"]
+                },
+                "description": "Create menu with percentage discount (15% off)"
+              }
+            },
+            {
+              "name": "Create Menu - Discount Nominal",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Nasi Goreng Special\",\n  \"category\": \"food\",\n  \"description\": \"Nasi goreng dengan telur dan ayam\",\n  \"price\": 35000,\n  \"discount_percentage\": 0,\n  \"discount_price\": 5000,\n  \"is_available\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus"]
+                },
+                "description": "Create menu with nominal discount (Rp 5.000 off)"
+              }
+            },
+            {
+              "name": "Create Menu - No Discount",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Americano\",\n  \"category\": \"drink\",\n  \"description\": \"Classic americano\",\n  \"price\": 25000,\n  \"discount_percentage\": 0,\n  \"discount_price\": 0,\n  \"is_available\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus"]
+                }
+              }
+            },
+            {
+              "name": "Update Menu Discount",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Cappuccino Special\",\n  \"category\": \"drink\",\n  \"price\": 35000,\n  \"discount_percentage\": 20,\n  \"discount_price\": 0,\n  \"is_available\": true\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus/{{menu_id}}",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus", "{{menu_id}}"]
+                },
+                "description": "Update menu discount from 15% to 20%"
+              }
+            },
+            {
+              "name": "Get All Menus",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus"]
+                }
+              }
+            },
+            {
+              "name": "Toggle Menu Availability",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"is_available\": false\n}"
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/admin/menus/{{menu_id}}/availability",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "admin", "menus", "{{menu_id}}", "availability"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "guest_token",
+      "value": "550e8400-e29b-41d4-a716-446655440000",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "menu_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cart_item_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "delivery_fee",
+      "value": "0",
+      "type": "string"
+    }
+  ]
+}

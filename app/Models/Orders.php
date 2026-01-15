@@ -24,13 +24,33 @@ class Orders extends Model
         'customer_phone',
         'status',
         'total_price',
+        'delivery_fee',
+        'discount_amount',
+        'final_price',
+        'notes',
     ];
 
     protected $casts = [
         'order_type' => OrderType::class,
         'status' => OrderStatus::class,
         'total_price' => 'decimal:2',
+        'delivery_fee' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'final_price' => 'decimal:2',
     ];
+
+    /**
+     * Menghitung dan update final_price
+     * 
+     * Formula: final_price = total_price + delivery_fee - discount_amount
+     * 
+     * @return void
+     */
+    public function calculateFinalPrice()
+    {
+        $this->final_price = $this->total_price + $this->delivery_fee - $this->discount_amount;
+        $this->final_price = max(0, $this->final_price); // Tidak boleh negatif
+    }
 
     public function user()
     {

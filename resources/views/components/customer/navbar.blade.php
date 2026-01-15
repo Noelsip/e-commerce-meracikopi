@@ -2,9 +2,9 @@
     /* Search bar styling */
     .navbar-search-input {
         width: 320px;
-        padding: 10px 16px 10px 44px;
-        background-color: rgba(75, 53, 42, 0.8);
-        border: 1px solid rgba(100, 75, 60, 0.6);
+        padding: 0 16px 0 44px;
+        background-color: #4b3c35;
+        border: none;
         border-radius: 24px;
         color: #f0f2bd;
         font-size: 14px;
@@ -38,7 +38,7 @@
 
     .nav-link-main.active {
         color: #ffffff;
-        border-bottom: 2px solid #ffffff;
+        border-bottom: 3px solid #ffffff;
     }
 
     /* Find a Cafe button */
@@ -82,10 +82,11 @@
 </style>
 
 <!-- Navbar Container -->
-<div style="background-color: #2b211e;">
+<div style="background-color: #1a1410; padding: 0 20px;">
+    <div style="background-color: #2a1b14; border-radius: 0 0 24px 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); max-width: 1440px; margin: 0 auto; min-height: 115px;">
     <!-- Top Row: Logo, Search, Find a Cafe, Cart -->
-    <div style="padding: 16px 24px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; max-width: 1280px; margin: 0 auto;">
+    <div style="padding: 20px 40px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; max-width: 1360px; margin: 0 auto; position: relative;">
             
             <!-- Left: Logo -->
             <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
@@ -103,12 +104,12 @@
             </a>
 
             <!-- Center: Search Bar -->
-            <form method="GET" action="{{ url('/customer/catalogs') }}" class="navbar-search-wrapper" style="flex: 1; max-width: 400px; margin: 0 40px;">
+            <form method="GET" action="{{ url('/customer/catalogs') }}" class="navbar-search-wrapper" style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); width: 100%; max-width: 629px;">
                 <div style="position: relative;">
                     <input type="text" name="search" value="{{ request('search') }}" 
                            placeholder="What Do you Want Today?" 
-                           class="navbar-search-input" style="width: 100%;">
-                    <svg style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: rgba(200, 190, 180, 0.7);" 
+                           class="navbar-search-input" style="width: 100%; height: 30px;">
+                    <svg style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: rgba(200, 190, 180, 0.7);" 
                          fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                               d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -117,10 +118,10 @@
             </form>
 
             <!-- Right: Find a Cafe & Cart -->
-            <div style="display: flex; align-items: center; gap: 24px;">
+            <div style="display: flex; align-items: center; gap: 40px;">
                 <!-- Find a Cafe -->
-                <a href="#" class="find-cafe-btn">
-                    <svg style="width: 18px; height: 18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="https://www.google.com/maps/search/Meracikopi/@-1.2248893,116.8632845,17z" target="_blank" class="find-cafe-btn">
+                    <svg style="width: 20px; height: 25px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -132,7 +133,7 @@
                 <!-- Cart Icon -->
                 <a href="#" style="color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
-                    <svg style="width: 24px; height: 24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg style="width: 25px; height: 25px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                               d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
@@ -152,13 +153,12 @@
     </div>
 
     <!-- Bottom Row: Navigation Links -->
-    <div class="navbar-desktop-menu" style="padding: 0 24px 16px 24px;">
-        <div style="display: flex; align-items: center; gap: 32px; max-width: 1280px; margin: 0 auto;">
-            <a href="/" class="nav-link-main {{ request()->is('/') ? 'active' : '' }}">Home</a>
-            <a href="{{ url('/customer/catalogs') }}" class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}">Menu</a>
-            <a href="#" class="nav-link-main">Contact</a>
-            <a href="#" class="nav-link-main">Order History</a>
+    <div class="navbar-desktop-menu" style="padding: 0 40px 24px 40px;">
+        <div style="display: flex; align-items: center; gap: 32px; max-width: 1360px; margin: 0 auto;">
+            <a href="/" class="nav-link-main {{ request()->is('/') ? 'active' : '' }}" style="font-weight: 600;">Home</a>
+            <a href="{{ url('/customer/catalogs') }}" class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}" style="font-weight: 600;">Catalog</a>
         </div>
+    </div>
     </div>
 </div>
 
@@ -197,20 +197,20 @@
 </script>
 
 <!-- Announcement Bar -->
-<div style="
-    background-color: #1a1410;
-    padding: 12px 24px; 
-    text-align: center;
-">
-    <p style="
-        color: #F8F5F2; 
-        font-size: 11px; 
-        margin: 0; 
-        letter-spacing: 0.2em;
-        font-weight: 400;
-        text-transform: uppercase;
-        opacity: 0.85;
+<div style="background-color: #0f0b08; padding: 0; margin-top: 60px;">
+    <div style="
+        padding: 16px 24px; 
+        text-align: center;
+        background: radial-gradient(50% 100% at 50% 50%, #322015 0%, rgba(15, 11, 8, 0) 100%);
     ">
-        Nikmati kopi pilihan hari ini Dine In & Delivery tersedia
-    </p>
+        <p style="
+            color: #E8E0D5; 
+            font-size: 14px; 
+            margin: 0; 
+            letter-spacing: 0.1em;
+            font-weight: 500;
+        ">
+            Nikmati kopi pilihan hari ini &nbsp;<span style="opacity: 0.6;">|</span>&nbsp; Dine In & Delivery tersedia
+        </p>
+    </div>
 </div>

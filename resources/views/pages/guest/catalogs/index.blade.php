@@ -100,7 +100,7 @@
                                     {{ $menu->name }}
                                 </h3>
                                 <p style="color: #a89890; font-size: 14px; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                    {{ $menu->description ?? 'Kopi nikmat dari biji pilihan' }}
+                                    {{ $menu->description }}
                                 </p>
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
                                     <span style="font-size: 20px; font-weight: bold; color: #CA7842;">

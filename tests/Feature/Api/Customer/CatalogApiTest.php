@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Api\Customer;
+namespace Tests\Feature\Customer;
 
 use Tests\TestCase;
 use App\Models\Menus;

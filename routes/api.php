@@ -4,13 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminMenuController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AuthAdminController;
-use App\Http\Controllers\Api\Admin\TableApiController;
-use App\Http\Controllers\Api\Customer\TableController;
+use App\Http\Controllers\Admin\TableApiController;
+use App\Http\Controllers\Customers\TableController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\CartController;
 use App\Http\Controllers\Customers\CartItemController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\PaymentController;
+use App\Http\Controllers\Customers\DeliveryController;
 
 // Admin Login (no auth required)
 Route::post('/admin/login', [AuthAdminController::class, 'login']);
@@ -52,6 +53,10 @@ Route::prefix('customer')->group(function () {
     // Tables (public - available tables only)
     Route::get('/tables', [TableController::class, 'index'])->name('customer.tables.index');
     Route::get('/tables/{id}', [TableController::class, 'show'])->name('customer.tables.show');
+
+    // Delivery - Calculate Fee (public)
+    Route::post('/delivery/calculate-fee', [DeliveryController::class, 'calculateFee'])->name('customer.delivery.calculate-fee');
+    Route::get('/delivery/options', [DeliveryController::class, 'getOptions'])->name('customer.delivery.options');
 });
 
 // Customer API - Cart & Orders (Guest Token Required)
