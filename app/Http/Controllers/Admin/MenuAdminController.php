@@ -28,12 +28,18 @@ class MenuAdminController extends Controller
             'category' => 'required|in:food,drink,coffee_beans',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount_price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_available' => 'boolean',
         ]);
 
-        $data = $request->only(['name', 'category', 'description', 'price']);
+        $data = $request->only(['name', 'category', 'description', 'price', 'discount_percentage', 'discount_price']);
         $data['is_available'] = $request->has('is_available');
+        
+        // Set default 0 jika tidak ada diskon
+        $data['discount_percentage'] = $request->input('discount_percentage', 0);
+        $data['discount_price'] = $request->input('discount_price', 0);
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('menus', 'public');
@@ -58,12 +64,18 @@ class MenuAdminController extends Controller
             'category' => 'required|in:food,drink,coffee_beans',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
+            'discount_percentage' => 'nullable|numeric|min:0|max:100',
+            'discount_price' => 'nullable|numeric|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'is_available' => 'boolean',
         ]);
 
-        $data = $request->only(['name', 'category', 'description', 'price']);
+        $data = $request->only(['name', 'category', 'description', 'price', 'discount_percentage', 'discount_price']);
         $data['is_available'] = $request->has('is_available');
+        
+        // Set default 0 jika tidak ada diskon
+        $data['discount_percentage'] = $request->input('discount_percentage', 0);
+        $data['discount_price'] = $request->input('discount_price', 0);
 
         if ($request->hasFile('image')) {
             // Delete old image if exists

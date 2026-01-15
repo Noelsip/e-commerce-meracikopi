@@ -34,8 +34,13 @@ class MenuController extends Controller
             'data' => $menus->map(fn($menu) => [
                 'id' => $menu->id,
                 'name' => $menu->name,
+                'category' => $menu->category,
                 'description' => $menu->description,
                 'price' => (int) $menu->price,
+                'discount_percentage' => (float) $menu->discount_percentage,
+                'discount_price' => (int) $menu->discount_price,
+                'final_price' => (int) $menu->final_price,
+                'has_discount' => $menu->hasDiscount(),
                 'image' => $menu->image_path,
                 'is_available' => (bool) $menu->is_available,
             ])
@@ -60,8 +65,14 @@ class MenuController extends Controller
             'data' => [
                 'id' => $menu->id,
                 'name' => $menu->name,
+                'category' => $menu->category,
                 'description' => $menu->description,
                 'price' => (int) $menu->price,
+                'discount_percentage' => (float) $menu->discount_percentage,
+                'discount_price' => (int) $menu->discount_price,
+                'final_price' => (int) $menu->final_price,
+                'discount_amount' => (int) $menu->discount_amount,
+                'has_discount' => $menu->hasDiscount(),
                 'image' => $menu->image_path,
                 'is_available' => (bool) $menu->is_available,
             ]
