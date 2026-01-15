@@ -417,9 +417,10 @@
             </div>
 
             <!-- Categories Grid -->
-            <div class="categories-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+            <div class="categories-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 30px;">
                 <!-- Category 1: Food -->
-                <a href="{{ url('/customer/catalogs?category=food') }}" class="category-card" style="text-decoration: none; display: block;">
+                <a href="{{ url('/customer/catalogs?category=food') }}" class="category-card"
+                    style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
@@ -451,7 +452,8 @@
                 </a>
 
                 <!-- Category 2: Drink -->
-                <a href="{{ url('/customer/catalogs?category=drink') }}" class="category-card" style="text-decoration: none; display: block;">
+                <a href="{{ url('/customer/catalogs?category=drink') }}" class="category-card"
+                    style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
@@ -483,7 +485,8 @@
                 </a>
 
                 <!-- Category 3: Coffee Beans -->
-                <a href="{{ url('/customer/catalogs?category=coffee-beans') }}" class="category-card" style="text-decoration: none; display: block;">
+                <a href="{{ url('/customer/catalogs?category=coffee-beans') }}" class="category-card"
+                    style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
@@ -511,6 +514,72 @@
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
                             Coffee Beans</h3>
+                    </div>
+                </a>
+
+                <!-- Category 4: Kopi Botolan -->
+                <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="category-card"
+                    style="text-decoration: none; display: block;">
+                    <div class="category-card-inner" style="
+                        background: linear-gradient(to top, #603e2a, #261810);
+                        border-radius: 24px;
+                        padding: 40px;
+                        text-align: center;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        border: 1px solid rgba(255,255,255,0.05);
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <!-- Image Container (Squircle) -->
+                        <div style="
+                            width: 160px;
+                            height: 160px;
+                            margin-bottom: 30px;
+                            border-radius: 40px;
+                            overflow: hidden;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                        ">
+                            <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=500&q=80"
+                                alt="Kopi Botolan" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                            Kopi Botolan</h3>
+                    </div>
+                </a>
+
+                <!-- Category 5: Sachet Drip -->
+                <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" class="category-card"
+                    style="text-decoration: none; display: block;">
+                    <div class="category-card-inner" style="
+                        background: linear-gradient(to top, #603e2a, #261810);
+                        border-radius: 24px;
+                        padding: 40px;
+                        text-align: center;
+                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+                        border: 1px solid rgba(255,255,255,0.05);
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <!-- Image Container (Squircle) -->
+                        <div style="
+                            width: 160px;
+                            height: 160px;
+                            margin-bottom: 30px;
+                            border-radius: 40px;
+                            overflow: hidden;
+                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                        ">
+                            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80"
+                                alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                            Sachet Drip</h3>
                     </div>
                 </a>
             </div>
