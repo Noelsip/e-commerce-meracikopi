@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('order_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->string('status')->default(OrderStatus::PENDING->value);
+            $table->string('status')->default(OrderStatus::CREATED->value);
             $table->text('note');
             $table->timestamps();
         });
