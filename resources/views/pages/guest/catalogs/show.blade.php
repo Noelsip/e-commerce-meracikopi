@@ -141,7 +141,17 @@
                 quantity: 1,
                 note: '',
                 loading: false,
+                init() {
+                    this.$watch('quantity', (value) => {
+                        if (value < 1 || value === '') {
+                             this.quantity = 1;
+                        }
+                    });
+                },
                 addToCart() {
+                    // Double check validation (just in case)
+                    if (this.quantity < 1) this.quantity = 1;
+
                     this.loading = true;
                     const token = localStorage.getItem('guest_token');
                     
@@ -171,19 +181,69 @@
                         return response.json();
                     })
                     .then(data => {
-                        alert('Berhasil menambahkan ke keranjang! 🛒');
+                        showToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1; // Reset quantity
                         this.note = ''; // Reset note
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Gagal menambahkan ke keranjang. Silakan coba lagi.');
+                        showToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
                     })
                     .finally(() => {
                         this.loading = false;
                     });
                 }
             }">
+
+                <!-- Toast Notification -->
+                <div id="toast"
+                    style="position: fixed; top: 100px; right: 20px; z-index: 9999; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; gap: 12px; padding: 16px 24px; background-color: #2b211e; border: 1px solid #D4A574; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 320px;">
+
+                    <p id="toast-message"
+                        style="margin: 0; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #f0f2bd; flex-grow: 1;">
+                    </p>
+
+                    <button onclick="hideToast()"
+                        style="background: none; border: none; cursor: pointer; color: #f0f2bd; opacity: 0.7; padding: 4px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <script>
+                    function showToast(message, type = 'success') {
+                        const toast = document.getElementById('toast');
+                        const toastMessage = document.getElementById('toast-message');
+                        const closeBtn = toast.querySelector('button');
+
+                        toastMessage.textContent = message;
+
+                        // Reset styling based on type
+                        if (type === 'error') {
+                            toast.style.borderColor = '#ef4444';
+                        } else {
+                            toast.style.borderColor = '#D4A574';
+                        }
+
+                        // Show with animation
+                        toast.style.transform = 'translateX(0)';
+                        toast.style.opacity = '1';
+
+                        // Auto hide after 3 seconds
+                        setTimeout(() => {
+                            hideToast();
+                        }, 3000);
+                    }
+
+                    function hideToast() {
+                        const toast = document.getElementById('toast');
+                        toast.style.transform = 'translateX(120%)';
+                        toast.style.opacity = '0';
+                    }
+                </script>
 
                 <!-- Product Image -->
                 <div class="product-image"
@@ -225,7 +285,8 @@
                         <button @click="quantity > 1 ? quantity-- : null"
                             style="width: 32px; height: 32px; border-radius: 50%; background: #F0F2BD; border: none; font-size: 20px; font-weight: 600; color: #2a1b14; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
 
-                        <input type="number" x-model.number="quantity" min="1"
+                        <input type="number" x-model.number="quantity" min="1" @input="validateQuantity()"
+                            @change="validateQuantity()"
                             style="width: 50px; background: transparent; border: none; font-size: 18px; color: #fff; font-weight: 500; text-align: center; outline: none; -moz-appearance: textfield;"
                             class="no-spinners">
 

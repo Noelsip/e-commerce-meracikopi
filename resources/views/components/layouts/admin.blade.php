@@ -256,19 +256,8 @@
                         {{ $title ?? 'Dashboard' }}
                     </h1>
 
-                    <!-- Search Bar -->
-                    <div class="admin-header-search flex-1 max-w-md mx-8">
-                        <div class="relative flex items-center">
-                            <svg class="absolute w-5 h-5" style="left: 16px; color: #f0f2bd;" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input type="text" placeholder="Search something"
-                                class="w-full py-2 rounded-full border-none focus:ring-2 focus:ring-amber-500 focus:outline-none"
-                                style="background-color: #3e302b; padding-left: 48px; padding-right: 16px; color: #f0f2bd;">
-                        </div>
-                    </div>
+                    <!-- Search Bar (Removed) -->
+                    <div class="flex-1 max-w-md mx-8"></div>
 
                     <!-- User Info -->
                     <div class="flex items-center gap-3">

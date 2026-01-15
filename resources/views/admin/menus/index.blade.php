@@ -8,11 +8,129 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 p-4 rounded-lg" style="background-color: #3e302b; color: #f0f2bd; border: 1px solid #D4A574;">
-            {{ session('success') }}
+    <!-- Custom Filter Styles -->
+    <style>
+        .custom-search-container {
+            background-color: #1e1715;
+            border: 1px solid #3e302b;
+            transition: all 0.3s ease;
+        }
+        .custom-search-container:focus-within {
+            border-color: #f0f2bd;
+            box-shadow: 0 0 0 1px #f0f2bd;
+        }
+        .custom-search-input {
+            color: #f0f2bd;
+        }
+        .custom-search-input::placeholder {
+            color: rgba(240, 242, 189, 0.5); /* #f0f2bd with opacity */
+        }
+        .custom-search-icon {
+            color: #6b7280; /* gray-500 */
+            transition: color 0.3s ease;
+        }
+        .custom-search-container:focus-within .custom-search-icon {
+            color: #f0f2bd;
+        }
+    </style>
+
+    <!-- Filters -->
+    <div class="mb-6 space-y-4">
+        <!-- Search Bar -->
+        <div class="relative">
+            <form action="{{ route('admin.menus.index') }}" method="GET">
+                <input type="hidden" name="category" value="{{ request('category') }}">
+                <div class="relative w-full">
+                    <!-- Flex Container Search Bar -->
+                    <div class="custom-search-container flex items-center w-full rounded-xl px-4 py-3 shadow-sm group">
+                        <!-- Icon -->
+                        <svg class="custom-search-icon h-5 w-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        
+                        <!-- Input -->
+                        <input type="text" name="search" placeholder="Cari nama menu..." value="{{ request('search') }}"
+                            class="custom-search-input w-full bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-base font-medium">
+                    </div>
+                </div>
+            </form>
         </div>
+
+        <!-- Category Pills -->
+        <div class="overflow-x-auto pb-2">
+            <div class="flex gap-3 min-w-max">
+                <!-- Semua Kategori Pill -->
+                <a href="{{ route('admin.menus.index', ['search' => request('search')]) }}" 
+                   class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap"
+                   style="{{ !request('category') 
+                       ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;' 
+                       : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
+                    Semua Produk
+                </a>
+
+                <!-- Category Items -->
+                @foreach($categories as $key => $label)
+                    <a href="{{ route('admin.menus.index', ['category' => $key, 'search' => request('search')]) }}"
+                       class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap"
+                       style="{{ request('category') == $key 
+                           ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;' 
+                           : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
+        <div class="flex items-center gap-3 px-6 py-4 rounded-xl shadow-xl" style="background-color: #1e1715; border: 1px solid #D4A574;">
+            <div class="flex-shrink-0">
+                <svg class="w-6 h-6 text-[#D4A574]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+            <p class="font-medium text-[#f0f2bd]" id="toast-message"></p>
+            <button onclick="hideToast()" class="ml-4 text-[#f0f2bd] hover:text-[#D4A574] transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Trigger Toast if Session has Success/Error -->
+    @if(session('success') || session('error'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const message = "{{ session('success') ?? session('error') }}";
+                const type = "{{ session('success') ? 'success' : 'error' }}";
+                showToast(message, type);
+            });
+        </script>
     @endif
+
+    <script>
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.textContent = message;
+            
+            // Show
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                hideToast();
+            }, 3000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('translate-x-full', 'opacity-0');
+        }
+    </script>
 
     <div class="rounded-xl border overflow-hidden" style="background-color: #2b211e; border-color: #3e302b;">
         <div class="overflow-x-auto">

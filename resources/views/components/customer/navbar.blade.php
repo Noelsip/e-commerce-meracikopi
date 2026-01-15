@@ -241,9 +241,9 @@
 
 <!-- Navbar Container -->
 <div class="navbar-container"
-    style="background-color: #1a1410; padding: 0 20px; position: sticky; top: 0; z-index: 100;">
+    style="background-color: #2a1b14; padding: 0; position: sticky; top: 0; z-index: 100;">
     <div class="navbar-inner"
-        style="background-color: #2a1b14; border-radius: 0 0 24px 24px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); max-width: 1440px; margin: 0 auto; min-height: 115px;">
+        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); min-height: 115px;">
         <!-- Top Row: Logo, Search, Find a Cafe, Cart -->
         <div class="navbar-top-wrapper" style="padding: 20px 40px;">
             <div

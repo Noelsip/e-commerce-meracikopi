@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->foreignId('table_id')->constrained('tables')->cascadeOnDelete();
             $table->string('customer_name');
             $table->string('customer_phone');
-            $table->string('status')->default(OrderStatus::PENDING->value);
+            $table->string('status')->default(OrderStatus::CREATED->value);
             $table->decimal('total_price', 10, 2);
             $table->timestamps();
         });

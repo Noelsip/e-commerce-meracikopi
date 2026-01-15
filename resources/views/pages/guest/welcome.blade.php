@@ -424,7 +424,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 40px;
+                        padding: 20px;
                         text-align: center;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
@@ -457,7 +457,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 40px;
+                        padding: 20px;
                         text-align: center;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
@@ -490,7 +490,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 40px;
+                        padding: 20px;
                         text-align: center;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
@@ -523,7 +523,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 40px;
+                        padding: 20px;
                         text-align: center;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
@@ -542,7 +542,7 @@
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=500&q=80"
+                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}"
                                 alt="Kopi Botolan" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
@@ -556,7 +556,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 40px;
+                        padding: 20px;
                         text-align: center;
                         box-shadow: 0 20px 40px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
@@ -575,7 +575,7 @@
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=500&q=80"
+                            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80"
                                 alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
