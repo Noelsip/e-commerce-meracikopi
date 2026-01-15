@@ -1,4 +1,40 @@
 <x-customer.layout title="Meracikopi - Kopi Berkualitas">
+    <style>
+        /* Hero Image Card Hover Effects */
+        .hero-image-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+        }
+
+        .hero-image-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 50px rgba(202, 120, 66, 0.3), 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+            border-color: rgba(202, 120, 66, 0.4) !important;
+        }
+
+        .hero-image-card:hover .hero-card-image {
+            transform: scale(1.1);
+        }
+
+        .hero-card-image {
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Category Card Hover Effects */
+        .category-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .category-card:hover {
+            transform: scale(1.03) !important;
+            box-shadow: 0 25px 60px rgba(202, 120, 66, 0.3), 0 15px 40px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .category-card:hover .category-card-inner {
+            border-color: rgba(202, 120, 66, 0.4) !important;
+        }
+    </style>
+
     <!-- Hero Section -->
     <div style="background-color: #1a1410; min-height: 80vh; padding: 40px 80px;">
         <div class="hero-container"
@@ -14,7 +50,7 @@
                         <!-- Ornament -->
                         <svg style="position: absolute; bottom: -8px; left: -5%; width: 110%; height: 12px; transform: rotate(-2deg);"
                             viewBox="0 0 100 15" fill="none" preserveAspectRatio="none">
-                            <path d="M2 10C20 15 50 15 98 2" stroke="#F8F5F2" stroke-width="3" stroke-linecap="round" />
+                            <path d="M2 10C20 15 50 15 98 2" stroke="#F8F5F2" stroke-width="5" stroke-linecap="round" />
                         </svg>
                     </span>
                     <br>
@@ -138,31 +174,12 @@
                         Cari Kopi Favoritmu
                     </a>
 
-                    <!-- Decorative Wavy Lines & Star -->
+                    <!-- Decorative Star Only -->
                     <div class="hero-decorative-lines"
                         style="position: absolute; top: 100%; left: 40px; pointer-events: none; z-index: 50;">
-                        <!-- Adjusted height to 350px to land above text -->
                         <svg width="250" height="350" viewBox="0 0 250 350" fill="none"
                             style="filter: drop-shadow(0 0 8px rgba(255,255,255,0.2));">
-
-                            <!-- Wavy Lines Ending at y=280 (above Layout spacer) -->
-                            <!-- Line 1 (Left) -->
-                            <path
-                                d="M10 0 C 10 50, 40 50, 40 100 C 40 150, 100 180, 120 220 C 140 260, 155 270, 155 280"
-                                stroke="white" stroke-width="3" fill="none" stroke-linecap="round" />
-
-                            <!-- Line 2 (Center) -->
-                            <path
-                                d="M25 0 C 25 50, 55 50, 55 100 C 55 150, 115 180, 135 220 C 155 260, 170 270, 170 280"
-                                stroke="white" stroke-width="3" fill="none" stroke-linecap="round" />
-
-                            <!-- Line 3 (Right) -->
-                            <path
-                                d="M40 0 C 40 50, 70 50, 70 100 C 70 150, 130 180, 150 220 C 170 260, 185 270, 185 280"
-                                stroke="white" stroke-width="3" fill="none" stroke-linecap="round" />
-
-                            <!-- Star positioned correctly at the end -->
-                            <!-- Scale increased to 2.5 for better visibility -->
+                            <!-- Star only -->
                             <path d="M0 -10 L2.3 -3.2 H9.5 L3.7 1 L5.9 7.8 L0 4.2 L-5.9 7.8 L-3.7 1 L-9.5 -3.2 H-2.3 Z"
                                 fill="white" stroke="white" stroke-width="2" stroke-linejoin="round"
                                 transform="translate(170, 295) scale(2.5)" />
@@ -262,69 +279,65 @@
                 <div
                     style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; position: relative; z-index: 1;">
                     <!-- Image 1 (Top Left - Leaf Shape) -->
-                    <div style="
+                    <div class="hero-image-card" style="
                         aspect-ratio: 1;
                         background: linear-gradient(135deg, #2a1f1a, #3a2f2a);
                         border-radius: 100px 20px 20px 20px;
                         overflow: hidden;
                         position: relative;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                        transition: transform 0.3s ease;
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
-                        <div
+                        <div class="hero-card-image"
                             style="width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500&q=80') center/cover;">
                         </div>
                     </div>
 
                     <!-- Image 2 (Top Right - Standard) -->
-                    <div style="
+                    <div class="hero-image-card" style="
                         aspect-ratio: 1;
                         background: linear-gradient(135deg, #2a1f1a, #3a2f2a);
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                        transition: transform 0.3s ease;
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
-                        <div
+                        <div class="hero-card-image"
                             style="width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80') center/cover;">
                         </div>
                     </div>
 
                     <!-- Image 3 (Bottom Left - Standard) -->
-                    <div style="
+                    <div class="hero-image-card" style="
                         aspect-ratio: 1;
                         background: linear-gradient(135deg, #2a1f1a, #3a2f2a);
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                        transition: transform 0.3s ease;
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
-                        <div
+                        <div class="hero-card-image"
                             style="width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&q=80') center/cover;">
                         </div>
                     </div>
 
                     <!-- Image 4 (Bottom Right - Inverse Leaf Shape) -->
-                    <div style="
+                    <div class="hero-image-card" style="
                         aspect-ratio: 1;
                         background: linear-gradient(135deg, #2a1f1a, #3a2f2a);
                         border-radius: 20px 20px 100px 20px;
                         overflow: hidden;
                         position: relative;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                        transition: transform 0.3s ease;
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
-                        <div
+                        <div class="hero-card-image"
                             style="width: 100%; height: 100%; background: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80') center/cover;">
                         </div>
                     </div>
@@ -406,10 +419,8 @@
             <!-- Categories Grid -->
             <div class="categories-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
                 <!-- Category 1: Food -->
-                <a href="#" style="text-decoration: none; display: block; transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='translateY(-10px)'"
-                    onmouseout="this.style.transform='translateY(0)'">
-                    <div style="
+                <a href="{{ url('/customer/catalogs?category=food') }}" class="category-card" style="text-decoration: none; display: block;">
+                    <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
                         padding: 40px;
@@ -427,7 +438,7 @@
                             width: 160px;
                             height: 160px;
                             margin-bottom: 30px;
-                            border-radius: 40px; /* Squircle appearance */
+                            border-radius: 40px;
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
@@ -440,10 +451,8 @@
                 </a>
 
                 <!-- Category 2: Drink -->
-                <a href="#" style="text-decoration: none; display: block; transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='translateY(-10px)'"
-                    onmouseout="this.style.transform='translateY(0)'">
-                    <div style="
+                <a href="{{ url('/customer/catalogs?category=drink') }}" class="category-card" style="text-decoration: none; display: block;">
+                    <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
                         padding: 40px;
@@ -461,7 +470,7 @@
                             width: 160px;
                             height: 160px;
                             margin-bottom: 30px;
-                            border-radius: 40px; /* Squircle appearance */
+                            border-radius: 40px;
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
@@ -474,10 +483,8 @@
                 </a>
 
                 <!-- Category 3: Coffee Beans -->
-                <a href="#" style="text-decoration: none; display: block; transition: transform 0.3s ease;"
-                    onmouseover="this.style.transform='translateY(-10px)'"
-                    onmouseout="this.style.transform='translateY(0)'">
-                    <div style="
+                <a href="{{ url('/customer/catalogs?category=coffee-beans') }}" class="category-card" style="text-decoration: none; display: block;">
+                    <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
                         padding: 40px;
@@ -495,7 +502,7 @@
                             width: 160px;
                             height: 160px;
                             margin-bottom: 30px;
-                            border-radius: 40px; /* Squircle appearance */
+                            border-radius: 40px;
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">

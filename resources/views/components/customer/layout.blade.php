@@ -28,6 +28,12 @@
             box-sizing: border-box;
         }
 
+        html,
+        body {
+            overscroll-behavior: none;
+            overflow-x: hidden;
+        }
+
         :root {
             --primary: #34231c;
             --secondary: #CA7842;

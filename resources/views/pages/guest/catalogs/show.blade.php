@@ -2,7 +2,7 @@
     <!-- Main Content Wrapper -->
     <div
         style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
-        
+
         <style>
             /* Hide number input spinners */
             .no-spinners::-webkit-outer-spin-button,
@@ -10,24 +10,81 @@
                 -webkit-appearance: none;
                 margin: 0;
             }
+
             .no-spinners {
                 -moz-appearance: textfield;
             }
-            
+
             /* Note input styling */
             .note-wrapper {
                 transition: all 0.3s ease;
                 border: 1px solid transparent;
             }
-            .note-wrapper:hover, .note-wrapper:focus-within {
+
+            .note-wrapper:hover,
+            .note-wrapper:focus-within {
                 border-color: #fff !important;
-                background: rgba(255,255,255,0.1) !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .product-container {
+                    padding: 0 20px !important;
+                }
+
+                .product-header {
+                    margin-bottom: 20px !important;
+                }
+
+                .product-header span {
+                    display: none;
+                }
+
+                .product-box {
+                    height: auto !important;
+                    min-height: 500px;
+                }
+
+                .product-content {
+                    flex-direction: column !important;
+                    gap: 30px !important;
+                    padding: 30px 20px !important;
+                }
+
+                .product-image {
+                    width: 200px !important;
+                    height: 200px !important;
+                }
+
+                .product-details {
+                    width: 100% !important;
+                    text-align: center;
+                }
+
+                .product-details h1 {
+                    font-size: 28px !important;
+                }
+
+                .product-quantity {
+                    justify-content: center !important;
+                }
+
+                .description-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 30px !important;
+                }
+
+                .description-section {
+                    padding: 20px !important;
+                }
             }
         </style>
 
-        <div style="max-width: 1440px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 10;">
+        <div class="product-container"
+            style="max-width: 1440px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 10;">
             <!-- Header / Breadcrumb Area -->
-            <div style="display: flex; align-items: center; margin-bottom: 40px;">
+            <div class="product-header" style="display: flex; align-items: center; margin-bottom: 40px;">
                 <a href="{{ url('/customer/catalogs') }}"
                     style="color: #fff; text-decoration: none; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 8px;">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -45,7 +102,7 @@
         </div>
 
         <!-- Combined Container for Background Box & Content -->
-        <div style="
+        <div class="product-box" style="
             position: relative; 
             width: 100%;
             max-width: 1440px; 
@@ -71,7 +128,7 @@
             "></div>
 
             <!-- Content Layer -->
-            <div style="
+            <div class="product-content" style="
                 position: relative;
                 z-index: 2;
                 width: 100%;
@@ -79,9 +136,8 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 60px; /* Adjust gap between image and text */
-            "
-            x-data="{
+                gap: 60px;
+            " x-data="{
                 quantity: 1,
                 note: '',
                 loading: false,
@@ -128,9 +184,9 @@
                     });
                 }
             }">
-                
+
                 <!-- Product Image -->
-                <div
+                <div class="product-image"
                     style="position: relative; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
                     <!-- Shadow -->
                     <div
@@ -149,7 +205,7 @@
                 </div>
 
                 <!-- Product Details -->
-                <div style="width: 250px;">
+                <div class="product-details" style="width: 250px;">
                     <h1
                         style="font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 800; color: #F0F2BD; margin: 0 0 4px 0; line-height: 1.2;">
                         {{ $menu->name }}
@@ -164,22 +220,20 @@
                         Hot/Ice
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                    <div class="product-quantity"
+                        style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                         <button @click="quantity > 1 ? quantity-- : null"
                             style="width: 32px; height: 32px; border-radius: 50%; background: #F0F2BD; border: none; font-size: 20px; font-weight: 600; color: #2a1b14; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
-                        
-                        <input type="number" x-model.number="quantity" min="1" 
-                            style="width: 50px; background: transparent; border: none; font-size: 18px; color: #fff; font-weight: 500; text-align: center; outline: none; -moz-appearance: textfield;" 
+
+                        <input type="number" x-model.number="quantity" min="1"
+                            style="width: 50px; background: transparent; border: none; font-size: 18px; color: #fff; font-weight: 500; text-align: center; outline: none; -moz-appearance: textfield;"
                             class="no-spinners">
-                        
+
                         <button @click="quantity++"
                             style="width: 32px; height: 32px; border-radius: 50%; background: #F0F2BD; border: none; font-size: 20px; font-weight: 600; color: #2a1b14; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
                     </div>
 
-                    <button 
-                        @click="addToCart"
-                        :disabled="loading"
-                        style="
+                    <button @click="addToCart" :disabled="loading" style="
                         width: 100%;
                         background-color: #000; 
                         color: #fff; 
@@ -209,11 +263,13 @@
         </div>
 
         <!-- Description and Notes Section -->
-        <div style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
-             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
+        <div class="description-section"
+            style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
+            <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
                 <!-- Description -->
                 <div>
-                    <h3 style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+                    <h3
+                        style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
                         Deskripsi Produk
                     </h3>
                     <p style="color: #aaa; font-size: 14px; line-height: 1.6;">
@@ -223,19 +279,18 @@
 
                 <!-- Notes -->
                 <div>
-                    <h3 style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+                    <h3
+                        style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
                         Catatan
                     </h3>
-                    <div class="note-wrapper" style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;">
-                        <textarea 
-                            x-model="note"
-                            placeholder="Catatan opsional..." 
+                    <div class="note-wrapper"
+                        style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;">
+                        <textarea x-model="note" placeholder="Catatan opsional..."
                             style="width: 100%; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; resize: none; font-family: 'Inter', sans-serif;"
-                            rows="6"
-                        ></textarea>
+                            rows="6"></textarea>
                     </div>
                 </div>
-             </div>
+            </div>
         </div>
     </div>
 </x-customer.layout>
