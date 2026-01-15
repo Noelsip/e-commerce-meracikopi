@@ -131,7 +131,7 @@
                 </a>
 
                 <!-- Cart Icon -->
-                <a href="#" style="color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
+                <a href="/customer/cart" style="color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
                    onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                     <svg style="width: 25px; height: 25px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"

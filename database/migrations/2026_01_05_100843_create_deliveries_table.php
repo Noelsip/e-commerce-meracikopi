@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->string('courier_name');
             $table->string('courier_order_id');
-            $table->string('status')->default(StatusDelivery::REQUEST->value);
+            $table->string('status')->default(StatusDelivery::REQUESTED->value);
             $table->decimal('price', 10, 2);
             $table->string('eta')->nullable();
             $table->json('raw_response');
