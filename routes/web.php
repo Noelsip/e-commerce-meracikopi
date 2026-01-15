@@ -54,6 +54,16 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/customer/catalogs', [CatalogController::class, 'index'])->name('catalogs.index');
 Route::get('/customer/catalogs/{id}', [CatalogController::class, 'show'])->name('catalogs.show');
 
+// Cart
+Route::get('/customer/cart', function () {
+    return view('pages.customer.cart');
+})->name('cart.index');
+
+// Checkout
+Route::get('/customer/checkout', function () {
+    return view('pages.customer.checkout');
+})->name('checkout.index');
+
 // Orders
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');

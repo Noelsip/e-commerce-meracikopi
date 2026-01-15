@@ -149,7 +149,7 @@
                     });
                 },
                 addToCart() {
-                    // Double check validation (just in case)
+                    // Double check validation
                     if (this.quantity < 1) this.quantity = 1;
 
                     this.loading = true;
@@ -163,31 +163,26 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
                         },
                         body: JSON.stringify({
-                            menu_id: {{ $menu->id }},
-                            quantity: this.quantity,
-                            note: this.note
+                             menu_id: {{ $menu->id }},
+                             quantity: this.quantity,
+                             note: this.note
                         })
                     })
                     .then(response => {
-                        // Store new token if received
                         const newToken = response.headers.get('X-GUEST-TOKEN');
-                        if(newToken) {
-                            localStorage.setItem('guest_token', newToken);
-                        }
+                        if(newToken) localStorage.setItem('guest_token', newToken);
 
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
+                        if (!response.ok) throw new Error('Network response was not ok');
                         return response.json();
                     })
                     .then(data => {
-                        showToast('Berhasil menambahkan ke keranjang!', 'success');
-                        this.quantity = 1; // Reset quantity
-                        this.note = ''; // Reset note
+                        window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
+                        this.quantity = 1; 
+                        this.note = ''; 
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        showToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
+                        window.showCustomerToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
                     })
                     .finally(() => {
                         this.loading = false;
@@ -195,53 +190,63 @@
                 }
             }">
 
-                <!-- Toast Notification -->
-                <div id="toast"
-                    style="position: fixed; top: 100px; right: 20px; z-index: 9999; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; gap: 12px; padding: 16px 24px; background-color: #2b211e; border: 1px solid #D4A574; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-width: 320px;">
-
-                    <p id="toast-message"
-                        style="margin: 0; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #f0f2bd; flex-grow: 1;">
-                    </p>
-
-                    <button onclick="hideToast()"
-                        style="background: none; border: none; cursor: pointer; color: #f0f2bd; opacity: 0.7; padding: 4px; display: flex; align-items: center; justify-content: center; transition: opacity 0.2s;">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-
                 <script>
-                    function showToast(message, type = 'success') {
-                        const toast = document.getElementById('toast');
-                        const toastMessage = document.getElementById('toast-message');
-                        const closeBtn = toast.querySelector('button');
+                    window.showCustomerToast = function (message, type = 'success') {
+                        // Create toast container if not exists
+                        let toast = document.getElementById('customer-toast');
+                        if (!toast) {
+                            toast = document.createElement('div');
+                            toast.id = 'customer-toast';
+                            Object.assign(toast.style, {
+                                position: 'fixed',
+                                top: '130px',
+                                right: '20px',
+                                zIndex: '9999',
+                                minWidth: '320px',
+                                maxWidth: '420px',
+                                backgroundColor: '#2b211e',
+                                borderRadius: '6px',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                                padding: '16px',
+                                display: 'flex',
+                                alignItems: 'start',
+                                gap: '12px',
+                                transform: 'translateX(120%)',
+                                transition: 'transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+                                opacity: '0'
+                            });
 
-                        toastMessage.textContent = message;
+                            // Close button inside
+                            toast.onclick = function () {
+                                toast.style.transform = 'translateX(120%)';
+                                toast.style.opacity = '0';
+                            };
 
-                        // Reset styling based on type
-                        if (type === 'error') {
-                            toast.style.borderColor = '#ef4444';
-                        } else {
-                            toast.style.borderColor = '#D4A574';
+                            document.body.appendChild(toast);
                         }
 
-                        // Show with animation
-                        toast.style.transform = 'translateX(0)';
-                        toast.style.opacity = '1';
+                        // Update Content
+                        const borderColor = type === 'error' ? '#ef4444' : '#D4A574';
+                        toast.style.borderLeft = `4px solid ${borderColor}`;
+                        toast.innerHTML = `
+                            <p style="margin: 0; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #f0f2bd; flex-grow: 1;">${message}</p>
+                            <span style="cursor: pointer; color: #f0f2bd; opacity: 0.7;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                            </span>
+                        `;
 
-                        // Auto hide after 3 seconds
-                        setTimeout(() => {
-                            hideToast();
+                        // Show
+                        requestAnimationFrame(() => {
+                            toast.style.transform = 'translateX(0)';
+                            toast.style.opacity = '1';
+                        });
+
+                        // Auto Hide
+                        if (window.toastTimeout) clearTimeout(window.toastTimeout);
+                        window.toastTimeout = setTimeout(() => {
+                            toast.style.transform = 'translateX(120%)';
+                            toast.style.opacity = '0';
                         }, 3000);
-                    }
-
-                    function hideToast() {
-                        const toast = document.getElementById('toast');
-                        toast.style.transform = 'translateX(120%)';
-                        toast.style.opacity = '0';
                     }
                 </script>
 

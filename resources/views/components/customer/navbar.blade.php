@@ -296,7 +296,8 @@
                     </a>
 
                     <!-- Cart Icon -->
-                    <a href="#"
+                    <!-- Cart Icon -->
+                    <a href="/customer/cart"
                         style="color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
                         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                         <svg class="navbar-cart-icon" style="width: 25px; height: 25px;" fill="none"
@@ -373,6 +374,8 @@
         <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Home</a>
         <a href="{{ url('/customer/catalogs') }}"
             class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
+        <a href="#">Contact</a>
+        <a href="#">Order History</a>
     </div>
 
     <form method="GET" action="{{ url('/customer/catalogs') }}" class="mobile-search-form">
@@ -407,7 +410,7 @@
     <div style="
         padding: 16px 24px; 
         text-align: center;
-        background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(50, 32, 21, 0.7) 0%, rgba(50, 32, 21, 0.3) 40%, rgba(26, 20, 16, 0) 100%);
+        background: radial-gradient(ellipse 75% 60% at 50% 50%, rgba(50, 32, 21, 0.7) 0%, rgba(50, 32, 21, 0.3) 45%, rgba(26, 20, 16, 0) 100%);
     ">
         <p style="
             color: #E8E0D5; 
