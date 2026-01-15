@@ -18,6 +18,37 @@
         background-color: #2A1B14;
         padding: 0;
         width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+
+    /* Back Button Container (Below Navbar, aligned with content) */
+    .back-button-container {
+        max-width: 1239px;
+        margin: 0 auto;
+        padding: 20px 20px 0 20px;
+    }
+
+    .back-to-cart-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 400;
+        transition: all 0.2s ease;
+    }
+
+    .back-to-cart-btn:hover {
+        color: var(--secondary);
+    }
+
+    .back-to-cart-btn svg {
+        flex-shrink: 0;
     }
 
     /* Logo and Title */
@@ -27,7 +58,6 @@
         gap: 12px;
         flex-shrink: 0;
     }
-
     .checkout-logo-circle {
         width: 45px;
         height: 45px;
@@ -148,6 +178,16 @@
     }
 </style>
 
+<!-- Back Button (Outside Navbar) -->
+<div class="back-button-container">
+    <a href="{{ route('cart.index') }}" class="back-to-cart-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Back</span>
+    </a>
+</div>
+
 <!-- Checkout Navbar Container -->
 <div class="checkout-navbar-container">
     <div class="checkout-navbar">
@@ -196,6 +236,12 @@
             }
             orderTypeDisplay.textContent = displayText;
         }
+
+        // Toggle delivery section visibility
+        if (typeof window.toggleDeliverySection === 'function') {
+            window.toggleDeliverySection(value === 'delivery');
+        }
+        
         console.log('Order type changed to:', value);
     }
 </script>

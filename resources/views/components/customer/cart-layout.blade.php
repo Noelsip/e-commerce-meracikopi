@@ -56,6 +56,7 @@
             max-width: 1239px;
             margin: 0 auto;
             padding: 40px 20px;
+            padding-bottom: 140px; /* Space for fixed footer */
         }
 
         /* Cart Table Header */
@@ -243,15 +244,25 @@
             color: #e74c3c;
         }
 
-        /* Cart Footer/Summary */
+        /* Cart Footer/Summary - Fixed at bottom */
+        .cart-summary-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2A1B14;
+            padding: 16px 0;
+            z-index: 100;
+            box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+        }
+
         .cart-summary {
             display: grid;
             grid-template-columns: 2fr 2fr 1fr;
             align-items: center;
-            padding: 20px 24px;
+            padding: 16px 24px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
-            margin-top: 24px;
             background: transparent;
             width: 100%;
             max-width: 1239px;

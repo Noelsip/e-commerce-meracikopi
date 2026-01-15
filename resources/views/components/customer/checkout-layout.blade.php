@@ -50,6 +50,37 @@
             background-color: #1a1410;
         }
 
+        /* Spacer for fixed navbar */
+        .navbar-spacer {
+            height: 115px;
+        }
+
+        /* Back Button Container (Below Navbar) */
+        .back-button-container {
+            max-width: 1239px;
+            margin: 0 auto;
+            padding: 20px 20px 0 20px;
+        }
+
+        .back-to-cart-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 400;
+            transition: all 0.2s ease;
+        }
+
+        .back-to-cart-btn:hover {
+            color: #CA7842;
+        }
+
+        .back-to-cart-btn svg {
+            flex-shrink: 0;
+        }
+
         /* Checkout Page Container */
         .checkout-page-container {
             width: 100%;
@@ -391,6 +422,289 @@
             object-fit: contain;
         }
 
+        /* Delivery Address Section */
+        .delivery-address-section {
+            margin-bottom: 24px;
+            padding: 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 8px;
+            background: transparent;
+        }
+
+        .address-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .address-header svg {
+            color: var(--secondary);
+        }
+
+        .address-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .address-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .address-info {
+            flex: 1;
+        }
+
+        .address-name-phone {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .recipient-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .recipient-divider {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .recipient-phone {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+
+        .address-detail {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .address-edit-btn {
+            color: var(--secondary);
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .address-edit-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Delivery Methods Section */
+        .delivery-methods-section {
+            margin-top: 40px;
+        }
+
+        .delivery-method-card {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border: 1px solid #D9D9D9;
+            border-radius: 8px;
+            background: transparent;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .delivery-method-card:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .delivery-method-card.selected {
+            border-color: var(--secondary);
+            background: rgba(202, 120, 66, 0.1);
+        }
+
+        .delivery-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            transition: all 0.2s ease;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .delivery-radio:checked {
+            border-color: var(--secondary);
+        }
+
+        .delivery-radio:checked::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            background-color: var(--secondary);
+            border-radius: 50%;
+        }
+
+        .delivery-method-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Address Modal */
+        .address-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .address-modal-content {
+            background: #2A1B14;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .address-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .address-modal-header h3 {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            color: white;
+        }
+
+        .address-modal-body {
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--secondary);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--secondary);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-cancel {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-save {
+            padding: 12px 24px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-save:hover {
+            background: #d4864c;
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .checkout-content {
@@ -432,6 +746,19 @@
     @include('components.customer.checkout-navbar')
 
     <!-- Main Content -->
+    <!-- Spacer for fixed navbar -->
+    <div class="navbar-spacer"></div>
+
+    <!-- Back Button (Below Navbar) -->
+    <div class="back-button-container">
+        <a href="{{ route('cart.index') }}" class="back-to-cart-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            <span>Back</span>
+        </a>
+    </div>
+
     <main>
         {{ $slot }}
     </main>

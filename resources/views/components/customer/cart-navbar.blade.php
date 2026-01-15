@@ -131,6 +131,32 @@
             font-size: 16px;
         }
     }
+
+    /* Back Button Container (Below Navbar, aligned with content) */
+    .back-button-container {
+        max-width: 1239px;
+        margin: 0 auto;
+        padding: 20px 20px 0 20px;
+    }
+
+    .back-to-home-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 400;
+        transition: all 0.2s ease;
+    }
+
+    .back-to-home-btn:hover {
+        color: #CA7842;
+    }
+
+    .back-to-home-btn svg {
+        flex-shrink: 0;
+    }
 </style>
 
 <!-- Cart Navbar Container -->
@@ -160,4 +186,14 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Back Button (Below Navbar) -->
+<div class="back-button-container">
+    <a href="{{ route('catalogs.index') }}" class="back-to-home-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        <span>Back</span>
+    </a>
 </div>

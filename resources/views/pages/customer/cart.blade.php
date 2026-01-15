@@ -1,4 +1,130 @@
 <x-customer.cart-layout>
+    <!-- Error Modal -->
+    <div id="errorModal" class="error-modal-overlay">
+        <div class="error-modal">
+            <div class="error-modal-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <h3 class="error-modal-title">Tidak Ada Produk Dipilih</h3>
+            <p class="error-modal-message">Pilih produk terlebih dahulu untuk melanjutkan ke checkout</p>
+            <button class="error-modal-btn" onclick="closeErrorModal()">OK, Mengerti</button>
+        </div>
+    </div>
+
+    <style>
+        /* Error Modal Styles */
+        .error-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .error-modal {
+            background: linear-gradient(145deg, #3a2a22, #2a1b14);
+            border: 1px solid rgba(202, 120, 66, 0.3);
+            border-radius: 16px;
+            padding: 40px 50px;
+            text-align: center;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-modal-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(202, 120, 66, 0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .error-modal-icon svg {
+            color: #CA7842;
+        }
+
+        .error-modal-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .error-modal-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 400;
+            margin-bottom: 28px;
+            line-height: 1.6;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .error-modal-btn {
+            background: linear-gradient(145deg, #CA7842, #b5693a);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .error-modal-btn:hover {
+            background: linear-gradient(145deg, #d88a52, #CA7842);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(202, 120, 66, 0.3);
+        }
+
+        .error-modal-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+
     <div class="cart-page-container">
         <!-- Cart Table Header -->
         <div class="cart-table-header">
@@ -80,8 +206,10 @@
                 <button class="delete-btn" onclick="removeItem(this)">Hapus</button>
             </div>
         </div>
+    </div>
 
-        <!-- Cart Summary/Footer -->
+    <!-- Cart Summary/Footer - Fixed at bottom -->
+    <div class="cart-summary-wrapper">
         <div class="cart-summary">
             <div class="cart-summary-left">
                 <input type="checkbox" class="cart-checkbox" id="selectAllFooter" onchange="toggleAllCheckboxes(this)">
@@ -179,12 +307,40 @@
         function proceedToCheckout() {
             const selectedItems = document.querySelectorAll('.item-checkbox:checked');
             if (selectedItems.length === 0) {
-                alert('Pilih produk terlebih dahulu untuk checkout');
+                showErrorModal();
                 return;
             }
             // Redirect to checkout page
             window.location.href = '/customer/checkout';
         }
+
+        // Show error modal
+        function showErrorModal() {
+            const modal = document.getElementById('errorModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close error modal
+        function closeErrorModal() {
+            const modal = document.getElementById('errorModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('errorModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeErrorModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeErrorModal();
+            }
+        });
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
