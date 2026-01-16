@@ -15,6 +15,102 @@
         </div>
     </div>
 
+    <!-- Success Modal - Pesanan Berhasil -->
+    <div id="successModal" class="success-modal-overlay">
+        <div class="success-modal-container">
+            <!-- Header with Checkmark -->
+            <div class="success-header">
+                <div class="success-checkmark">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>
+                </div>
+                <h2 class="success-title">Pesanan Berhasil</h2>
+                <p class="success-subtitle">Terima Kasih sudah order</p>
+            </div>
+
+            <!-- Order Receipt Card -->
+            <div class="receipt-card">
+                <!-- Cart Icon and Order Number -->
+                <div class="receipt-header">
+                    <div class="receipt-cart-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#FFF4D6" stroke-width="1.5">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                            <line x1="3" y1="6" x2="21" y2="6"></line>
+                            <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                    </div>
+                    <p class="receipt-label">Nomor Order</p>
+                    <p class="receipt-order-number" id="orderNumber">MRK-20260116-001</p>
+                    <p class="receipt-date" id="orderDate">16 Januari 2026 pukul 10:30</p>
+                </div>
+
+                <!-- Order Type & Payment Method -->
+                <div class="receipt-info-row">
+                    <div class="receipt-info-col">
+                        <p class="receipt-info-label">Order Type</p>
+                        <p class="receipt-info-value" id="receiptOrderType">Dine In</p>
+                        <p class="receipt-info-sub" id="receiptTableInfo">Meja 10</p>
+                    </div>
+                    <div class="receipt-info-col">
+                        <p class="receipt-info-label">Payment Method</p>
+                        <p class="receipt-info-value payment-method-display" id="receiptPaymentMethod">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                                <line x1="1" y1="10" x2="23" y2="10"></line>
+                            </svg>
+                            <span id="paymentMethodName">Credit Card</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="receipt-items-section">
+                    <p class="receipt-section-title">Order Items</p>
+                    <div class="receipt-items-list" id="receiptItemsList">
+                        <div class="receipt-item">
+                            <div class="receipt-item-info">
+                                <span class="receipt-item-name">Americano</span>
+                                <span class="receipt-item-variant">Iced | Qty: 1</span>
+                            </div>
+                            <span class="receipt-item-price">RP 20.000</span>
+                        </div>
+                        <div class="receipt-item">
+                            <div class="receipt-item-info">
+                                <span class="receipt-item-name">Americano</span>
+                                <span class="receipt-item-variant">Hot | Qty: 1</span>
+                            </div>
+                            <span class="receipt-item-price">RP 20.000</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div class="receipt-total-section">
+                    <span class="receipt-total-label">Total</span>
+                    <span class="receipt-total-value" id="receiptTotal">RP 40.000</span>
+                </div>
+
+                <!-- Note for Barista -->
+                <div class="receipt-note-section">
+                    <p class="receipt-note-label">Note For Barista</p>
+                    <p class="receipt-note-text" id="receiptNote">No sugar ya mas</p>
+                </div>
+            </div>
+
+            <!-- Berhasil Button -->
+            <button class="berhasil-btn" onclick="closeSuccessModal()">Berhasil</button>
+
+            <!-- Action Buttons -->
+            <div class="success-action-buttons">
+                <button class="btn-riwayat" onclick="goToRiwayat()">
+                    Lihat Riwayat<br>Pesanan
+                </button>
+                <button class="btn-kembali" onclick="goBackToHome()">Kembali</button>
+            </div>
+        </div>
+    </div>
+
     <style>
         /* Error Modal Styles */
         .error-modal-overlay {
@@ -122,6 +218,352 @@
 
         .error-modal-btn:active {
             transform: translateY(0);
+        }
+
+        /* Success Modal Styles */
+        .success-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 20, 16, 0.95);
+            z-index: 10000;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        .success-modal-overlay.show {
+            display: flex;
+        }
+
+        .success-modal-container {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: slideIn 0.4s ease;
+        }
+
+        /* Success Header */
+        .success-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .success-checkmark {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #FFF4D6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .success-checkmark svg {
+            color: #FFF4D6;
+        }
+
+        .success-title {
+            color: #FFF4D6;
+            font-size: 24px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+
+        .success-subtitle {
+            color: #FFF4D6;
+            font-size: 14px;
+            font-weight: 400;
+            font-family: 'Poppins', sans-serif;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        /* Receipt Card */
+        .receipt-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 244, 214, 0.2);
+            border-radius: 12px;
+            padding: 24px 20px;
+            margin-bottom: 24px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 244, 214, 0.15);
+            margin-bottom: 16px;
+        }
+
+        .receipt-cart-icon {
+            margin-bottom: 12px;
+        }
+
+        .receipt-label {
+            color: #FFF4D6;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-bottom: 4px;
+        }
+
+        .receipt-order-number {
+            color: #FFF4D6;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .receipt-date {
+            color: #FFF4D6;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Order Info Row */
+        .receipt-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 244, 214, 0.1);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .receipt-info-col {
+            flex: 1;
+        }
+
+        .receipt-info-col:first-child {
+            border-right: 1px solid rgba(255, 244, 214, 0.1);
+            padding-right: 16px;
+        }
+
+        .receipt-info-col:last-child {
+            padding-left: 16px;
+        }
+
+        .receipt-info-label {
+            color: #FFF4D6;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.6;
+            margin-bottom: 6px;
+        }
+
+        .receipt-info-value {
+            color: #FFF4D6;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .receipt-info-value.payment-method-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .receipt-info-value.payment-method-display svg {
+            color: #FFF4D6;
+        }
+
+        .receipt-info-sub {
+            color: #FFF4D6;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Order Items Section */
+        .receipt-items-section {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 244, 214, 0.1);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .receipt-section-title {
+            color: #FFF4D6;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .receipt-items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .receipt-item-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .receipt-item-name {
+            color: #FFF4D6;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .receipt-item-variant {
+            color: #FFF4D6;
+            font-size: 10px;
+            font-weight: 400;
+            opacity: 0.6;
+        }
+
+        .receipt-item-price {
+            color: #FFF4D6;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Total Section */
+        .receipt-total-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 244, 214, 0.1);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .receipt-total-label {
+            color: #FFF4D6;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .receipt-total-value {
+            color: #FFF4D6;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Note Section */
+        .receipt-note-section {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 244, 214, 0.1);
+            border-radius: 8px;
+        }
+
+        .receipt-note-label {
+            color: #FFF4D6;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .receipt-note-text {
+            color: #FFF4D6;
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.7;
+        }
+
+        /* Berhasil Button */
+        .berhasil-btn {
+            width: 140px;
+            height: 36px;
+            background: #6B4526;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .berhasil-btn:hover {
+            background: #7d5330;
+            transform: translateY(-2px);
+        }
+
+        /* Action Buttons */
+        .success-action-buttons {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            max-width: 620px;
+        }
+
+        .btn-riwayat {
+            width: 350px;
+            height: 55px;
+            background: #C89B6D;
+            color: #1E1E1E;
+            border: none;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            line-height: 1.3;
+        }
+
+        .btn-riwayat:hover {
+            background: #d4a97a;
+            transform: translateY(-2px);
+        }
+
+        .btn-kembali {
+            width: 250px;
+            height: 55px;
+            background: transparent;
+            color: #FFF4D6;
+            border: 1px solid #FFF4D6;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-kembali:hover {
+            background: rgba(255, 244, 214, 0.1);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 600px) {
+            .success-action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-riwayat,
+            .btn-kembali {
+                width: 100%;
+                max-width: 300px;
+            }
         }
     </style>
 
@@ -450,16 +892,87 @@
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                console.log('Processing delivery with:', selectedDelivery.value);
+                // Show success modal with delivery info
+                showSuccessModal(orderType, selectedDelivery.value);
             } else {
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                     return;
                 }
-                console.log('Processing payment with:', selectedPayment.value);
+                // Show success modal with payment info
+                showSuccessModal(orderType, selectedPayment.value);
             }
-            // Process order logic here
+        }
+
+        // Show success modal
+        function showSuccessModal(orderType, paymentMethod) {
+            // Generate order number
+            const now = new Date();
+            const orderNumber = 'MRK-' + now.getFullYear() + 
+                String(now.getMonth() + 1).padStart(2, '0') + 
+                String(now.getDate()).padStart(2, '0') + '-' + 
+                String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
+            
+            // Format date
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const orderDate = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + 
+                             ' pukul ' + String(now.getHours()).padStart(2, '0') + ':' + 
+                             String(now.getMinutes()).padStart(2, '0');
+
+            // Payment method display names
+            const paymentNames = {
+                'dana': 'DANA',
+                'qris': 'QRIS',
+                'transfer_bank': 'Transfer Bank',
+                'gopay': 'GoPay',
+                'shopeepay': 'ShopeePay',
+                'jnt': 'J&T Express',
+                'jne': 'JNE',
+                'grab_express': 'Grab Express',
+                'gosend': 'Go Send',
+                'sicepat': 'SiCepat Express'
+            };
+
+            // Update modal content
+            document.getElementById('orderNumber').textContent = orderNumber;
+            document.getElementById('orderDate').textContent = orderDate;
+            document.getElementById('receiptOrderType').textContent = orderType;
+            document.getElementById('paymentMethodName').textContent = paymentNames[paymentMethod] || paymentMethod;
+
+            // Update table info based on order type
+            const tableInfo = document.getElementById('receiptTableInfo');
+            if (orderType === 'Dine In') {
+                tableInfo.textContent = 'Meja 10';
+                tableInfo.style.display = 'block';
+            } else if (orderType === 'Delivery') {
+                tableInfo.textContent = '';
+                tableInfo.style.display = 'none';
+            } else {
+                tableInfo.textContent = '';
+                tableInfo.style.display = 'none';
+            }
+
+            // Show modal
+            document.getElementById('successModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Go to order history
+        function goToRiwayat() {
+            window.location.href = '/customer/orders';
+        }
+
+        // Go back to home/catalogs
+        function goBackToHome() {
+            window.location.href = '/customer/catalogs';
         }
 
         // Edit address

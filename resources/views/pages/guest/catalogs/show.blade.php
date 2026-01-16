@@ -79,7 +79,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 60px; /* Adjust gap between image and text */
+                gap: 60px;
             "
             x-data="{
                 quantity: 1,
@@ -103,7 +103,6 @@
                         })
                     })
                     .then(response => {
-                        // Store new token if received
                         const newToken = response.headers.get('X-GUEST-TOKEN');
                         if(newToken) {
                             localStorage.setItem('guest_token', newToken);
@@ -116,8 +115,8 @@
                     })
                     .then(data => {
                         alert('Berhasil menambahkan ke keranjang! 🛒');
-                        this.quantity = 1; // Reset quantity
-                        this.note = ''; // Reset note
+                        this.quantity = 1;
+                        this.note = '';
                     })
                     .catch(error => {
                         console.error('Error:', error);
