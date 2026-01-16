@@ -192,10 +192,18 @@
                         }
 
                         .cta-button-custom {
-                            width: 100%;
+                            width: auto !important;
                             justify-content: center;
                             font-size: 14px !important;
-                            padding: 12px 24px !important;
+                            padding: 12px 32px !important;
+                            margin: 0 auto;
+                        }
+
+                        .hero-cta-container {
+                            display: block !important;
+                            width: 100% !important;
+                            text-align: center !important;
+                            margin-top: 10px;
                         }
 
                         .hero-decorative-lines {
@@ -255,7 +263,7 @@
 
                     }
                 </style>
-                <div style="position: relative; display: inline-block;">
+                <div class="hero-cta-container" style="position: relative; display: inline-block;">
                     <!-- Main CTA Button -->
                     <a href="{{ url('/customer/catalogs') }}" class="cta-button-custom" style="overflow: hidden;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -446,8 +454,15 @@
             <div class="features-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 60px;">
                 <!-- Feature 1: Quality (Icon replaced by falling star) -->
                 <div style="text-align: center;">
-                    <div style="height: 60px; margin-bottom: 24px;">
-                        <!-- Transparent spacer for the star to land in -->
+                    <div
+                        style="height: 60px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center;">
+                        <!-- Static Star for Mobile (Chunky/Rounded) -->
+                        <svg class="mobile-only" style="display: none;" width="50" height="50" viewBox="0 0 24 24"
+                            fill="white">
+                            <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                                stroke="white" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
+                        </svg>
                     </div>
                     <h3 class="feature-title"
                         style="color: white; font-size: 24px; font-weight: 600; margin-bottom: 16px;">Quality</h3>
