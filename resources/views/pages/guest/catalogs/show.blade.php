@@ -212,7 +212,7 @@
                                 alignItems: 'start',
                                 gap: '12px',
                                 transform: 'translateX(120%)',
-                                transition: 'transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+                                transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease',
                                 opacity: '0'
                             });
 

@@ -50,8 +50,9 @@
             <div class="footer-brand">
                 <div class="footer-brand-inner"
                     style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
-                    <!-- Logo Placeholder -->
-                    <div style="width: 60px; height: 60px; background-color: white; border-radius: 50%;"></div>
+                    <!-- Logo -->
+                    <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo"
+                        style="width: 60px; height: 60px; object-fit: contain;">
                     <div>
                         <h3 style="font-size: 24px; font-weight: 700; margin: 0;">Meracikopi</h3>
                         <p style="font-size: 14px; font-weight: 300; color: #a89890; margin: 0;">Coffe Space & Roastery

@@ -36,7 +36,7 @@
     </style>
 
     <!-- Hero Section -->
-    <div style="background-color: #1a1410; min-height: 80vh; padding: 40px 80px;">
+    <div class="hero-section" style="background-color: #1a1410; min-height: 80vh; padding: 40px 80px;">
         <div class="hero-container"
             style="max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 60px;">
 
@@ -48,10 +48,13 @@
                     <span style="position: relative; display: inline-block;">
                         <span style="color: #CA7842; font-style: italic;">Kopi</span>
                         <!-- Ornament -->
-                        <svg style="position: absolute; bottom: -8px; left: -5%; width: 110%; height: 12px; transform: rotate(-2deg);"
+                        <!-- Ornament Desktop -->
+                        <svg class="kopi-underline desktop-only"
+                            style="position: absolute; bottom: -8px; left: -5%; width: 110%; height: 12px; transform: rotate(-2deg);"
                             viewBox="0 0 100 15" fill="none" preserveAspectRatio="none">
                             <path d="M2 10C20 15 50 15 98 2" stroke="#F8F5F2" stroke-width="5" stroke-linecap="round" />
                         </svg>
+
                     </span>
                     <br>
                     <span style="color: white; font-weight: 700;">Berkualitas, Diracik</span>
@@ -160,6 +163,96 @@
                         padding-left: 32px;
                         /* Subtle expansion */
                         padding-right: 32px;
+                    }
+
+                    /* Mobile Responsive Styles */
+                    @media (max-width: 768px) {
+                        .hero-container {
+                            flex-direction: column !important;
+                            padding: 30px 20px !important;
+                            gap: 40px !important;
+                        }
+
+                        .hero-title {
+                            font-size: 32px !important;
+                            text-align: center;
+                            line-height: 1.2 !important;
+                        }
+
+                        .hero-title svg {
+                            width: 32px !important;
+                            height: 32px !important;
+                        }
+
+                        .hero-subtitle {
+                            font-size: 15px !important;
+                            text-align: center;
+                            max-width: 100% !important;
+                            line-height: 1.5 !important;
+                        }
+
+                        .cta-button-custom {
+                            width: 100%;
+                            justify-content: center;
+                            font-size: 14px !important;
+                            padding: 12px 24px !important;
+                        }
+
+                        .hero-decorative-lines {
+                            display: none !important;
+                        }
+
+                        .hero-image-grid {
+                            max-width: 400px;
+                            margin: 0 auto;
+                        }
+
+                        .hero-ornament {
+                            display: none !important;
+                        }
+
+                        /* SVG Switching for Mobile */
+                        .desktop-only {
+                            display: none !important;
+                        }
+
+                        .mobile-only {
+                            display: block !important;
+                        }
+                    }
+
+                    @media (max-width: 480px) {
+                        .hero-title {
+                            font-size: 26px !important;
+                            margin-bottom: 16px !important;
+                            line-height: 1.2 !important;
+                        }
+
+                        .hero-title svg {
+                            width: 28px !important;
+                            height: 28px !important;
+                        }
+
+                        .hero-subtitle {
+                            font-size: 14px !important;
+                            margin-bottom: 30px !important;
+                            line-height: 1.6 !important;
+                        }
+
+                        .cta-button-custom {
+                            font-size: 13px !important;
+                            padding: 10px 20px !important;
+                        }
+
+                        .hero-image-grid {
+                            max-width: 300px;
+                        }
+
+                        .hero-section {
+                            padding: 30px 16px !important;
+                            min-height: auto !important;
+                        }
+
                     }
                 </style>
                 <div style="position: relative; display: inline-block;">
@@ -517,7 +610,7 @@
                     </div>
                 </a>
 
-                <!-- Category 4: Kopi Botolan -->
+                <!-- Category 4: Kopi Botol -->
                 <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
@@ -542,11 +635,11 @@
                             overflow: hidden;
                             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}"
-                                alt="Kopi Botolan" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Kopi Botol"
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
-                            Kopi Botolan</h3>
+                            Kopi Botol</h3>
                     </div>
                 </a>
 

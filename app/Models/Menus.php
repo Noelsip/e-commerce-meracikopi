@@ -30,7 +30,7 @@ class Menus extends Model
         'food' => 'Food',
         'drink' => 'Drink',
         'coffee_beans' => 'Coffee Beans',
-        'kopi_botolan' => 'Kopi Botolan',
+        'kopi_botolan' => 'Kopi Botol',
         'sachet-drip' => 'Sachet Drip',
     ];
 

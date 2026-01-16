@@ -17,7 +17,7 @@
             <!-- Logo & Title -->
             <div class="text-center mb-8">
                 <div class="flex justify-center mb-4">
-                    <x-app-logo-icon class="h-12 w-12" />
+                    <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" class="h-16 w-auto">
                 </div>
                 <h2 class="text-2xl font-bold" style="color: #f0f2bd;">Admin Login</h2>
                 <p class="mt-2 text-sm" style="color: #f0f2bd;">Masuk ke Dashboard Admin Meracikopi</p>
