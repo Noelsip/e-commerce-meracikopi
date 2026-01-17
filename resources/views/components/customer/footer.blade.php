@@ -1,3 +1,46 @@
+<style>
+    /* Footer Social Icons Hover */
+    .footer-social a {
+        color: rgba(255, 255, 255, 0.7) !important;
+        transition: color 0.3s ease;
+    }
+
+    .footer-social a:hover {
+        color: #ffffff !important;
+    }
+
+    @media (max-width: 768px) {
+        .footer-container {
+            padding: 40px 20px 30px 20px !important;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr !important;
+            gap: 30px !important;
+            text-align: center;
+        }
+
+        .footer-brand-inner {
+            flex-direction: column !important;
+            gap: 12px !important;
+        }
+
+        .footer-social {
+            justify-content: center !important;
+        }
+
+        .footer-section h4 {
+            font-size: 16px !important;
+            margin-bottom: 16px !important;
+        }
+
+        .footer-section ul,
+        .footer-section>div {
+            align-items: center;
+        }
+    }
+</style>
+
 <footer class="footer-container"
     style="background-color: #231812; padding: 80px 80px 40px 80px; color: white; border-top: 1px solid rgba(255,255,255,0.05);">
     <div style="max-width: 1200px; margin: 0 auto;">

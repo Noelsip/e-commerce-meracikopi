@@ -3,9 +3,7 @@
     .checkout-navbar {
         background-color: #2A1B14;
         width: 100%;
-        max-width: 1440px;
         height: 115px;
-        margin: 0 auto;
         box-shadow: 0 7px 4px rgba(0, 0, 0, 0.25);
         display: flex;
         align-items: center;
@@ -58,6 +56,7 @@
         gap: 12px;
         flex-shrink: 0;
     }
+
     .checkout-logo-circle {
         width: 45px;
         height: 45px;
@@ -182,7 +181,7 @@
 <div class="back-button-container">
     <a href="{{ route('cart.index') }}" class="back-to-cart-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         <span>Back</span>
     </a>
@@ -209,8 +208,9 @@
                     <option value="takeaway">Takeaway</option>
                     <option value="delivery">Delivery</option>
                 </select>
-                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9l6 6 6-6"/>
+                <svg class="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <path d="M6 9l6 6 6-6" />
                 </svg>
             </div>
         </div>
@@ -223,7 +223,7 @@
         const orderTypeDisplay = document.getElementById('orderTypeDisplay');
         if (orderTypeDisplay) {
             let displayText = '';
-            switch(value) {
+            switch (value) {
                 case 'dine_in':
                     displayText = 'Dine In';
                     break;
@@ -241,7 +241,7 @@
         if (typeof window.toggleDeliverySection === 'function') {
             window.toggleDeliverySection(value === 'delivery');
         }
-        
+
         console.log('Order type changed to:', value);
     }
 </script>

@@ -2,15 +2,19 @@
     /* Cart Navbar Styling */
     .cart-navbar {
         background-color: #2A1B14;
-        width: 100%;
-        max-width: 1440px;
         height: 115px;
-        margin: 0 auto;
         box-shadow: 0 7px 4px rgba(0, 0, 0, 0.25);
+        padding: 0 40px;
+        position: relative;
+    }
+
+    .cart-navbar-inner {
+        max-width: 1360px;
+        height: 100%;
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 100px;
         position: relative;
     }
 
@@ -18,6 +22,10 @@
         background-color: #2A1B14;
         padding: 0;
         width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
     }
 
     /* Logo and Cart Title */
@@ -29,8 +37,8 @@
     }
 
     .cart-logo-circle {
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         background: linear-gradient(145deg, #F0F2BD, #d4d6a3);
         border-radius: 50%;
         display: flex;
@@ -41,7 +49,7 @@
     .cart-logo-text {
         color: white;
         font-weight: 600;
-        font-size: 20px;
+        font-size: 18px;
         font-family: 'Poppins', sans-serif;
     }
 
@@ -55,17 +63,18 @@
     .cart-title {
         color: #CA7842;
         font-weight: 600;
-        font-size: 20px;
+        font-size: 18px;
         font-family: 'Poppins', sans-serif;
     }
 
     /* Search bar in cart navbar - aligned with Aksi column (right edge of rectangle) */
     .cart-search-wrapper {
-        width: 610px;
+        width: 100%;
+        max-width: 629px;
         position: absolute;
-        right: calc((100% - 1239px) / 2 + 24px);
-        top: 50%;
-        transform: translateY(-50%);
+        left: 50%;
+        top: 55%;
+        transform: translate(-50%, -50%);
     }
 
     .cart-search-input {
@@ -130,13 +139,17 @@
         .cart-title {
             font-size: 16px;
         }
+
+        .back-button-container {
+            padding-top: 100px !important;
+        }
     }
 
     /* Back Button Container (Below Navbar, aligned with content) */
     .back-button-container {
-        max-width: 1239px;
+        max-width: 1360px;
         margin: 0 auto;
-        padding: 20px 20px 0 20px;
+        padding: 135px 20px 0 20px;
     }
 
     .back-to-home-btn {
@@ -162,27 +175,26 @@
 <!-- Cart Navbar Container -->
 <div class="cart-navbar-container">
     <div class="cart-navbar">
-        <!-- Left: Logo and Cart Title -->
-        <div class="cart-logo-section">
-            <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                <div class="cart-logo-circle"></div>
-                <span class="cart-logo-text">Meracikopi</span>
-            </a>
-            <div class="cart-divider"></div>
-            <span class="cart-title">Cart</span>
-        </div>
+        <div class="cart-navbar-inner">
+            <!-- Left: Logo and Cart Title -->
+            <div class="cart-logo-section">
+                <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
+                    <div class="cart-logo-circle"></div>
+                    <span class="cart-logo-text">Meracikopi</span>
+                </a>
+                <div class="cart-divider"></div>
+                <span class="cart-title">Cart</span>
+            </div>
 
-        <!-- Center: Search Bar -->
-        <div class="cart-search-wrapper">
-            <div style="position: relative;">
-                <input type="text" name="search" 
-                       placeholder="What Do you Want Today?" 
-                       class="cart-search-input">
-                <svg class="cart-search-icon" 
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+            <!-- Center: Search Bar -->
+            <div class="cart-search-wrapper">
+                <div style="position: relative;">
+                    <input type="text" name="search" placeholder="What Do you Want Today?" class="cart-search-input">
+                    <svg class="cart-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
             </div>
         </div>
     </div>
@@ -192,7 +204,7 @@
 <div class="back-button-container">
     <a href="{{ route('catalogs.index') }}" class="back-to-home-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
         <span>Back</span>
     </a>

@@ -24,12 +24,19 @@ class Orders extends Model
         'customer_phone',
         'status',
         'total_price',
+        'notes',
+        'delivery_fee',
+        'discount_amount',
+        'final_price',
     ];
 
     protected $casts = [
         'order_type' => OrderType::class,
         'status' => OrderStatus::class,
         'total_price' => 'decimal:2',
+        'delivery_fee' => 'decimal:2',
+        'discount_amount' => 'decimal:2',
+        'final_price' => 'decimal:2',
     ];
 
     public function user()

@@ -41,22 +41,22 @@
             margin: 0;
             min-height: 100vh;
             /* Background linear gradient sesuai gambar ketiga */
-            background: linear-gradient(
-                to right,
-                rgba(42, 27, 20, 0.75) 0%,
-                rgba(42, 27, 20, 0.45) 50%,
-                rgba(42, 27, 20, 0.75) 100%
-            );
+            background: linear-gradient(to right,
+                    rgba(42, 27, 20, 0.75) 0%,
+                    rgba(42, 27, 20, 0.45) 50%,
+                    rgba(42, 27, 20, 0.75) 100%);
             background-color: #1a1410;
+            overflow-x: hidden;
+            width: 100%;
         }
 
         /* Cart Page Styles */
         .cart-page-container {
-            width: 100%;
-            max-width: 1239px;
+            max-width: 1360px;
             margin: 0 auto;
             padding: 40px 20px;
-            padding-bottom: 140px; /* Space for fixed footer */
+            padding-bottom: 140px;
+            /* Space for fixed footer */
         }
 
         /* Cart Table Header */
@@ -69,8 +69,7 @@
             border-radius: 8px;
             margin-bottom: 16px;
             background: transparent;
-            width: 100%;
-            max-width: 1239px;
+            max-width: 1360px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -102,8 +101,7 @@
             margin-bottom: 12px;
             background: transparent;
             transition: all 0.3s ease;
-            width: 100%;
-            max-width: 1239px;
+            max-width: 1360px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -264,8 +262,7 @@
             border: 1px solid #D9D9D9;
             border-radius: 8px;
             background: transparent;
-            width: 100%;
-            max-width: 1239px;
+            max-width: 1360px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -337,6 +334,7 @@
 
         /* Responsive */
         @media (max-width: 992px) {
+
             .cart-table-header,
             .cart-item-row,
             .cart-summary {

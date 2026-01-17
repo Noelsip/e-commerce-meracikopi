@@ -516,7 +516,7 @@
 
         .btn-riwayat {
             width: 350px;
-            height: 55px;
+            height: 40px;
             background: #C89B6D;
             color: #1E1E1E;
             border: none;
@@ -536,7 +536,7 @@
 
         .btn-kembali {
             width: 250px;
-            height: 55px;
+            height: 40px;
             background: transparent;
             color: #FFF4D6;
             border: 1px solid #FFF4D6;
