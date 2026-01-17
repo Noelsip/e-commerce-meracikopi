@@ -40,6 +40,9 @@ class OrderController extends Controller
                 'order_type' => $order->order_type,
                 'status' => $order->status,
                 'total_price' => (int) $order->total_price,
+                'delivery_fee' => (int) $order->delivery_fee,
+                'discount_amount' => (int) $order->discount_amount,
+                'final_price' => (int) $order->final_price,
                 'created_at' => $order->created_at->toIso8601String(),
             ])
         ], 200);
@@ -79,36 +82,57 @@ class OrderController extends Controller
                 abort(422, 'Cart is empty');
             }
 
-            // Menghitung total harga dari server
+            // Menghitung total harga dari server dengan diskon
             $totalPrice = 0;
+            $totalDiscountAmount = 0;
 
             foreach ($cart->items as $item) {
                 if (!$item->menu->is_available) {
                     abort(422, "Menu '{$item->menu->name}' is not available");
                 }
 
-                $totalPrice += $item->menu->price * $item->quantity;
+                // Hitung dengan harga setelah diskon
+                $finalPrice = $item->menu->final_price;
+                $totalPrice += $finalPrice * $item->quantity;
+                
+                // Hitung total diskon
+                $totalDiscountAmount += $item->menu->discount_amount * $item->quantity;
             }
+
+            // Hitung delivery fee (jika order type = delivery)
+            $deliveryFee = 0;
+            if ($request->order_type === 'delivery') {
+                // TODO: Integrate dengan third party delivery service
+                // Untuk sementara set default atau dari request
+                $deliveryFee = $request->input('delivery_fee', 0);
+            }
+
+            // Hitung final price
+            $finalPrice = $totalPrice + $deliveryFee;
 
             // Membuat order
             $order = Orders::create([
                 'guest_token' => $cart->guest_token,
+                'user_id' => auth()->check() ? auth()->id() : null,
                 'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
                 'order_type' => $request->order_type,
                 'table_id' => $request->table_id,
                 'total_price' => $totalPrice,
+                'delivery_fee' => $deliveryFee,
+                'discount_amount' => $totalDiscountAmount,
+                'final_price' => $finalPrice,
                 'status' => OrderStatus::PENDING_PAYMENT,
                 'notes' => $request->notes,
             ]);
 
-            // Copy cart_items ke order_items
+            // Copy cart_items ke order_items dengan harga final (setelah diskon)
             foreach ($cart->items as $item) {
                 OrderItems::create([
                     'order_id' => $order->id,
                     'menu_id' => $item->menu_id,
                     'quantity' => $item->quantity,
-                    'price' => $item->menu->price,
+                    'price' => $item->menu->final_price, // Gunakan harga setelah diskon
                 ]);
             }
 
@@ -142,6 +166,9 @@ class OrderController extends Controller
                     'order_type' => $order->order_type,
                     'status' => $order->status,
                     'total_price' => (int) $order->total_price,
+                    'delivery_fee' => (int) $order->delivery_fee,
+                    'discount_amount' => (int) $order->discount_amount,
+                    'final_price' => (int) $order->final_price,
                 ]
             ], 201);
         });
@@ -179,8 +206,12 @@ class OrderController extends Controller
                 'order_type' => $order->order_type,
                 'status' => $order->status,
                 'total_price' => (int) $order->total_price,
+                'delivery_fee' => (int) $order->delivery_fee,
+                'discount_amount' => (int) $order->discount_amount,
+                'final_price' => (int) $order->final_price,
                 'customer_name' => $order->customer_name,
                 'customer_phone' => $order->customer_phone,
+                'notes' => $order->notes,
                 'user' => $order->user ? [
                     'id' => $order->user->id,
                     'name' => $order->user->name,
