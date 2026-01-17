@@ -9,10 +9,22 @@ use Illuminate\Support\Facades\Storage;
 
 class MenuAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $menus = Menus::latest()->paginate(10);
-        return view('admin.menus.index', compact('menus'));
+        $query = Menus::latest();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        $menus = $query->paginate(10)->withQueryString();
+        $categories = Menus::CATEGORIES;
+
+        return view('admin.menus.index', compact('menus', 'categories'));
     }
 
     public function create()

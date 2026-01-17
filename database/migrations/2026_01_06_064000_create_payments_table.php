@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('transaction_id')->unique();
             $table->string('reference_id')->nullable();
             $table->decimal('amount', 10, 2);
-            $table->string('status')->default(StatusPayments::PENDING->value);
+            $table->string('status')->default(StatusPayments::REQUESTED->value);
             $table->json('payload');
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
