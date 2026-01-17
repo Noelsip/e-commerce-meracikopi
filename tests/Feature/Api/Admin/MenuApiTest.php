@@ -1,144 +1,127 @@
 <?php
 
-namespace Tests\Feature\Api\Admin;
-
-use Tests\TestCase;
 use App\Models\User;
 use App\Models\Menus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use Illuminate\Support\Facades\Auth;
 
-class MenuApiTest extends TestCase
-{
-    use RefreshDatabase;
+beforeEach(function () {
+    $this->admin = User::factory()->create([
+        'role' => 'admin',
+        'email' => 'admin@meracikopi.com',
+        'password' => 'password'
+    ]);
+    
+    // Create Sanctum token untuk admin
+    Sanctum::actingAs($this->admin, ['*']);
+});
 
-    protected User $admin;
+test('admin can get all menus', function () {
+    Menus::factory()->count(3)->create();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        
-        // Buat admin user untuk testing
-        $this->admin = User::factory()->create([
-            'role' => 'admin',
-            'email' => 'admin@meracikopi.com',
-            'password' => 'password'
-        ]);
-    }
+    $response = $this->getJson('/api/admin/menus');
 
-    public function test_get_all_menus(): void
-    {
-        // Buat beberapa menu
-        Menus::factory()->count(3)->create();
-
-        $response = $this->actingAs($this->admin)
-            ->getJson('/api/admin/menus');
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => [
                 'data' => [
                     '*' => ['id', 'name', 'description', 'price', 'is_available']
-                ]
-            ]);
-    }
+                ],
+                'current_page',
+                'per_page',
+                'total'
+            ]
+        ]);
+});
 
-    public function test_create_menu(): void
-    {
-        $menuData = [
-            'name' => 'Kopi Susu Gula Aren',
-            'description' => 'Kopi susu dengan gula aren premium',
-            'price' => 28000,
-            'image_path' => '/images/kopi.jpg',
-            'is_available' => true,
-        ];
+test('admin can create menu', function () {
+    $menuData = [
+        'name' => 'Kopi Susu Gula Aren',
+        'description' => 'Kopi susu dengan gula aren premium',
+        'price' => 28000,
+        'image_path' => '/images/kopi.jpg',
+        'is_available' => true,
+    ];
 
-        $response = $this->actingAs($this->admin)
-            ->postJson('/api/admin/menus', $menuData);
+    $response = $this->postJson('/api/admin/menus', $menuData);
 
-        $response->assertStatus(201)
-            ->assertJson([
-                'message' => 'Menu Created',
-                'data' => [
-                    'name' => 'Kopi Susu Gula Aren',
-                ]
-            ]);
+    $response->assertStatus(201)
+        ->assertJson([
+            'message' => 'Menu Created',
+            'data' => [
+                'name' => 'Kopi Susu Gula Aren',
+            ]
+        ]);
 
-        $this->assertDatabaseHas('menus', ['name' => 'Kopi Susu Gula Aren']);
-    }
+    $this->assertDatabaseHas('menus', ['name' => 'Kopi Susu Gula Aren']);
+});
 
-    public function test_get_menu_by_id(): void
-    {
-        $menu = Menus::factory()->create();
+test('admin can get menu by id', function () {
+    $menu = Menus::factory()->create();
 
-        $response = $this->actingAs($this->admin)
-            ->getJson("/api/admin/menus/{$menu->id}");
+    $response = $this->getJson("/api/admin/menus/{$menu->id}");
 
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => ['id', 'name', 'description', 'price', 'is_available']
-            ]);
-    }
+    $response->assertStatus(200)
+        ->assertJsonStructure([
+            'data' => ['id', 'name', 'description', 'price', 'is_available']
+        ]);
+});
 
-    public function test_update_menu(): void
-    {
-        $menu = Menus::factory()->create();
+test('admin can update menu', function () {
+    $menu = Menus::factory()->create();
 
-        $response = $this->actingAs($this->admin)
-            ->putJson("/api/admin/menus/{$menu->id}", [
+    $response = $this->putJson("/api/admin/menus/{$menu->id}", [
+        'name' => 'Updated Menu Name',
+        'price' => 35000,
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'message' => 'Menu Updated',
+            'data' => [
                 'name' => 'Updated Menu Name',
                 'price' => 35000,
-            ]);
-
-        $response->assertStatus(200)
-            ->assertJson([
-                'message' => 'Menu Updated',
-                'data' => [
-                    'name' => 'Updated Menu Name',
-                    'price' => 35000,
-                ]
-            ]);
-    }
-
-    public function test_update_menu_availability(): void
-    {
-        $menu = Menus::factory()->create(['is_available' => true]);
-
-        $response = $this->actingAs($this->admin)
-            ->patchJson("/api/admin/menus/{$menu->id}/availability", [
-                'is_available' => false,
-            ]);
-
-        $response->assertStatus(200);
-        $this->assertDatabaseHas('menus', [
-            'id' => $menu->id,
-            'is_available' => false,
+            ]
         ]);
-    }
+});
 
-    public function test_delete_menu(): void
-    {
-        $menu = Menus::factory()->create();
+test('admin can update menu availability', function () {
+    $menu = Menus::factory()->create(['is_available' => true]);
 
-        $response = $this->actingAs($this->admin)
-            ->deleteJson("/api/admin/menus/{$menu->id}");
+    $response = $this->patchJson("/api/admin/menus/{$menu->id}/availability", [
+        'is_available' => false,
+    ]);
 
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'Menu Deleted Successfully']);
-    }
+    $response->assertStatus(200);
+    $this->assertDatabaseHas('menus', [
+        'id' => $menu->id,
+        'is_available' => false,
+    ]);
+});
 
-    public function test_unauthenticated_user_cannot_access_admin_menus(): void
-    {
-        $response = $this->getJson('/api/admin/menus');
+test('admin can delete menu', function () {
+    $menu = Menus::factory()->create();
 
-        $response->assertStatus(401);
-    }
+    $response = $this->deleteJson("/api/admin/menus/{$menu->id}");
 
-    public function test_non_admin_cannot_access_admin_menus(): void
-    {
-        $customer = User::factory()->create(['role' => 'customer']);
+    $response->assertStatus(200)
+        ->assertJson(['message' => 'Menu Deleted Successfully']);
+});
 
-        $response = $this->actingAs($customer)
-            ->getJson('/api/admin/menus');
+test('unauthenticated user cannot access admin menus', function () {
+    // Clear any authentication - don't use Auth::logout() with Sanctum
+    Sanctum::actingAs(null);
+    
+    $response = $this->getJson('/api/admin/menus');
 
-        $response->assertStatus(403);
-    }
-}
+    $response->assertStatus(401);
+});
+
+test('non-admin cannot access admin menus', function () {
+    $customer = User::factory()->create(['role' => 'customer']);
+    Sanctum::actingAs($customer, ['*']);
+
+    $response = $this->getJson('/api/admin/menus');
+
+    $response->assertStatus(403);
+});
