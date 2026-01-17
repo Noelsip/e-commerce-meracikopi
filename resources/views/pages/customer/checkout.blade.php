@@ -779,9 +779,81 @@
                     <label>Nomor Telepon</label>
                     <input type="text" class="form-input" id="recipientPhone" value="(+62) 822 54554411">
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <select class="form-input form-select" id="province">
+                            <option value="">Pilih Provinsi</option>
+                            <option value="kaltim" selected>Kalimantan Timur</option>
+                            <option value="kalteng">Kalimantan Tengah</option>
+                            <option value="kalsel">Kalimantan Selatan</option>
+                            <option value="kalbar">Kalimantan Barat</option>
+                            <option value="kaltara">Kalimantan Utara</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kota/Kabupaten</label>
+                        <select class="form-input form-select" id="city">
+                            <option value="">Pilih Kota</option>
+                            <option value="balikpapan" selected>Kota Balikpapan</option>
+                            <option value="samarinda">Kota Samarinda</option>
+                            <option value="bontang">Kota Bontang</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kecamatan</label>
+                        <select class="form-input form-select" id="district">
+                            <option value="">Pilih Kecamatan</option>
+                            <option value="balikpapan_utara" selected>Balikpapan Utara</option>
+                            <option value="balikpapan_selatan">Balikpapan Selatan</option>
+                            <option value="balikpapan_timur">Balikpapan Timur</option>
+                            <option value="balikpapan_barat">Balikpapan Barat</option>
+                            <option value="balikpapan_tengah">Balikpapan Tengah</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kode Pos</label>
+                        <input type="text" class="form-input" id="postalCode" value="76614" maxlength="5">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Alamat Lengkap</label>
-                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</textarea>
+                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Detail Lainnya <span class="optional-label">(Opsional)</span></label>
+                    <input type="text" class="form-input" id="addressDetail" placeholder="Patokan, warna rumah, dll">
+                </div>
+                <div class="form-group">
+                    <label>Label Alamat</label>
+                    <div class="address-label-options">
+                        <button type="button" class="label-btn active" onclick="selectAddressLabel(this, 'rumah')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Rumah
+                        </button>
+                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kantor')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            Kantor
+                        </button>
+                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kos')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
+                                <path d="M9 21v-6h6v6"></path>
+                                <path d="M9 9h.01"></path>
+                                <path d="M15 9h.01"></path>
+                            </svg>
+                            Kos
+                        </button>
+                    </div>
+                    <input type="hidden" id="addressLabel" value="rumah">
                 </div>
                 <div class="form-actions">
                     <button class="btn-cancel" onclick="closeAddressModal()">Batal</button>
@@ -886,6 +958,13 @@
         function proceedToPayment() {
             const orderType = document.getElementById('orderTypeDisplay').textContent;
             
+            // Check if at least one order item is selected
+            const selectedItems = document.querySelectorAll('.order-item-checkbox:checked');
+            if (selectedItems.length === 0) {
+                showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
+                return;
+            }
+            
             if (orderType === 'Delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
@@ -985,16 +1064,43 @@
             document.getElementById('addressModal').style.display = 'none';
         }
 
+        // Select address label
+        function selectAddressLabel(btn, label) {
+            // Remove active from all buttons
+            document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+            // Add active to clicked button
+            btn.classList.add('active');
+            // Update hidden input
+            document.getElementById('addressLabel').value = label;
+        }
+
         // Save address
         function saveAddress() {
             const name = document.getElementById('recipientName').value;
             const phone = document.getElementById('recipientPhone').value;
+            const province = document.getElementById('province');
+            const city = document.getElementById('city');
+            const district = document.getElementById('district');
+            const postalCode = document.getElementById('postalCode').value;
             const address = document.getElementById('fullAddress').value;
+            const detail = document.getElementById('addressDetail').value;
+            const label = document.getElementById('addressLabel').value;
+
+            // Build full address string
+            const provinceName = province.options[province.selectedIndex]?.text || '';
+            const cityName = city.options[city.selectedIndex]?.text || '';
+            const districtName = district.options[district.selectedIndex]?.text || '';
+            
+            let fullAddressText = address;
+            if (districtName) fullAddressText += ', Kec. ' + districtName;
+            if (cityName) fullAddressText += ', ' + cityName;
+            if (provinceName) fullAddressText += ', ' + provinceName;
+            if (postalCode) fullAddressText += ' ' + postalCode;
 
             // Update display
             document.querySelector('.recipient-name').textContent = name;
             document.querySelector('.recipient-phone').textContent = phone;
-            document.querySelector('.address-detail').textContent = address;
+            document.querySelector('.address-detail').textContent = fullAddressText;
 
             closeAddressModal();
         }

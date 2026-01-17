@@ -57,7 +57,7 @@
         width: 2px;
         height: 30px;
         background-color: rgba(255, 255, 255, 0.5);
-        margin: 0 16px;
+        margin: 0 20px;
     }
 
     .cart-title {
@@ -70,11 +70,11 @@
     /* Search bar in cart navbar - aligned with Aksi column (right edge of rectangle) */
     .cart-search-wrapper {
         width: 100%;
-        max-width: 629px;
+        max-width: 750px;
         position: absolute;
-        left: 50%;
+        right: 0;
         top: 55%;
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
     }
 
     .cart-search-input {
@@ -88,12 +88,12 @@
         font-size: 13px;
         outline: none;
         transition: all 0.3s ease;
-        text-align: center;
+        text-align: left;
     }
 
     .cart-search-input::placeholder {
         color: rgba(200, 190, 180, 0.6);
-        text-align: center;
+        text-align: left;
     }
 
     .cart-search-input:focus {

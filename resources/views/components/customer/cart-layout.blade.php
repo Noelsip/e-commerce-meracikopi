@@ -274,8 +274,26 @@
         }
 
         .select-all-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
             color: rgba(255, 255, 255, 0.85);
-            font-size: 13px;
+            font-size: 20 px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .select-all-label:hover {
+            color: white;
+        }
+
+        .header-checkbox {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .select-all-checkbox {
             cursor: pointer;
         }
 
@@ -326,10 +344,17 @@
             justify-self: end;
         }
 
-        .checkout-btn:hover {
+        .checkout-btn:hover:not(:disabled) {
             background-color: #d4864c;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(202, 120, 66, 0.4);
+        }
+
+        .checkout-btn:disabled {
+            background-color: #6b5c54;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.6;
         }
 
         /* Responsive */
