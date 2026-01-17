@@ -110,7 +110,7 @@ test('admin can delete menu', function () {
 
 test('unauthenticated user cannot access admin menus', function () {
     // Clear any authentication - don't use Auth::logout() with Sanctum
-    Sanctum::actingAs(null);
+    // Sanctum::actingAs(null);
     
     $response = $this->getJson('/api/admin/menus');
 

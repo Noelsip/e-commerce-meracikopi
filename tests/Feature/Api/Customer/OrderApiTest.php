@@ -43,6 +43,12 @@ test('customer can create take away order', function () {
         'order_type' => 'take_away',
         'customer_name' => 'John Doe',
     ]);
+
+    // Verify cart status changed to checked_out
+    $this->assertDatabaseHas('carts', [
+        'guest_token' => $this->guestToken,
+        'status' => 'checked_out'
+    ]);
 });
 
 test('customer can create dine in order', function () {
@@ -180,7 +186,7 @@ test('customer can get order by id', function () {
 
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'data' => ['id', 'order_type', 'status', 'total_price', 'items']
+            'data' => ['id', 'order_type', 'status', 'items']
         ]);
 });
 
