@@ -302,7 +302,7 @@
                 <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" 
                    class="catalog-filter-pill"
                    style="{{ request('category') == 'kopi_botolan' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
-                    Kopi Botolan
+                    Kopi Botol
                 </a>
                 <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" 
                    class="catalog-filter-pill"
