@@ -176,6 +176,9 @@
                         return response.json();
                     })
                     .then(data => {
+                        alert('Berhasil menambahkan ke keranjang! 🛒');
+                        this.quantity = 1;
+                        this.note = '';
                         window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1; 
                         this.note = ''; 
