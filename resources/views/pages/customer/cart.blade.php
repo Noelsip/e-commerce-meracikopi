@@ -45,47 +45,65 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-row">
-                        <!-- Item Checkbox -->
-                        <div class="flex justify-center">
-                            <input type="checkbox" 
-                                   class="cart-checkbox item-checkbox" 
-                                   :checked="item.selected" 
-                                   @change="toggleItemSelection(item.id)">
+                    <div class="cart-item-wrapper" 
+                         x-data="{ swiped: false, startX: 0, currentX: 0 }"
+                         @touchstart="startX = $event.touches[0].clientX; currentX = 0"
+                         @touchmove="currentX = $event.touches[0].clientX - startX"
+                         @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }"
+                    >
+                        <div class="cart-item-row" :class="{ 'swiped': swiped }">
+                            <!-- Item Checkbox -->
+                            <div class="flex justify-center">
+                                <input type="checkbox" 
+                                       class="cart-checkbox item-checkbox" 
+                                       :checked="item.selected" 
+                                       @change="toggleItemSelection(item.id)">
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="product-info">
+                                <template x-if="item.menu_image">
+                                    <img :src="item.menu_image" alt="Product" class="product-image">
+                                </template>
+                                <template x-if="!item.menu_image">
+                                    <div class="product-image-placeholder"></div>
+                                </template>
+                                <span class="product-name" x-text="item.menu_name"></span>
+                            </div>
+
+                            <!-- Price -->
+                            <span class="product-price" x-text="formatRupiah(item.price)"></span>
+
+                            <!-- Quantity -->
+                            <div class="quantity-controls">
+                                <button type="button" class="quantity-btn quantity-btn-minus"
+                                    @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
+                                    −
+                                </button>
+                                <span class="quantity-value" x-text="item.quantity"></span>
+                                <button type="button" class="quantity-btn quantity-btn-plus"
+                                    @click="updateQuantity(item.id, item.quantity + 1)" :disabled="item.updating">
+                                    +
+                                </button>
+                            </div>
+
+                            <!-- Subtotal -->
+                            <span class="total-price" x-text="formatRupiah(item.subtotal)"></span>
+
+                            <!-- Delete (Desktop only) -->
+                            <button class="delete-btn delete-btn-desktop" @click="removeItem(item.id)">Hapus</button>
                         </div>
-
-                        <!-- Product Info -->
-                        <div class="product-info">
-                            <template x-if="item.menu_image">
-                                <img :src="item.menu_image" alt="Product" class="product-image">
-                            </template>
-                            <template x-if="!item.menu_image">
-                                <div class="product-image-placeholder"></div>
-                            </template>
-                            <span class="product-name" x-text="item.menu_name"></span>
-                        </div>
-
-                        <!-- Price -->
-                        <span class="product-price" x-text="formatRupiah(item.price)"></span>
-
-                        <!-- Quantity -->
-                        <div class="quantity-controls">
-                            <button type="button" class="quantity-btn quantity-btn-minus"
-                                @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
-                                −
-                            </button>
-                            <span class="quantity-value" x-text="item.quantity"></span>
-                            <button type="button" class="quantity-btn quantity-btn-plus"
-                                @click="updateQuantity(item.id, item.quantity + 1)" :disabled="item.updating">
-                                +
-                            </button>
-                        </div>
-
-                        <!-- Subtotal -->
-                        <span class="total-price" x-text="formatRupiah(item.subtotal)"></span>
-
-                        <!-- Delete -->
-                        <button class="delete-btn" @click="removeItem(item.id)">Hapus</button>
+                        
+                        <!-- Swipe Delete Button (Mobile only) -->
+                        <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            <span>Hapus</span>
+                        </button>
                     </div>
                 </template>
             </div>

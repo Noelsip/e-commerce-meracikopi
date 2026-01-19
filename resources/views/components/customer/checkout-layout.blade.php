@@ -814,21 +814,6 @@
                 text-align: right;
                 margin-top: 8px;
             }
-
-            .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
-            }
-
-            .address-label-options {
-                flex-wrap: wrap;
-            }
-
-            .label-btn {
-                flex: 1;
-                justify-content: center;
-                min-width: 80px;
-            }
         }
 
         /* Footer adjustments */

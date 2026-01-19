@@ -193,7 +193,7 @@
         <!-- Left: Logo and Title -->
         <div class="checkout-logo-section">
             <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                <div class="checkout-logo-circle"></div>
+                <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" style="width: 45px; height: 45px; object-fit: contain;">
                 <span class="checkout-logo-text">Meracikopi</span>
             </a>
             <div class="checkout-divider"></div>
