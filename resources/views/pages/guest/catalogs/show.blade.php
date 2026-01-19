@@ -4,6 +4,11 @@
         style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
 
         <style>
+            /* Hide announcement banner on product detail page */
+            .announcement-bar {
+                display: none !important;
+            }
+
             /* Hide number input spinners */
             .no-spinners::-webkit-outer-spin-button,
             .no-spinners::-webkit-inner-spin-button {

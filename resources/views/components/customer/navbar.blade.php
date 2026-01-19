@@ -48,8 +48,8 @@
         text-decoration: none;
         font-weight: 500;
         font-size: 14px;
-        padding-bottom: 4px;
-        border-bottom: 2px solid transparent;
+        padding-bottom: 8px;
+        border-bottom: 3px solid transparent;
         transition: all 0.3s ease;
     }
 
@@ -275,9 +275,9 @@
 <!-- Navbar Container -->
 <div class="navbar-container" style="background-color: #2a1b14; padding: 0; position: sticky; top: 0; z-index: 100;">
     <div class="navbar-inner"
-        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); min-height: 115px;">
+        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
         <!-- Top Row: Logo, Search, Find a Cafe, Cart -->
-        <div class="navbar-top-wrapper" style="padding: 20px 40px;">
+        <div class="navbar-top-wrapper" style="padding: 16px 40px 8px 40px;">
             <div
                 style="display: flex; align-items: center; justify-content: space-between; max-width: 1360px; margin: 0 auto; position: relative;">
 
@@ -370,7 +370,7 @@
         </div>
 
         <!-- Bottom Row: Navigation Links -->
-        <div class="navbar-desktop-menu" style="padding: 0 40px 24px 40px;">
+        <div class="navbar-desktop-menu" style="padding: 4px 40px 0 40px;">
             <div style="display: flex; align-items: center; gap: 32px; max-width: 1360px; margin: 0 auto;">
                 <a href="/" class="nav-link-main {{ request()->is('/') ? 'active' : '' }}"
                     style="font-weight: 600;">Home</a>
@@ -465,7 +465,7 @@
 </script>
 
 <!-- Announcement Bar -->
-<div style="background-color: #1a1410; padding: 0; margin-top: 60px;">
+<div class="announcement-bar" style="background-color: #1a1410; padding: 0; margin-top: 60px;">
     <div style="
         padding: 16px 24px; 
         text-align: center;
