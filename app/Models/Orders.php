@@ -24,17 +24,10 @@ class Orders extends Model
         'customer_phone',
         'status',
         'total_price',
-<<<<<<< HEAD
         'notes',
         'delivery_fee',
         'discount_amount',
         'final_price',
-=======
-        'delivery_fee',
-        'discount_amount',
-        'final_price',
-        'notes',
->>>>>>> b70e90df2b163e24a2047d47aa680f26a73d6468
     ];
 
     protected $casts = [

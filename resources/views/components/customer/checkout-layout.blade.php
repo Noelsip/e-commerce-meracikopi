@@ -578,6 +578,8 @@
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            overflow-y: auto;
+            padding: 20px 0;
         }
 
         .address-modal-content {
@@ -585,8 +587,10 @@
             border-radius: 12px;
             width: 100%;
             max-width: 500px;
-            margin: 20px;
+            margin: auto 20px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .address-modal-header {
@@ -595,6 +599,10 @@
             align-items: center;
             padding: 20px 24px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            background: #2A1B14;
+            z-index: 1;
         }
 
         .address-modal-header h3 {
@@ -705,6 +713,80 @@
             background: #d4864c;
         }
 
+        /* Form Row for side-by-side inputs */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Form Select styling */
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+
+        .form-select option {
+            background: #2a1b14;
+            color: white;
+        }
+
+        /* Optional label */
+        .optional-label {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        /* Address Label Options */
+        .address-label-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .label-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .label-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .label-btn.active {
+            background: rgba(202, 120, 66, 0.2);
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        .label-btn.active svg {
+            stroke: var(--secondary);
+        }
+
+        .label-btn svg {
+            stroke: rgba(255, 255, 255, 0.6);
+        }
+
         /* Responsive */
         @media (max-width: 992px) {
             .checkout-content {
@@ -731,6 +813,142 @@
                 width: 100%;
                 text-align: right;
                 margin-top: 8px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .address-label-options {
+                flex-wrap: wrap;
+            }
+
+            .label-btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 80px;
+            }
+        }
+
+        }
+
+        }
+
+        }
+
+        /* Mobile Card Style - "Gambar Kedua" */
+        @media (max-width: 768px) {
+            .order-summary-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+            }
+            
+            .checkout-content {
+                padding-bottom: 280px;
+            }
+
+            /* Hide 'Jumlah Pesanan' title on mobile */
+            .order-summary-section .section-title {
+                display: none;
+            }
+
+            /* 
+             * Layout: Cart-like but with Borders 
+             * Grid: [Checkbox] [Image] [Name]
+             *                          [Price]
+             *                          [Controls]
+             */
+            .order-item-card {
+                display: grid !important;
+                grid-template-columns: auto auto 1fr !important;
+                grid-template-rows: auto auto auto !important;
+                gap: 8px 12px !important;
+                align-items: center !important;
+                padding: 16px 12px !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important; /* Border added */
+                border-radius: 12px !important; /* Rounded corners */
+                margin-bottom: 12px !important; /* Spacing between cards */
+                background: transparent !important;
+            }
+
+            .order-item-checkbox {
+                grid-column: 1;
+                grid-row: 1 / span 3;
+                align-self: center;
+                margin: 0 !important;
+            }
+
+            .order-item-image {
+                grid-column: 2;
+                grid-row: 1 / span 3;
+                width: 80px !important;
+                height: 80px !important;
+                border-radius: 8px !important;
+                margin: 0 !important;
+            }
+
+            .order-item-details {
+                display: contents !important;
+            }
+
+            /* Name: Top Left of Content Area (Row 1) */
+            .order-item-name {
+                grid-column: 3;
+                grid-row: 1;
+                font-size: 14px !important;
+                font-weight: 500 !important;
+                margin-bottom: 4px !important;
+                line-height: 1.3;
+                align-self: end;
+            }
+
+            /* Price: Middle Row Left (Row 2) - Orange */
+            .order-item-price {
+                grid-column: 3;
+                grid-row: 2;
+                justify-self: start !important;
+                color: #E55B2B !important;
+                font-weight: 600 !important;
+                font-size: 15px !important;
+                margin: 0 !important;
+                text-align: left !important;
+                width: auto !important;
+            }
+
+            /* Quantity + Delete: Middle Row Right (Row 2) - Inline with Price */
+            .order-item-quantity {
+                grid-column: 3;
+                grid-row: 2;
+                justify-self: end;
+                align-self: center;
+                display: flex !important;
+                align-items: center !important;
+                gap: 12px !important;
+                margin-top: 0 !important;
+            }
+
+            .quantity-controls {
+                gap: 8px !important;
+            }
+
+            .quantity-btn {
+                background: rgba(255,255,255,0.1) !important;
+                border: 1px solid rgba(255,255,255,0.2) !important;
+                color: rgba(255,255,255,0.8) !important;
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 14px !important;
+                border-radius: 4px !important;
+            }
+            
+            .order-item-delete {
+                color: rgba(255,255,255,0.5) !important;
+                font-size: 18px !important;
+                cursor: pointer;
             }
         }
 
