@@ -249,6 +249,130 @@
                 font-size: 10px !important;
             }
         }
+
+        /* Mobile Bottom Sheet Styles */
+        .product-bottom-sheet-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 9998;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .product-bottom-sheet-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .product-bottom-sheet {
+            display: none;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fff;
+            border-radius: 24px 24px 0 0;
+            z-index: 9999;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 85vh;
+            overflow: hidden;
+        }
+
+        .product-bottom-sheet.active {
+            display: block;
+            transform: translateY(0);
+        }
+
+        .bottom-sheet-handle {
+            display: flex;
+            justify-content: center;
+            padding: 12px 0 8px 0;
+        }
+
+        .bottom-sheet-handle-bar {
+            width: 40px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .bottom-sheet-content {
+            padding: 0 20px 24px 20px;
+            overflow-y: auto;
+            max-height: calc(85vh - 80px);
+        }
+
+        .bottom-sheet-image {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border-radius: 16px;
+            overflow: hidden;
+            background: #f5f5f5;
+            margin-bottom: 16px;
+        }
+
+        .bottom-sheet-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bottom-sheet-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .bottom-sheet-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .bottom-sheet-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+        }
+
+        .bottom-sheet-add-btn {
+            width: 100%;
+            padding: 16px;
+            background: #CA7842;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .bottom-sheet-add-btn:hover {
+            background: #b56a38;
+        }
+
+        .bottom-sheet-add-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Hide bottom sheet on desktop */
+        @media (min-width: 601px) {
+            .product-bottom-sheet,
+            .product-bottom-sheet-overlay {
+                display: none !important;
+            }
+        }
     </style>
 
     <!-- Hero Section -->
@@ -342,7 +466,15 @@
                 <!-- Menu Grid -->
                 <div class="catalog-grid">
                     @foreach($menus as $menu)
-                        <a href="{{ url('/customer/catalogs/' . $menu->id) }}" class="catalog-card">
+                        <a href="{{ url('/customer/catalogs/' . $menu->id) }}" 
+                           class="catalog-card"
+                           data-menu-id="{{ $menu->id }}"
+                           data-menu-name="{{ $menu->name }}"
+                           data-menu-desc="{{ $menu->description }}"
+                           data-menu-price="{{ number_format($menu->price, 0, ',', '.') }}"
+                           data-menu-image="{{ $menu->image_path ? asset($menu->image_path) : '' }}"
+                           data-menu-available="{{ $menu->is_available ? '1' : '0' }}"
+                           onclick="handleCardClick(event, this)">
                             <!-- Favorite Button (Mobile) -->
                             <div class="catalog-favorite-btn" style="display: none;">
                                 <svg width="16" height="16" fill="none" stroke="#888" viewBox="0 0 24 24">
@@ -392,4 +524,122 @@
             @endif
         </div>
     </div>
+
+    <!-- Mobile Bottom Sheet -->
+    <div class="product-bottom-sheet-overlay" id="bottomSheetOverlay" onclick="closeBottomSheet()"></div>
+    <div class="product-bottom-sheet" id="productBottomSheet">
+        <div class="bottom-sheet-handle" onclick="closeBottomSheet()">
+            <div class="bottom-sheet-handle-bar"></div>
+        </div>
+        <div class="bottom-sheet-content">
+            <div class="bottom-sheet-image" id="bottomSheetImage">
+                <img src="" alt="Product" id="bottomSheetImgTag">
+            </div>
+            <h2 class="bottom-sheet-title" id="bottomSheetTitle"></h2>
+            <p class="bottom-sheet-desc" id="bottomSheetDesc"></p>
+            <p class="bottom-sheet-price" id="bottomSheetPrice"></p>
+            <a href="#" id="bottomSheetLink" style="text-decoration: none;">
+                <button class="bottom-sheet-add-btn" id="bottomSheetBtn">
+                    Lihat Detail
+                </button>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function isMobile() {
+            return window.innerWidth <= 600;
+        }
+
+        function handleCardClick(event, card) {
+            if (isMobile()) {
+                event.preventDefault();
+                openBottomSheet(card);
+            }
+            // On desktop, let the default link behavior happen
+        }
+
+        function openBottomSheet(card) {
+            const overlay = document.getElementById('bottomSheetOverlay');
+            const sheet = document.getElementById('productBottomSheet');
+            const imgTag = document.getElementById('bottomSheetImgTag');
+            const imageContainer = document.getElementById('bottomSheetImage');
+            const title = document.getElementById('bottomSheetTitle');
+            const desc = document.getElementById('bottomSheetDesc');
+            const price = document.getElementById('bottomSheetPrice');
+            const link = document.getElementById('bottomSheetLink');
+            const btn = document.getElementById('bottomSheetBtn');
+
+            // Set data
+            const menuId = card.dataset.menuId;
+            const menuName = card.dataset.menuName;
+            const menuDesc = card.dataset.menuDesc;
+            const menuPrice = card.dataset.menuPrice;
+            const menuImage = card.dataset.menuImage;
+            const menuAvailable = card.dataset.menuAvailable === '1';
+
+            title.textContent = menuName;
+            desc.textContent = menuDesc;
+            price.textContent = menuPrice;
+            link.href = `/customer/catalogs/${menuId}`;
+
+            if (menuImage) {
+                imgTag.src = menuImage;
+                imgTag.style.display = 'block';
+            } else {
+                imgTag.style.display = 'none';
+                imageContainer.innerHTML = '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 64px; color: #ccc;">☕</div>';
+            }
+
+            // Show bottom sheet
+            overlay.classList.add('active');
+            sheet.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBottomSheet() {
+            const overlay = document.getElementById('bottomSheetOverlay');
+            const sheet = document.getElementById('productBottomSheet');
+
+            overlay.classList.remove('active');
+            sheet.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeBottomSheet();
+            }
+        });
+
+        // Handle swipe down to close
+        let touchStartY = 0;
+        let touchCurrentY = 0;
+
+        document.getElementById('productBottomSheet')?.addEventListener('touchstart', function(e) {
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.getElementById('productBottomSheet')?.addEventListener('touchmove', function(e) {
+            touchCurrentY = e.touches[0].clientY;
+            const diff = touchCurrentY - touchStartY;
+            
+            if (diff > 0) {
+                this.style.transform = `translateY(${diff}px)`;
+            }
+        });
+
+        document.getElementById('productBottomSheet')?.addEventListener('touchend', function(e) {
+            const diff = touchCurrentY - touchStartY;
+            
+            if (diff > 100) {
+                closeBottomSheet();
+            }
+            
+            this.style.transform = '';
+            touchStartY = 0;
+            touchCurrentY = 0;
+        });
+    </script>
 </x-customer.layout>

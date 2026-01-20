@@ -16,8 +16,8 @@
                 </path>
             </svg>
             <h3 class="text-white text-xl font-medium mb-2">Keranjang Anda Kosong</h3>
-            <p class="text-white/60 mb-8">Silakan pilih menu favorit Anda terlebih dahulu</p>
-            <a href="{{ route('catalogs.index') }}"
+            <p class="text-white text-xl font-medium mb-2">Silakan pilih menu favorit Anda terlebih dahulu</p>
+            <a href="{{ route('catalogs.index') }}"gular
                 class="inline-block px-8 py-3 bg-[#CA7842] text-white rounded-full hover:bg-[#b5693a] transition-colors">
                 Lihat Menu
             </a>
