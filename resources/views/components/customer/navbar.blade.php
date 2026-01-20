@@ -48,8 +48,8 @@
         text-decoration: none;
         font-weight: 500;
         font-size: 14px;
-        padding-bottom: 4px;
-        border-bottom: 2px solid transparent;
+        padding-bottom: 8px;
+        border-bottom: 3px solid transparent;
         transition: all 0.3s ease;
     }
 
@@ -178,7 +178,7 @@
             display: flex !important;
         }
 
-        .navbar-right-icons > a:not(.mobile-search-btn):not(.find-cafe-btn) {
+        .navbar-right-icons>a:not(.mobile-search-btn):not(.find-cafe-btn) {
             order: 2;
         }
 
@@ -237,30 +237,54 @@
             padding: 4px !important;
         }
     }
+
+    /* Mobile Search Overlay */
+    .mobile-search-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #2a1b14;
+        z-index: 9999;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .mobile-search-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .mobile-search-overlay-content {
+        width: 100%;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .mobile-search-overlay-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
 </style>
 
 <!-- Navbar Container -->
-<div class="navbar-container"
-    style="background-color: #2a1b14; padding: 0; position: sticky; top: 0; z-index: 100;">
+<div class="navbar-container" style="background-color: #2a1b14; padding: 0; position: sticky; top: 0; z-index: 100;">
     <div class="navbar-inner"
-        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); min-height: 115px;">
+        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
         <!-- Top Row: Logo, Search, Find a Cafe, Cart -->
-        <div class="navbar-top-wrapper" style="padding: 20px 40px;">
+        <div class="navbar-top-wrapper" style="padding: 16px 40px 8px 40px;">
             <div
                 style="display: flex; align-items: center; justify-content: space-between; max-width: 1360px; margin: 0 auto; position: relative;">
 
                 <!-- Left: Logo -->
                 <a href="/" style="display: flex; align-items: center; gap: 10px; text-decoration: none;">
-                    <div class="navbar-logo-icon" style="
-                    width: 40px; 
-                    height: 40px; 
-                    background: linear-gradient(145deg, #F0F2BD, #d4d6a3);
-                    border-radius: 50%; 
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center;
-                ">
-                    </div>
+                    <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" class="navbar-logo-icon"
+                        style="width: 40px; height: 40px; object-fit: contain;">
                     <span class="navbar-logo-text"
                         style="color: white; font-weight: 600; font-size: 18px; font-family: 'Figtree', sans-serif;">Meracikopi</span>
                 </a>
@@ -308,9 +332,10 @@
                     </a>
 
                     <!-- Mobile Search Button -->
-                    <button type="button" class="mobile-search-btn" onclick="toggleMobileSearch()"
+                    <button type="button" class="mobile-search-btn" onclick="toggleMobileSearchOverlay()"
                         style="display: none; color: rgba(255, 255, 255, 0.85); padding: 8px; transition: color 0.3s ease; background: none; border: none; cursor: pointer;">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
@@ -333,7 +358,7 @@
         <!-- Mobile Search Bar (hidden by default) -->
         <div id="mobileSearchBar" class="mobile-search-bar" style="display: none; padding: 0 16px 16px 16px;">
             <form method="GET" action="{{ url('/customer/catalogs') }}" style="position: relative;">
-                <input type="text" name="search" placeholder="Cari produk..." 
+                <input type="text" name="search" placeholder="Cari produk..."
                     style="width: 100%; height: 40px; padding: 0 16px 0 44px; background-color: #4b3c35; border: 2px solid transparent; border-radius: 20px; color: #f0f2bd; font-size: 14px; outline: none;"
                     id="mobileSearchInput">
                 <svg style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: rgba(200, 190, 180, 0.7);"
@@ -345,7 +370,7 @@
         </div>
 
         <!-- Bottom Row: Navigation Links -->
-        <div class="navbar-desktop-menu" style="padding: 0 40px 24px 40px;">
+        <div class="navbar-desktop-menu" style="padding: 4px 40px 0 40px;">
             <div style="display: flex; align-items: center; gap: 32px; max-width: 1360px; margin: 0 auto;">
                 <a href="/" class="nav-link-main {{ request()->is('/') ? 'active' : '' }}"
                     style="font-weight: 600;">Home</a>
@@ -353,6 +378,34 @@
                     class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}"
                     style="font-weight: 600;">Catalog</a>
             </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Mobile Search Overlay -->
+<div class="mobile-search-overlay" id="mobileSearchOverlay">
+    <div class="mobile-search-overlay-content">
+        <div class="mobile-search-overlay-header">
+            <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo"
+                style="height: 30px; width: auto; flex-shrink: 0;">
+            <form method="GET" action="{{ url('/customer/catalogs') }}" style="position: relative; flex: 1;">
+                <svg style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: rgba(200, 190, 180, 0.7); z-index: 1;"
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input type="text" name="search" placeholder="Cari produk..." autofocus id="mobileOverlaySearchInput"
+                    style="width: 100%; padding: 12px 40px 12px 42px; background-color: #4b3c35; border: 2px solid #6b4d3a; border-radius: 50px; color: #f0f2bd; font-size: 14px; outline: none;">
+                <button type="button" onclick="toggleMobileSearchOverlay()"
+                    style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #f0f2bd; cursor: pointer; padding: 6px; z-index: 1;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -374,13 +427,7 @@
         <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Home</a>
         <a href="{{ url('/customer/catalogs') }}"
             class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
-        <a href="#">Contact</a>
-        <a href="#">Order History</a>
     </div>
-
-    <form method="GET" action="{{ url('/customer/catalogs') }}" class="mobile-search-form">
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari produk...">
-    </form>
 </div>
 
 <script>
@@ -395,7 +442,7 @@
     function toggleMobileSearch() {
         const searchBar = document.getElementById('mobileSearchBar');
         const searchInput = document.getElementById('mobileSearchInput');
-        
+
         if (searchBar.style.display === 'none' || searchBar.style.display === '') {
             searchBar.style.display = 'block';
             searchInput.focus();
@@ -403,16 +450,28 @@
             searchBar.style.display = 'none';
         }
     }
+
+    function toggleMobileSearchOverlay() {
+        const overlay = document.getElementById('mobileSearchOverlay');
+        const searchInput = document.getElementById('mobileOverlaySearchInput');
+
+        overlay.classList.toggle('active');
+        document.body.style.overflow = overlay.classList.contains('active') ? 'hidden' : '';
+
+        if (overlay.classList.contains('active')) {
+            setTimeout(() => searchInput.focus(), 100);
+        }
+    }
 </script>
 
 <!-- Announcement Bar -->
-<div style="background-color: #1a1410; padding: 0; margin-top: 60px;">
+<div class="announcement-bar" style="background-color: #1a1410; padding: 0; margin-top: 60px;">
     <div style="
         padding: 16px 24px; 
         text-align: center;
         background: radial-gradient(ellipse 75% 60% at 50% 50%, rgba(50, 32, 21, 0.7) 0%, rgba(50, 32, 21, 0.3) 45%, rgba(26, 20, 16, 0) 100%);
     ">
-        <p style="
+        <p class="announcement-text" style="
             color: #E8E0D5; 
             font-size: 14px; 
             margin: 0; 
@@ -423,3 +482,20 @@
         </p>
     </div>
 </div>
+
+<style>
+    @media (max-width: 600px) {
+        .announcement-text {
+            font-size: 11px !important;
+            letter-spacing: 0.05em !important;
+            padding: 0 8px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .announcement-text {
+            font-size: 10px !important;
+            letter-spacing: 0.03em !important;
+        }
+    }
+</style>

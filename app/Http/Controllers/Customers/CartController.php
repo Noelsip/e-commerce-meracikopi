@@ -43,7 +43,7 @@ class CartController extends Controller
                 'id' => $item->id,
                 'menu_id' => $item->menu_id,
                 'menu_name' => $item->menu->name,
-                'menu_image' => $item->menu->image_path ? asset('storage/' . $item->menu->image_path) : null,
+                'menu_image' => $item->menu->image_path ? asset($item->menu->image_path) : null,
                 'price' => $item->menu->price,
                 'quantity' => $item->quantity,
                 'subtotal' => $subtotal
