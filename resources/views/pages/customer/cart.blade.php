@@ -30,10 +30,8 @@
             <div class="cart-table-header">
                 <!-- Select All Checkbox -->
                 <div class="header-checkbox">
-                    <input type="checkbox" 
-                           class="cart-checkbox select-all-checkbox" 
-                           :checked="allSelected" 
-                           @change="toggleSelectAll">
+                    <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
+                        @change="toggleSelectAll">
                 </div>
                 <span class="header-produk">Produk</span>
                 <span class="header-harga">Harga Satuan</span>
@@ -45,19 +43,15 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-wrapper" 
-                         x-data="{ swiped: false, startX: 0, currentX: 0 }"
-                         @touchstart="startX = $event.touches[0].clientX; currentX = 0"
-                         @touchmove="currentX = $event.touches[0].clientX - startX"
-                         @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }"
-                    >
+                    <div class="cart-item-wrapper" x-data="{ swiped: false, startX: 0, currentX: 0 }"
+                        @touchstart="startX = $event.touches[0].clientX; currentX = 0"
+                        @touchmove="currentX = $event.touches[0].clientX - startX"
+                        @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }">
                         <div class="cart-item-row" :class="{ 'swiped': swiped }">
                             <!-- Item Checkbox -->
                             <div class="flex justify-center">
-                                <input type="checkbox" 
-                                       class="cart-checkbox item-checkbox" 
-                                       :checked="item.selected" 
-                                       @change="toggleItemSelection(item.id)">
+                                <input type="checkbox" class="cart-checkbox item-checkbox" :checked="item.selected"
+                                    @change="toggleItemSelection(item.id)">
                             </div>
 
                             <!-- Product Info -->
@@ -93,12 +87,15 @@
                             <!-- Delete (Desktop only) -->
                             <button class="delete-btn delete-btn-desktop" @click="removeItem(item.id)">Hapus</button>
                         </div>
-                        
+
                         <!-- Swipe Delete Button (Mobile only) -->
                         <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
                                 <line x1="10" y1="11" x2="10" y2="17"></line>
                                 <line x1="14" y1="11" x2="14" y2="17"></line>
                             </svg>
@@ -114,22 +111,25 @@
 
         <!-- Cart Summary Footer -->
         <div x-show="!loading && items.length > 0" class="cart-summary-wrapper" style="display: none;">
-            <div class="cart-summary">
-                <div class="cart-summary-left">
-                    <!-- Select All Checkbox in Footer -->
-                    <label class="select-all-label">
-                        <input type="checkbox" 
-                               class="cart-checkbox" 
-                               :checked="allSelected" 
-                               @change="toggleSelectAll">
-                        <span>Pilih Semua</span>
-                    </label>
+            <div class="cart-summary-container">
+                <div class="cart-summary">
+                    <!-- Left side: Checkbox + Pilih Semua -->
+                    <div class="cart-summary-left">
+                        <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
+                            @change="toggleSelectAll">
+                        <span class="select-all-text">Pilih Semua</span>
+                    </div>
+
+                    <!-- Right side: Total + Checkout -->
+                    <div class="cart-summary-right">
+                        <div class="cart-total-section">
+                            <span class="cart-total-label">Total (<span x-text="selectedCount"></span> Produk):</span>
+                            <span class="cart-total-amount" x-text="formatRupiah(selectedTotal)"></span>
+                        </div>
+                        <button class="checkout-btn" @click="proceedToCheckout"
+                            :disabled="selectedCount === 0">Checkout</button>
+                    </div>
                 </div>
-                <div class="cart-total-section">
-                    <span class="cart-total-label">Total (<span x-text="selectedCount"></span> Produk):</span>
-                    <span class="cart-total-amount" x-text="formatRupiah(selectedTotal)"></span>
-                </div>
-                <button class="checkout-btn" @click="proceedToCheckout" :disabled="selectedCount === 0">Checkout</button>
             </div>
         </div>
 
@@ -280,13 +280,13 @@
                         }
                         return;
                     }
-                    
+
                     // Store selected item IDs in localStorage for checkout
                     const selectedIds = this.items
                         .filter(item => item.selected)
                         .map(item => item.id);
                     localStorage.setItem('selected_cart_items', JSON.stringify(selectedIds));
-                    
+
                     window.location.href = '/customer/checkout';
                 }
             }));

@@ -371,49 +371,123 @@
                 <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
                     Lainnya</h3>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+
+                <!-- Horizontal Scroll Container -->
+                <div class="other-menus-scroll-container">
                     @foreach($relatedMenus as $related)
-                        <a href="{{ route('catalogs.show', $related->id) }}"
-                            style="background: #2b211e; border-radius: 16px; overflow: hidden; text-decoration: none; border: 1px solid #3e302b; display: block; transition: transform 0.3s;"
-                            onmouseover="this.style.transform='translateY(-4px)'"
-                            onmouseout="this.style.transform='translateY(0)'">
-
-                            <!-- Image -->
-                            <!-- Image -->
-                            <div style="aspect-ratio: 1; background-color: #3e302b; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;">
-                                <img src="{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}"
-                                    alt="{{ $related->name }}"
-                                    style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
-                                    onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:40px;\'>☕</span>'">
+                        <a href="{{ route('catalogs.show', $related->id) }}" class="menu-rec-card">
+                            <div class="menu-rec-image"
+                                style="background-image: url('{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}');">
+                                @if(!$related->image_path)
+                                    <span
+                                        style="display:flex; height:100%; align-items:center; justify-content:center; font-size:24px;">☕</span>
+                                @endif
                             </div>
 
-                            <!-- Content -->
-                            <div style="padding: 20px;">
-                                <h4
-                                    style="font-weight: 600; color: #f0f2bd; font-size: 18px; margin-bottom: 4px; margin-top: 0;">
-                                    {{ $related->name }}</h4>
-                                <p
-                                    style="color: #a89890; font-size: 14px; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 0;">
-                                    {{ $related->description }}
-                                </p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 18px; font-weight: bold; color: #CA7842;">Rp
-                                        {{ number_format($related->price, 0, ',', '.') }}</span>
-                                    
-                                    @if($related->is_available)
-                                        <span style="background: #C27C4E; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 10px rgba(194, 124, 78, 0.3);">
-                                            Tersedia
-                                        </span>
-                                    @else
-                                        <span style="background: #3e302b; color: #aaa; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #555;">
-                                            Habis
-                                        </span>
-                                    @endif
-                                </div>
-                            </div>
+                            <div class="menu-rec-name" title="{{ $related->name }}">{{ $related->name }}</div>
+                            <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
+
+                            <button class="menu-rec-btn">
+                                {{ $related->is_available ? 'Tersedia' : 'Habis' }}
+                            </button>
                         </a>
                     @endforeach
                 </div>
+
+                <style>
+                    /* Horizontal Scroll Styles */
+                    .other-menus-scroll-container {
+                        display: flex;
+                        gap: 16px;
+                        overflow-x: auto;
+                        padding-bottom: 20px;
+                        scrollbar-width: none;
+                        /* Firefox */
+                        -ms-overflow-style: none;
+                        /* IE 10+ */
+                        margin: 0 -20px;
+                        /* Values to hit edges on mobile */
+                        padding: 0 20px 20px 20px;
+                        /* Padding inside scroll */
+                    }
+
+                    /* Desktop Scroll Adjustment */
+                    @media (min-width: 769px) {
+                        .other-menus-scroll-container {
+                            margin: 0;
+                            padding: 0 0 20px 0;
+                        }
+                    }
+
+                    .other-menus-scroll-container::-webkit-scrollbar {
+                        display: none;
+                        /* Chrome/Safari */
+                    }
+
+                    .menu-rec-card {
+                        flex: 0 0 160px;
+                        background: linear-gradient(145deg, rgba(42, 27, 20, 0.6), rgba(42, 27, 20, 0.3));
+                        border: 1px solid rgba(202, 120, 66, 0.1);
+                        border-radius: 12px;
+                        padding: 12px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        transition: transform 0.2s ease;
+                        text-decoration: none;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .menu-rec-card:hover {
+                        transform: translateY(-4px);
+                        background: linear-gradient(145deg, rgba(62, 37, 26, 0.7), rgba(42, 27, 20, 0.4));
+                        border-color: rgba(202, 120, 66, 0.2);
+                    }
+
+                    .menu-rec-image {
+                        width: 100%;
+                        aspect-ratio: 1/1;
+                        border-radius: 8px;
+                        background-size: cover;
+                        background-position: center;
+                        background-color: #1a1410;
+                    }
+
+                    .menu-rec-name {
+                        font-size: 13px;
+                        font-weight: 500;
+                        color: white;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin-top: 4px;
+                    }
+
+                    .menu-rec-price {
+                        font-size: 13px;
+                        font-weight: 600;
+                        color: #CA7842;
+                    }
+
+                    .menu-rec-btn {
+                        margin-top: auto;
+                        width: 100%;
+                        padding: 8px;
+                        background: #CA7842;
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 11px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    }
+
+                    .menu-rec-btn:hover {
+                        background: #d88a52;
+                    }
+                </style>
 
                 <!-- Mobile padding fix style -->
                 <style>
