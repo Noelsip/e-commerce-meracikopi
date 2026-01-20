@@ -133,7 +133,7 @@
             <!-- Logo -->
             <div class="p-6">
                 <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2">
-                    <x-app-logo-icon class="h-8 w-8" />
+                    <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" class="h-10 w-auto">
                     <span class="text-xl font-bold" style="color: #f0f2bd;">Meracikopi</span>
                 </a>
             </div>

@@ -565,6 +565,12 @@
                 max-width: 300px;
             }
         }
+
+        /* Spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 
     <div class="checkout-page-container">
@@ -598,74 +604,89 @@
 
         <!-- Main Content -->
         <div class="checkout-content">
-            <!-- Left: Order Items -->
-            <div class="order-items-section">
-                <p class="section-title">Pesanan</p>
+            <!-- Left: Order Items + Payment/Delivery Options -->
+            <div class="order-items-section-wrapper">
+                <div class="order-items-section">
+                    <p class="section-title">Pesanan</p>
 
-                <!-- Order Item 1 -->
-                <div class="order-item-card">
-                    <input type="checkbox" class="order-item-checkbox" checked>
-                    <div class="order-item-image"></div>
-                    <div class="order-item-details">
-                        <span class="order-item-name">Coffe Beans Arabica</span>
-                        <div class="order-item-quantity">
-                            <div class="quantity-wrapper">
-                                <select class="quantity-dropdown" onchange="updateOrderTotal()">
-                                    <option value="1" selected>Jumlah: 1</option>
-                                    <option value="2">Jumlah: 2</option>
-                                    <option value="3">Jumlah: 3</option>
-                                    <option value="4">Jumlah: 4</option>
-                                    <option value="5">Jumlah: 5</option>
-                                </select>
-                            </div>
-                            <span class="order-item-delete" onclick="removeOrderItem(this)">×</span>
+                    <!-- Dynamic order items will be loaded here by JavaScript -->
+                    <div id="checkoutItemsContainer">
+                        <!-- Loading state -->
+                        <div class="checkout-loading" style="text-align: center; padding: 40px; color: #fff;">
+                            <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(202, 120, 66, 0.3); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <p style="margin-top: 16px; opacity: 0.7;">Loading cart items...</p>
                         </div>
                     </div>
-                    <span class="order-item-price">RP 40.000</span>
                 </div>
 
-                <!-- Order Item 2 -->
-                <div class="order-item-card">
-                    <input type="checkbox" class="order-item-checkbox" checked>
-                    <div class="order-item-image"></div>
-                    <div class="order-item-details">
-                        <span class="order-item-name">Americano</span>
-                        <div class="order-item-quantity">
-                            <div class="quantity-wrapper">
-                                <select class="quantity-dropdown" onchange="updateOrderTotal()">
-                                    <option value="1" selected>Jumlah: 1</option>
-                                    <option value="2">Jumlah: 2</option>
-                                    <option value="3">Jumlah: 3</option>
-                                    <option value="4">Jumlah: 4</option>
-                                    <option value="5">Jumlah: 5</option>
-                                </select>
-                            </div>
-                            <span class="order-item-delete" onclick="removeOrderItem(this)">×</span>
-                        </div>
-                    </div>
-                    <span class="order-item-price">RP 40.000</span>
+                <!-- Delivery Methods Section (Hidden by default, shown when Delivery is selected) -->
+                <div class="delivery-methods-section" id="deliveryMethodsSection" style="display: none; margin-top: 40px;">
+                    <p class="section-title">Metode Pengiriman</p>
+
+                    <!-- J&T Express -->
+                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jnt')">
+                        <input type="radio" name="delivery_method" value="jnt" class="delivery-radio">
+                        <span class="delivery-method-name">J&T Express</span>
+                    </label>
+
+                    <!-- JNE -->
+                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jne')">
+                        <input type="radio" name="delivery_method" value="jne" class="delivery-radio">
+                        <span class="delivery-method-name">JNE</span>
+                    </label>
+
+                    <!-- Grab Express -->
+                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'grab_express')">
+                        <input type="radio" name="delivery_method" value="grab_express" class="delivery-radio">
+                        <span class="delivery-method-name">Grab Express</span>
+                    </label>
+
+                    <!-- Go Send -->
+                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'gosend')">
+                        <input type="radio" name="delivery_method" value="gosend" class="delivery-radio">
+                        <span class="delivery-method-name">Go Send</span>
+                    </label>
+
+                    <!-- SiCepat Express -->
+                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'sicepat')">
+                        <input type="radio" name="delivery_method" value="sicepat" class="delivery-radio">
+                        <span class="delivery-method-name">SiCepat Express</span>
+                    </label>
                 </div>
 
-                <!-- Order Item 3 -->
-                <div class="order-item-card">
-                    <input type="checkbox" class="order-item-checkbox" checked>
-                    <div class="order-item-image"></div>
-                    <div class="order-item-details">
-                        <span class="order-item-name">Coffe Beans Arabica</span>
-                        <div class="order-item-quantity">
-                            <div class="quantity-wrapper">
-                                <select class="quantity-dropdown" onchange="updateOrderTotal()">
-                                    <option value="1" selected>Jumlah: 1</option>
-                                    <option value="2">Jumlah: 2</option>
-                                    <option value="3">Jumlah: 3</option>
-                                    <option value="4">Jumlah: 4</option>
-                                    <option value="5">Jumlah: 5</option>
-                                </select>
-                            </div>
-                            <span class="order-item-delete" onclick="removeOrderItem(this)">×</span>
-                        </div>
-                    </div>
-                    <span class="order-item-price">RP 40.000</span>
+                <!-- Payment Methods Section (Shown for Dine In and Takeaway) -->
+                <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
+                    <p class="section-title">Metode Pembayaran</p>
+
+                    <!-- DANA -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
+                        <input type="radio" name="payment_method" value="dana" class="payment-radio">
+                        <span class="payment-method-name">DANA</span>
+                    </label>
+
+                    <!-- QRIS -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')">
+                        <input type="radio" name="payment_method" value="qris" class="payment-radio">
+                        <span class="payment-method-name">Qris</span>
+                    </label>
+
+                    <!-- Transfer Bank -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')">
+                        <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
+                        <span class="payment-method-name">Transfer Bank</span>
+                    </label>
+
+                    <!-- GoPay -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')">
+                        <input type="radio" name="payment_method" value="gopay" class="payment-radio">
+                        <span class="payment-method-name">GoPay</span>
+                    </label>
+
+                    <!-- ShopeePay -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')">
+                        <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
+                        <span class="payment-method-name">ShopeePay</span>
+                    </label>
                 </div>
             </div>
 
@@ -691,76 +712,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Delivery Methods Section (Hidden by default, shown when Delivery is selected) -->
-        <div class="delivery-methods-section" id="deliveryMethodsSection" style="display: none;">
-            <p class="section-title">Metode Pengiriman</p>
-
-            <!-- J&T Express -->
-            <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jnt')">
-                <input type="radio" name="delivery_method" value="jnt" class="delivery-radio">
-                <span class="delivery-method-name">J&T Express</span>
-            </label>
-
-            <!-- JNE -->
-            <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jne')">
-                <input type="radio" name="delivery_method" value="jne" class="delivery-radio">
-                <span class="delivery-method-name">JNE</span>
-            </label>
-
-            <!-- Grab Express -->
-            <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'grab_express')">
-                <input type="radio" name="delivery_method" value="grab_express" class="delivery-radio">
-                <span class="delivery-method-name">Grab Express</span>
-            </label>
-
-            <!-- Go Send -->
-            <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'gosend')">
-                <input type="radio" name="delivery_method" value="gosend" class="delivery-radio">
-                <span class="delivery-method-name">Go Send</span>
-            </label>
-
-            <!-- SiCepat Express -->
-            <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'sicepat')">
-                <input type="radio" name="delivery_method" value="sicepat" class="delivery-radio">
-                <span class="delivery-method-name">SiCepat Express</span>
-            </label>
-        </div>
-
-        <!-- Payment Methods Section (Shown for Dine In and Takeaway) -->
-        <div class="payment-methods-section" id="paymentMethodsSection">
-            <p class="section-title">Metode Pembayaran</p>
-
-            <!-- DANA -->
-            <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
-                <input type="radio" name="payment_method" value="dana" class="payment-radio">
-                <span class="payment-method-name">DANA</span>
-            </label>
-
-            <!-- QRIS -->
-            <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')">
-                <input type="radio" name="payment_method" value="qris" class="payment-radio">
-                <span class="payment-method-name">Qris</span>
-            </label>
-
-            <!-- Transfer Bank -->
-            <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')">
-                <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
-                <span class="payment-method-name">Transfer Bank</span>
-            </label>
-
-            <!-- GoPay -->
-            <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')">
-                <input type="radio" name="payment_method" value="gopay" class="payment-radio">
-                <span class="payment-method-name">GoPay</span>
-            </label>
-
-            <!-- ShopeePay -->
-            <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')">
-                <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
-                <span class="payment-method-name">ShopeePay</span>
-            </label>
-        </div>
     </div>
 
     <!-- Address Modal -->
@@ -779,9 +730,81 @@
                     <label>Nomor Telepon</label>
                     <input type="text" class="form-input" id="recipientPhone" value="(+62) 822 54554411">
                 </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Provinsi</label>
+                        <select class="form-input form-select" id="province">
+                            <option value="">Pilih Provinsi</option>
+                            <option value="kaltim" selected>Kalimantan Timur</option>
+                            <option value="kalteng">Kalimantan Tengah</option>
+                            <option value="kalsel">Kalimantan Selatan</option>
+                            <option value="kalbar">Kalimantan Barat</option>
+                            <option value="kaltara">Kalimantan Utara</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kota/Kabupaten</label>
+                        <select class="form-input form-select" id="city">
+                            <option value="">Pilih Kota</option>
+                            <option value="balikpapan" selected>Kota Balikpapan</option>
+                            <option value="samarinda">Kota Samarinda</option>
+                            <option value="bontang">Kota Bontang</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Kecamatan</label>
+                        <select class="form-input form-select" id="district">
+                            <option value="">Pilih Kecamatan</option>
+                            <option value="balikpapan_utara" selected>Balikpapan Utara</option>
+                            <option value="balikpapan_selatan">Balikpapan Selatan</option>
+                            <option value="balikpapan_timur">Balikpapan Timur</option>
+                            <option value="balikpapan_barat">Balikpapan Barat</option>
+                            <option value="balikpapan_tengah">Balikpapan Tengah</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kode Pos</label>
+                        <input type="text" class="form-input" id="postalCode" value="76614" maxlength="5">
+                    </div>
+                </div>
                 <div class="form-group">
                     <label>Alamat Lengkap</label>
-                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</textarea>
+                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Detail Lainnya <span class="optional-label">(Opsional)</span></label>
+                    <input type="text" class="form-input" id="addressDetail" placeholder="Patokan, warna rumah, dll">
+                </div>
+                <div class="form-group">
+                    <label>Label Alamat</label>
+                    <div class="address-label-options">
+                        <button type="button" class="label-btn active" onclick="selectAddressLabel(this, 'rumah')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            Rumah
+                        </button>
+                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kantor')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                            </svg>
+                            Kantor
+                        </button>
+                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kos')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
+                                <path d="M9 21v-6h6v6"></path>
+                                <path d="M9 9h.01"></path>
+                                <path d="M15 9h.01"></path>
+                            </svg>
+                            Kos
+                        </button>
+                    </div>
+                    <input type="hidden" id="addressLabel" value="rumah">
                 </div>
                 <div class="form-actions">
                     <button class="btn-cancel" onclick="closeAddressModal()">Batal</button>
@@ -886,6 +909,13 @@
         function proceedToPayment() {
             const orderType = document.getElementById('orderTypeDisplay').textContent;
             
+            // Check if at least one order item is selected
+            const selectedItems = document.querySelectorAll('.order-item-checkbox:checked');
+            if (selectedItems.length === 0) {
+                showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
+                return;
+            }
+            
             if (orderType === 'Delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
@@ -985,16 +1015,43 @@
             document.getElementById('addressModal').style.display = 'none';
         }
 
+        // Select address label
+        function selectAddressLabel(btn, label) {
+            // Remove active from all buttons
+            document.querySelectorAll('.label-btn').forEach(b => b.classList.remove('active'));
+            // Add active to clicked button
+            btn.classList.add('active');
+            // Update hidden input
+            document.getElementById('addressLabel').value = label;
+        }
+
         // Save address
         function saveAddress() {
             const name = document.getElementById('recipientName').value;
             const phone = document.getElementById('recipientPhone').value;
+            const province = document.getElementById('province');
+            const city = document.getElementById('city');
+            const district = document.getElementById('district');
+            const postalCode = document.getElementById('postalCode').value;
             const address = document.getElementById('fullAddress').value;
+            const detail = document.getElementById('addressDetail').value;
+            const label = document.getElementById('addressLabel').value;
+
+            // Build full address string
+            const provinceName = province.options[province.selectedIndex]?.text || '';
+            const cityName = city.options[city.selectedIndex]?.text || '';
+            const districtName = district.options[district.selectedIndex]?.text || '';
+            
+            let fullAddressText = address;
+            if (districtName) fullAddressText += ', Kec. ' + districtName;
+            if (cityName) fullAddressText += ', ' + cityName;
+            if (provinceName) fullAddressText += ', ' + provinceName;
+            if (postalCode) fullAddressText += ' ' + postalCode;
 
             // Update display
             document.querySelector('.recipient-name').textContent = name;
             document.querySelector('.recipient-phone').textContent = phone;
-            document.querySelector('.address-detail').textContent = address;
+            document.querySelector('.address-detail').textContent = fullAddressText;
 
             closeAddressModal();
         }
@@ -1016,8 +1073,128 @@
             }
         }
 
+
+        // Fetch and render cart items
+        async function loadCheckoutItems() {
+            const token = localStorage.getItem('guest_token') || '';
+            const container = document.getElementById('checkoutItemsContainer');
+            
+            try {
+                const response = await fetch('/api/customer/cart', {
+                    headers: {
+                        'X-GUEST-TOKEN': token,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch cart');
+                
+                const result = await response.json();
+                const items = result.data.items || [];
+
+                if (items.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5);">
+                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 20px;">
+                                <circle cx="9" cy="21" r="1"></circle>
+                                <circle cx="20" cy="21" r="1"></circle>
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                            </svg>
+                            <p style="font-size: 18px; font-weight: 500;">Cart is empty</p>
+                            <p style="font-size: 14px; margin-top: 8px;">Add items to proceed with checkout</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Render items
+                container.innerHTML = items.map(item => `
+                    <div class="order-item-card" data-item-id="${item.id}">
+                        <input type="checkbox" class="order-item-checkbox" checked onchange="updateOrderTotal()">
+                        <div class="order-item-image" style="background-image: url('${item.menu_image || ''}'); background-size: cover; background-position: center;">
+                            ${!item.menu_image ? '<span style="font-size: 24px;">☕</span>' : ''}
+                        </div>
+                        <div class="order-item-details">
+                            <span class="order-item-name">${item.menu_name}</span>
+                            <div class="order-item-quantity">
+                                <div class="quantity-controls" style="display: flex; align-items: center; gap: 8px;">
+                                    <button type="button" class="quantity-btn" onclick="updateQuantityCheckout(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''} style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(202,120,66,0.3); background: rgba(202,120,66,0.1); color: #CA7842; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">−</button>
+                                    <span style="min-width: 30px; text-align: center; color: #fff; font-weight: 500;">${item.quantity}</span>
+                                    <button type="button" class="quantity-btn" onclick="updateQuantityCheckout(${item.id}, ${item.quantity + 1})" style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(202,120,66,0.3); background: rgba(202,120,66,0.1); color: #CA7842; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
+                                </div>
+                                <span class="order-item-delete" onclick="removeCheckoutItem(${item.id})">×</span>
+                            </div>
+                        </div>
+                        <span class="order-item-price">Rp ${formatRupiah(item.subtotal)}</span>
+                    </div>
+                `).join('');
+
+                updateOrderTotal();
+            } catch (error) {
+                console.error('Error loading checkout items:', error);
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <p>Failed to load cart items. Please try again.</p>
+                        <button onclick="loadCheckoutItems()" style="margin-top: 16px; padding: 8px 24px; background: #CA7842; color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // Update quantity via API
+        async function updateQuantityCheckout(itemId, newQty) {
+            const token = localStorage.getItem('guest_token') || '';
+            try {
+                const response = await fetch(`/api/customer/cart/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-GUEST-TOKEN': token,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({ quantity: parseInt(newQty) })
+                });
+
+                if (response.ok) {
+                    await loadCheckoutItems(); // Reload to update prices
+                }
+            } catch (error) {
+                console.error('Error updating quantity:', error);
+            }
+        }
+
+        // Remove item from checkout
+        async function removeCheckoutItem(itemId) {
+            if (!confirm('Remove this item from cart?')) return;
+            
+            const token = localStorage.getItem('guest_token') || '';
+            try {
+                const response = await fetch(`/api/customer/cart/items/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-GUEST-TOKEN': token,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    }
+                });
+
+                if (response.ok) {
+                    await loadCheckoutItems();
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+            }
+        }
+
+        // Format number to Rupiah
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID').format(amount);
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            // Load cart items for checkout
+            loadCheckoutItems();
+            
             // Add transition styles to order items
             document.querySelectorAll('.order-item-card').forEach(card => {
                 card.style.transition = 'all 0.3s ease';

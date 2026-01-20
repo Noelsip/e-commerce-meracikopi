@@ -57,7 +57,7 @@
         width: 2px;
         height: 30px;
         background-color: rgba(255, 255, 255, 0.5);
-        margin: 0 16px;
+        margin: 0 20px;
     }
 
     .cart-title {
@@ -70,11 +70,11 @@
     /* Search bar in cart navbar - aligned with Aksi column (right edge of rectangle) */
     .cart-search-wrapper {
         width: 100%;
-        max-width: 629px;
+        max-width: 750px;
         position: absolute;
-        left: 50%;
+        right: 0;
         top: 55%;
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
     }
 
     .cart-search-input {
@@ -88,12 +88,12 @@
         font-size: 13px;
         outline: none;
         transition: all 0.3s ease;
-        text-align: center;
+        text-align: left;
     }
 
     .cart-search-input::placeholder {
         color: rgba(200, 190, 180, 0.6);
-        text-align: center;
+        text-align: left;
     }
 
     .cart-search-input:focus {
@@ -114,36 +114,122 @@
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .cart-navbar {
-            height: auto;
-            min-height: 80px;
-            padding: 16px 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 16px;
+            height: 60px;
+            padding: 12px 12px;
         }
 
-        .cart-search-wrapper {
-            position: relative;
-            left: auto;
-            top: auto;
-            transform: none;
-            max-width: 100%;
-            width: 100%;
-            margin-right: 0;
+        .cart-navbar-inner {
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .cart-logo-section {
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .cart-logo-section img {
+            width: 28px !important;
+            height: 28px !important;
         }
 
         .cart-logo-text {
-            font-size: 16px;
+            font-size: 13px;
+        }
+
+        .cart-divider {
+            height: 20px;
+            margin: 0 8px;
         }
 
         .cart-title {
-            font-size: 16px;
+            font-size: 13px;
+        }
+
+        /* Compact search bar always visible */
+        .cart-search-wrapper {
+            position: static;
+            transform: none;
+            max-width: none;
+            flex: 1;
+            min-width: 0; /* Allow flexbox to shrink */
+        }
+
+        .cart-search-input {
+            height: 32px;
+            padding: 0 32px 0 12px;
+            font-size: 12px;
+            border-radius: 16px;
+        }
+
+        .cart-search-icon {
+            width: 14px;
+            height: 14px;
+            right: 10px;
+        }
+
+        /* Hide mobile search icon */
+        .mobile-search-icon {
+            display: none;
         }
 
         .back-button-container {
-            padding-top: 100px !important;
+            padding-top: 75px !important;
         }
     }
+
+    @media (max-width: 480px) {
+        .cart-navbar {
+            height: 56px;
+            padding: 10px 8px;
+        }
+
+        .cart-logo-section {
+            gap: 4px;
+        }
+
+        .cart-logo-section img {
+            width: 24px !important;
+            height: 24px !important;
+        }
+
+        .cart-logo-text {
+            font-size: 12px;
+        }
+
+        .cart-divider {
+            height: 18px;
+            margin: 0 6px;
+        }
+
+        .cart-title {
+            font-size: 12px;
+        }
+
+        .cart-search-input {
+            height: 30px;
+            font-size: 11px;
+            padding: 0 28px 0 10px;
+        }
+
+        .cart-search-icon {
+            width: 12px;
+            height: 12px;
+            right: 8px;
+        }
+
+        .back-button-container {
+            padding-top: 70px !important;
+        }
+    }
+
+    /* Desktop: hide mobile search icon */
+    @media (min-width: 769px) {
+        .mobile-search-icon {
+            display: none;
+        }
+    }
+
 
     /* Back Button Container (Below Navbar, aligned with content) */
     .back-button-container {
@@ -179,17 +265,17 @@
             <!-- Left: Logo and Cart Title -->
             <div class="cart-logo-section">
                 <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                    <div class="cart-logo-circle"></div>
+                    <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" style="width: 40px; height: 40px; object-fit: contain;">
                     <span class="cart-logo-text">Meracikopi</span>
                 </a>
                 <div class="cart-divider"></div>
                 <span class="cart-title">Cart</span>
             </div>
 
-            <!-- Center: Search Bar -->
+            <!-- Right: Search Bar (Always visible, responsive sizing) -->
             <div class="cart-search-wrapper">
                 <div style="position: relative;">
-                    <input type="text" name="search" placeholder="What Do you Want Today?" class="cart-search-input">
+                    <input type="text" name="search" placeholder="Search in cart..." class="cart-search-input">
                     <svg class="cart-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

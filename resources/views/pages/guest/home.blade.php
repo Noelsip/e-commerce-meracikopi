@@ -1,7 +1,7 @@
 <x-layout title="Home - Meracikopi">
     <div class="min-h-screen flex flex-col items-center justify-center">
         <div class="flex justify-center mb-6">
-            <x-app-logo-icon class="h-16 w-16" />
+            <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" class="h-20 w-auto">
         </div>
         <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
             Selamat Datang di Meracikopi
@@ -10,8 +10,8 @@
             Nikmati kopi terbaik untuk Anda
         </p>
         <div class="flex gap-4">
-            <a href="{{ route('admin.login') }}" 
-               class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('admin.login') }}"
+                class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 Admin Login
             </a>
         </div>

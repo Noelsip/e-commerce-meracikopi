@@ -16,8 +16,8 @@
                 </path>
             </svg>
             <h3 class="text-white text-xl font-medium mb-2">Keranjang Anda Kosong</h3>
-            <p class="text-white/60 mb-8">Silakan pilih menu favorit Anda terlebih dahulu</p>
-            <a href="{{ route('catalogs.index') }}"
+            <p class="text-white text-xl font-medium mb-2">Silakan pilih menu favorit Anda terlebih dahulu</p>
+            <a href="{{ route('catalogs.index') }}"gular
                 class="inline-block px-8 py-3 bg-[#CA7842] text-white rounded-full hover:bg-[#b5693a] transition-colors">
                 Lihat Menu
             </a>
@@ -28,8 +28,13 @@
 
             <!-- Cart Table Header -->
             <div class="cart-table-header">
-                <!-- Checkbox removed for simplicity or handled differently if implementing bulk actions -->
-                <div style="width: 24px;"></div>
+                <!-- Select All Checkbox -->
+                <div class="header-checkbox">
+                    <input type="checkbox" 
+                           class="cart-checkbox select-all-checkbox" 
+                           :checked="allSelected" 
+                           @change="toggleSelectAll">
+                </div>
                 <span class="header-produk">Produk</span>
                 <span class="header-harga">Harga Satuan</span>
                 <span class="header-kuantitas">Kuantitas</span>
@@ -40,44 +45,65 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-row">
-                        <!-- Checkbox (Optional, currently just placeholder) -->
-                        <div class="flex justify-center">
-                            <input type="checkbox" class="cart-checkbox item-checkbox" checked disabled>
+                    <div class="cart-item-wrapper" 
+                         x-data="{ swiped: false, startX: 0, currentX: 0 }"
+                         @touchstart="startX = $event.touches[0].clientX; currentX = 0"
+                         @touchmove="currentX = $event.touches[0].clientX - startX"
+                         @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }"
+                    >
+                        <div class="cart-item-row" :class="{ 'swiped': swiped }">
+                            <!-- Item Checkbox -->
+                            <div class="flex justify-center">
+                                <input type="checkbox" 
+                                       class="cart-checkbox item-checkbox" 
+                                       :checked="item.selected" 
+                                       @change="toggleItemSelection(item.id)">
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="product-info">
+                                <template x-if="item.menu_image">
+                                    <img :src="item.menu_image" alt="Product" class="product-image">
+                                </template>
+                                <template x-if="!item.menu_image">
+                                    <div class="product-image-placeholder"></div>
+                                </template>
+                                <span class="product-name" x-text="item.menu_name"></span>
+                            </div>
+
+                            <!-- Price -->
+                            <span class="product-price" x-text="formatRupiah(item.price)"></span>
+
+                            <!-- Quantity -->
+                            <div class="quantity-controls">
+                                <button type="button" class="quantity-btn quantity-btn-minus"
+                                    @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
+                                    −
+                                </button>
+                                <span class="quantity-value" x-text="item.quantity"></span>
+                                <button type="button" class="quantity-btn quantity-btn-plus"
+                                    @click="updateQuantity(item.id, item.quantity + 1)" :disabled="item.updating">
+                                    +
+                                </button>
+                            </div>
+
+                            <!-- Subtotal -->
+                            <span class="total-price" x-text="formatRupiah(item.subtotal)"></span>
+
+                            <!-- Delete (Desktop only) -->
+                            <button class="delete-btn delete-btn-desktop" @click="removeItem(item.id)">Hapus</button>
                         </div>
-
-                        <!-- Product Info -->
-                        <div class="product-info">
-                            <template x-if="item.menu_image">
-                                <img :src="item.menu_image" alt="Product" class="product-image">
-                            </template>
-                            <template x-if="!item.menu_image">
-                                <div class="product-image-placeholder"></div>
-                            </template>
-                            <span class="product-name" x-text="item.menu_name"></span>
-                        </div>
-
-                        <!-- Price -->
-                        <span class="product-price" x-text="formatRupiah(item.price)"></span>
-
-                        <!-- Quantity -->
-                        <div class="quantity-controls">
-                            <button type="button" class="quantity-btn quantity-btn-minus"
-                                @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
-                                −
-                            </button>
-                            <span class="quantity-value" x-text="item.quantity"></span>
-                            <button type="button" class="quantity-btn quantity-btn-plus"
-                                @click="updateQuantity(item.id, item.quantity + 1)" :disabled="item.updating">
-                                +
-                            </button>
-                        </div>
-
-                        <!-- Subtotal -->
-                        <span class="total-price" x-text="formatRupiah(item.subtotal)"></span>
-
-                        <!-- Delete -->
-                        <button class="delete-btn" @click="removeItem(item.id)">Hapus</button>
+                        
+                        <!-- Swipe Delete Button (Mobile only) -->
+                        <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                            </svg>
+                            <span>Hapus</span>
+                        </button>
                     </div>
                 </template>
             </div>
@@ -90,13 +116,20 @@
         <div x-show="!loading && items.length > 0" class="cart-summary-wrapper" style="display: none;">
             <div class="cart-summary">
                 <div class="cart-summary-left">
-                    <!-- Bulk actions can be added here -->
+                    <!-- Select All Checkbox in Footer -->
+                    <label class="select-all-label">
+                        <input type="checkbox" 
+                               class="cart-checkbox" 
+                               :checked="allSelected" 
+                               @change="toggleSelectAll">
+                        <span>Pilih Semua</span>
+                    </label>
                 </div>
                 <div class="cart-total-section">
-                    <span class="cart-total-label">Total (<span x-text="items.length"></span> Produk):</span>
-                    <span class="cart-total-amount" x-text="formatRupiah(totalPrice)"></span>
+                    <span class="cart-total-label">Total (<span x-text="selectedCount"></span> Produk):</span>
+                    <span class="cart-total-amount" x-text="formatRupiah(selectedTotal)"></span>
                 </div>
-                <button class="checkout-btn" @click="proceedToCheckout">Checkout</button>
+                <button class="checkout-btn" @click="proceedToCheckout" :disabled="selectedCount === 0">Checkout</button>
             </div>
         </div>
 
@@ -113,6 +146,40 @@
 
                 init() {
                     this.fetchCart();
+                },
+
+                // Computed: Check if all items are selected
+                get allSelected() {
+                    return this.items.length > 0 && this.items.every(item => item.selected);
+                },
+
+                // Computed: Count of selected items
+                get selectedCount() {
+                    return this.items.filter(item => item.selected).length;
+                },
+
+                // Computed: Total price of selected items only
+                get selectedTotal() {
+                    return this.items
+                        .filter(item => item.selected)
+                        .reduce((sum, item) => sum + item.subtotal, 0);
+                },
+
+                // Toggle all items selection
+                toggleSelectAll() {
+                    const newState = !this.allSelected;
+                    this.items = this.items.map(item => ({
+                        ...item,
+                        selected: newState
+                    }));
+                },
+
+                // Toggle individual item selection
+                toggleItemSelection(itemId) {
+                    const itemIndex = this.items.findIndex(i => i.id === itemId);
+                    if (itemIndex !== -1) {
+                        this.items[itemIndex].selected = !this.items[itemIndex].selected;
+                    }
                 },
 
                 formatRupiah(amount) {
@@ -138,10 +205,11 @@
 
                         const result = await response.json();
 
-                        // Add 'updating' state to each item
+                        // Add 'updating' and 'selected' state to each item
                         this.items = (result.data.items || []).map(item => ({
                             ...item,
-                            updating: false
+                            updating: false,
+                            selected: true // Default selected
                         }));
 
                         this.totalPrice = result.data.total_price || 0;
@@ -203,6 +271,22 @@
                 },
 
                 proceedToCheckout() {
+                    // Check if any item is selected
+                    if (this.selectedCount === 0) {
+                        // Show error modal
+                        const modal = document.getElementById('errorModal');
+                        if (modal) {
+                            modal.classList.add('show');
+                        }
+                        return;
+                    }
+                    
+                    // Store selected item IDs in localStorage for checkout
+                    const selectedIds = this.items
+                        .filter(item => item.selected)
+                        .map(item => item.id);
+                    localStorage.setItem('selected_cart_items', JSON.stringify(selectedIds));
+                    
                     window.location.href = '/customer/checkout';
                 }
             }));

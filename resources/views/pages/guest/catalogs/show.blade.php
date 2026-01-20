@@ -4,6 +4,11 @@
         style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
 
         <style>
+            /* Hide announcement banner on product detail page */
+            .announcement-bar {
+                display: none !important;
+            }
+
             /* Hide number input spinners */
             .no-spinners::-webkit-outer-spin-button,
             .no-spinners::-webkit-inner-spin-button {
@@ -176,12 +181,9 @@
                         return response.json();
                     })
                     .then(data => {
-                        alert('Berhasil menambahkan ke keranjang! 🛒');
+                        window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1;
                         this.note = '';
-                        window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
-                        this.quantity = 1; 
-                        this.note = ''; 
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -215,7 +217,7 @@
                                 alignItems: 'start',
                                 gap: '12px',
                                 transform: 'translateX(120%)',
-                                transition: 'transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55)',
+                                transition: 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease',
                                 opacity: '0'
                             });
 
@@ -361,5 +363,67 @@
                 </div>
             </div>
         </div>
+
+        <!-- Related Menus Section -->
+        @if(isset($relatedMenus) && $relatedMenus->count() > 0)
+            <div class="related-menus-section"
+                style="max-width: 1440px; margin: 0 auto; padding: 0 40px 80px 40px; position: relative; z-index: 10;">
+                <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
+                    Lainnya</h3>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+                    @foreach($relatedMenus as $related)
+                        <a href="{{ route('catalogs.show', $related->id) }}"
+                            style="background: #2b211e; border-radius: 16px; overflow: hidden; text-decoration: none; border: 1px solid #3e302b; display: block; transition: transform 0.3s;"
+                            onmouseover="this.style.transform='translateY(-4px)'"
+                            onmouseout="this.style.transform='translateY(0)'">
+
+                            <!-- Image -->
+                            <!-- Image -->
+                            <div style="aspect-ratio: 1; background-color: #3e302b; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;">
+                                <img src="{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}"
+                                    alt="{{ $related->name }}"
+                                    style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
+                                    onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:40px;\'>☕</span>'">
+                            </div>
+
+                            <!-- Content -->
+                            <div style="padding: 20px;">
+                                <h4
+                                    style="font-weight: 600; color: #f0f2bd; font-size: 18px; margin-bottom: 4px; margin-top: 0;">
+                                    {{ $related->name }}</h4>
+                                <p
+                                    style="color: #a89890; font-size: 14px; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 0;">
+                                    {{ $related->description }}
+                                </p>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 18px; font-weight: bold; color: #CA7842;">Rp
+                                        {{ number_format($related->price, 0, ',', '.') }}</span>
+                                    
+                                    @if($related->is_available)
+                                        <span style="background: #C27C4E; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 10px rgba(194, 124, 78, 0.3);">
+                                            Tersedia
+                                        </span>
+                                    @else
+                                        <span style="background: #3e302b; color: #aaa; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #555;">
+                                            Habis
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+                <!-- Mobile padding fix style -->
+                <style>
+                    @media (max-width: 768px) {
+                        .related-menus-section {
+                            padding: 0 20px 80px 20px !important;
+                        }
+                    }
+                </style>
+            </div>
+        @endif
     </div>
 </x-customer.layout>
