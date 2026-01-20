@@ -341,17 +341,130 @@
             font-size: 18px;
             font-weight: 700;
             color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+
+        .bottom-sheet-note-wrapper {
+            margin-bottom: 16px;
+        }
+
+        .bottom-sheet-note-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .bottom-sheet-note-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: none;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s ease;
+        }
+
+        .bottom-sheet-note-input:focus {
+            border-color: #CA7842;
+        }
+
+        .bottom-sheet-note-input::placeholder {
+            color: #999;
+        }
+
+        .bottom-sheet-quantity-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 20px;
         }
 
+        .bottom-sheet-quantity-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .bottom-sheet-quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .bottom-sheet-qty-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-size: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .bottom-sheet-qty-btn:hover:not(:disabled) {
+            background: #f5f5f5;
+            border-color: #CA7842;
+            color: #CA7842;
+        }
+
+        .bottom-sheet-qty-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .bottom-sheet-qty-value {
+            font-size: 18px;
+            font-weight: 600;
+            min-width: 30px;
+            text-align: center;
+            color: #1a1a1a;
+        }
+
+        .bottom-sheet-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .bottom-sheet-detail-btn {
+            flex: 1;
+            padding: 14px;
+            background: #fff;
+            color: #CA7842;
+            border: 2px solid #CA7842;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bottom-sheet-detail-btn:hover {
+            background: #FFF8F0;
+        }
+
         .bottom-sheet-add-btn {
-            width: 100%;
-            padding: 16px;
+            flex: 2;
+            padding: 14px;
             background: #CA7842;
             color: #fff;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s ease;
@@ -538,15 +651,45 @@
             <h2 class="bottom-sheet-title" id="bottomSheetTitle"></h2>
             <p class="bottom-sheet-desc" id="bottomSheetDesc"></p>
             <p class="bottom-sheet-price" id="bottomSheetPrice"></p>
-            <a href="#" id="bottomSheetLink" style="text-decoration: none;">
-                <button class="bottom-sheet-add-btn" id="bottomSheetBtn">
+
+            <!-- Notes/Catatan -->
+            <div class="bottom-sheet-note-wrapper">
+                <label class="bottom-sheet-note-label">Catatan</label>
+                <textarea 
+                    class="bottom-sheet-note-input" 
+                    id="bottomSheetNote"
+                    rows="2"
+                    placeholder="Contoh: less sugar, extra shot, tanpa es, dll"></textarea>
+            </div>
+
+            <!-- Quantity Control -->
+            <div class="bottom-sheet-quantity-wrapper">
+                <span class="bottom-sheet-quantity-label">Jumlah</span>
+                <div class="bottom-sheet-quantity-controls">
+                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyMinus" onclick="updateQuantity(-1)">−</button>
+                    <span class="bottom-sheet-qty-value" id="bottomSheetQtyValue">1</span>
+                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyPlus" onclick="updateQuantity(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="bottom-sheet-buttons">
+                <a href="#" id="bottomSheetLink" class="bottom-sheet-detail-btn">
                     Lihat Detail
+                </a>
+                <button type="button" class="bottom-sheet-add-btn" id="bottomSheetAddBtn" onclick="addToCart()">
+                    Tambah ke Keranjang
                 </button>
-            </a>
+            </div>
         </div>
     </div>
 
+    <input type="hidden" id="currentMenuId" value="">
+    <input type="hidden" id="currentMenuPrice" value="">
+
     <script>
+        let currentQuantity = 1;
+
         function isMobile() {
             return window.innerWidth <= 600;
         }
@@ -568,7 +711,13 @@
             const desc = document.getElementById('bottomSheetDesc');
             const price = document.getElementById('bottomSheetPrice');
             const link = document.getElementById('bottomSheetLink');
-            const btn = document.getElementById('bottomSheetBtn');
+            const addBtn = document.getElementById('bottomSheetAddBtn');
+
+            // Reset values
+            currentQuantity = 1;
+            document.getElementById('bottomSheetQtyValue').textContent = '1';
+            document.getElementById('bottomSheetNote').value = '';
+            document.getElementById('bottomSheetQtyMinus').disabled = true;
 
             // Set data
             const menuId = card.dataset.menuId;
@@ -578,10 +727,23 @@
             const menuImage = card.dataset.menuImage;
             const menuAvailable = card.dataset.menuAvailable === '1';
 
+            // Store current menu ID and price
+            document.getElementById('currentMenuId').value = menuId;
+            document.getElementById('currentMenuPrice').value = menuPrice.replace(/\./g, '');
+
             title.textContent = menuName;
             desc.textContent = menuDesc;
-            price.textContent = menuPrice;
+            price.textContent = 'Rp ' + menuPrice;
             link.href = `/customer/catalogs/${menuId}`;
+
+            // Set button state based on availability
+            if (!menuAvailable) {
+                addBtn.disabled = true;
+                addBtn.textContent = 'Stok Habis';
+            } else {
+                addBtn.disabled = false;
+                addBtn.textContent = 'Tambah ke Keranjang';
+            }
 
             if (menuImage) {
                 imgTag.src = menuImage;
@@ -604,6 +766,77 @@
             overlay.classList.remove('active');
             sheet.classList.remove('active');
             document.body.style.overflow = '';
+        }
+
+        function updateQuantity(change) {
+            currentQuantity += change;
+            if (currentQuantity < 1) currentQuantity = 1;
+            if (currentQuantity > 99) currentQuantity = 99;
+
+            document.getElementById('bottomSheetQtyValue').textContent = currentQuantity;
+            document.getElementById('bottomSheetQtyMinus').disabled = currentQuantity <= 1;
+        }
+
+        function addToCart() {
+            const menuId = document.getElementById('currentMenuId').value;
+            const quantity = currentQuantity;
+            const note = document.getElementById('bottomSheetNote').value;
+            const addBtn = document.getElementById('bottomSheetAddBtn');
+
+            // Disable button while processing
+            addBtn.disabled = true;
+            addBtn.textContent = 'Menambahkan...';
+
+            // Get or create guest token
+            let guestToken = localStorage.getItem('guest_token');
+            if (!guestToken) {
+                guestToken = 'guest_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('guest_token', guestToken);
+            }
+
+            // Send request to add to cart via API
+            fetch('/api/customer/cart/items', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Guest-Token': guestToken,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    menu_id: parseInt(menuId),
+                    quantity: quantity,
+                    note: note
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                addBtn.textContent = '✓ Berhasil Ditambahkan';
+                addBtn.style.background = '#27ae60';
+                
+                setTimeout(() => {
+                    closeBottomSheet();
+                    addBtn.textContent = 'Tambah ke Keranjang';
+                    addBtn.style.background = '#CA7842';
+                    addBtn.disabled = false;
+                }, 1200);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addBtn.textContent = 'Gagal, Coba Lagi';
+                addBtn.style.background = '#e74c3c';
+                addBtn.disabled = false;
+                
+                setTimeout(() => {
+                    addBtn.textContent = 'Tambah ke Keranjang';
+                    addBtn.style.background = '#CA7842';
+                }, 2000);
+            });
         }
 
         // Close on escape key

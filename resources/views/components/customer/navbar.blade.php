@@ -377,6 +377,9 @@
                 <a href="{{ url('/customer/catalogs') }}"
                     class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}"
                     style="font-weight: 600;">Catalog</a>
+                <a href="{{ url('/customer/order-history') }}"
+                    class="nav-link-main {{ request()->is('customer/order-history*') ? 'active' : '' }}"
+                    style="font-weight: 600;">Order History</a>
             </div>
         </div>
     </div>
@@ -427,6 +430,8 @@
         <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Home</a>
         <a href="{{ url('/customer/catalogs') }}"
             class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
+        <a href="{{ url('/customer/order-history') }}"
+            class="{{ request()->is('customer/order-history*') ? 'active' : '' }}">Order History</a>
     </div>
 </div>
 
