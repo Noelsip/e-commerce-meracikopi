@@ -40,18 +40,18 @@ class PaymentController extends Controller
                 abort(422, 'Order already paid');
             }
 
+            // Generate transaction ID
+            $transactionId = 'MERACIKOPI-' . $order->id . '-' . time();
+
             // Membuat record pembayaran
             $payment = Payments::create([
                 'order_id' => $order->id,
                 'payment_gateway' => 'midtrans',
                 'payment_method' => 'snap',
-                'amount' => $order->total_price,
-                'status' => StatusPayments::PENDING,
-            ]);
-
-            $transactionId = 'MERACIKOPI-' . $order->id;
-            $payment->update([
                 'transaction_id' => $transactionId,
+                'amount' => $order->final_price, // Gunakan final_price (setelah diskon + delivery fee)
+                'status' => StatusPayments::PENDING,
+                'payload' => [], // Initialize empty payload
             ]);
 
             // Init Midtrans

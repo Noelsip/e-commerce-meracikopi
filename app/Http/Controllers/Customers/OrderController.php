@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         $guestToken = $request->attributes->get('guest_token');
 
-        $query = Orders::query();
+        $query = Orders::with(['payments', 'order_items.menu']);
 
         // Filter by guest token or user_id
         if (auth()->check()) {
@@ -28,23 +28,48 @@ class OrderController extends Controller
             $query->where('guest_token', $guestToken);
         }
 
+        // Filter by status
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->get();
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        // Pagination
+        $perPage = $request->input('per_page', 10);
+        $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
             'data' => $orders->map(fn($order) => [
                 'id' => $order->id,
                 'order_type' => $order->order_type,
                 'status' => $order->status,
+                'customer_name' => $order->customer_name,
                 'total_price' => (int) $order->total_price,
                 'delivery_fee' => (int) $order->delivery_fee,
                 'discount_amount' => (int) $order->discount_amount,
                 'final_price' => (int) $order->final_price,
+                'items_count' => $order->order_items->count(),
+                'items_summary' => $order->order_items->take(3)->map(fn($item) => $item->menu?->name)->filter()->implode(', '),
+                'payment' => $order->payments->first() ? [
+                    'status' => $order->payments->first()->status,
+                    'method' => $order->payments->first()->payment_method,
+                    'paid_at' => $order->payments->first()->paid_at?->toIso8601String(),
+                ] : null,
                 'created_at' => $order->created_at->toIso8601String(),
-            ])
+            ]),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+            ]
         ], 200);
     }
 
