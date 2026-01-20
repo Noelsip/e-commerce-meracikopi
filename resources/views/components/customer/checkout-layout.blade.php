@@ -147,7 +147,7 @@
             padding: 16px 20px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
-            background: transparent;
+            background: #241813;
             gap: 16px;
         }
 

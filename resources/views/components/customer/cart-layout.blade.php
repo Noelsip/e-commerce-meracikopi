@@ -99,7 +99,7 @@
             border: 1px solid #D9D9D9;
             border-radius: 8px;
             margin-bottom: 12px;
-            background: transparent;
+            background: #241813;
             transition: all 0.3s ease;
             max-width: 1360px;
             margin-left: auto;
@@ -416,7 +416,7 @@
                 border-radius: 8px;
                 padding: 12px 8px;
                 margin-bottom: 8px;
-                background: transparent;
+                background: #241813;
             }
 
             .cart-item-row:hover {
@@ -558,7 +558,7 @@
             .cart-item-wrapper .cart-item-row {
                 transition: transform 0.3s ease;
                 margin-bottom: 0;
-                background: #1a1410;
+                background: #241813;
             }
 
             .cart-item-wrapper .cart-item-row.swiped {
