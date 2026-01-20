@@ -20,11 +20,11 @@
             <flux:spacer />
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
+                <flux:navlist.item icon="code-bracket" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                 {{ __('Repository') }}
                 </flux:navlist.item>
 
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
+                <flux:navlist.item icon="book-open" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
                 {{ __('Documentation') }}
                 </flux:navlist.item>
             </flux:navlist>
@@ -34,7 +34,7 @@
                 <flux:profile
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
-                    icon:trailing="chevrons-up-down"
+                    icon:trailing="chevron-up-down"
                     data-test="sidebar-menu-button"
                 />
 
@@ -61,7 +61,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog-6-tooth" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />
@@ -78,7 +78,7 @@
 
         <!-- Mobile User Menu -->
         <flux:header class="lg:hidden">
-            <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
+            <flux:sidebar.toggle class="lg:hidden" icon="bars-3" inset="left" />
 
             <flux:spacer />
 
@@ -111,7 +111,7 @@
                     <flux:menu.separator />
 
                     <flux:menu.radio.group>
-                        <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
+                        <flux:menu.item :href="route('profile.edit')" icon="cog-6-tooth" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     </flux:menu.radio.group>
 
                     <flux:menu.separator />

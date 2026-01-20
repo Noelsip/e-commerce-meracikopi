@@ -21,3 +21,11 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/testing
+/tests
+
+/testing/postman_environment.json
+/testing/postman_collection.json
+/testing/postman_collection.json
+
+/.cursor
