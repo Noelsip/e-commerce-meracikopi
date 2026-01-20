@@ -133,12 +133,12 @@
         }
 
         .navbar-container {
-            padding: 0 12px !important;
+            padding: 0 !important;
         }
 
         .navbar-inner {
             min-height: 70px !important;
-            border-radius: 0 0 16px 16px !important;
+            border-radius: 0 !important;
         }
 
         .navbar-top-wrapper {
@@ -274,8 +274,7 @@
 
 <!-- Navbar Container -->
 <div class="navbar-container" style="background-color: #2a1b14; padding: 0; position: sticky; top: 0; z-index: 100;">
-    <div class="navbar-inner"
-        style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
+    <div class="navbar-inner" style="background-color: #2a1b14; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);">
         <!-- Top Row: Logo, Search, Find a Cafe, Cart -->
         <div class="navbar-top-wrapper" style="padding: 16px 40px 8px 40px;">
             <div

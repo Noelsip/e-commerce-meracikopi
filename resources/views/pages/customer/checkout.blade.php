@@ -1,17 +1,37 @@
 <x-customer.checkout-layout>
     <!-- Error Modal -->
     <div id="errorModal" class="error-modal-overlay">
-        <div class="error-modal">
+        <div class="error-modal compact-modal">
             <div class="error-modal-icon">
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
                 </svg>
             </div>
             <h3 class="error-modal-title" id="errorModalTitle">Metode Pembayaran Belum Dipilih</h3>
             <p class="error-modal-message" id="errorModalMessage">Silahkan pilih metode pembayaran terlebih dahulu</p>
             <button class="error-modal-btn" onclick="closeErrorModal()">OK, Mengerti</button>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="error-modal-overlay">
+        <div class="error-modal compact-modal">
+            <div class="error-modal-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18"></path>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+            </div>
+            <h3 class="error-modal-title">Hapus Produk?</h3>
+            <p class="error-modal-message">Apakah Anda yakin ingin menghapus produk ini dari pesanan?</p>
+            <div class="delete-modal-actions">
+                <button class="btn-cancel" onclick="closeDeleteConfirm()">Batal</button>
+                <button class="btn-confirm-delete" onclick="confirmDelete()">Iya</button>
+            </div>
         </div>
     </div>
 
@@ -22,7 +42,7 @@
             <div class="success-header">
                 <div class="success-checkmark">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 6L9 17l-5-5"/>
+                        <path d="M20 6L9 17l-5-5" />
                     </svg>
                 </div>
                 <h2 class="success-title">Pesanan Berhasil</h2>
@@ -55,7 +75,8 @@
                     <div class="receipt-info-col">
                         <p class="receipt-info-label">Payment Method</p>
                         <p class="receipt-info-value payment-method-display" id="receiptPaymentMethod">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
@@ -137,6 +158,7 @@
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
@@ -147,6 +169,7 @@
                 opacity: 0;
                 transform: scale(0.9) translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: scale(1) translateY(0);
@@ -220,6 +243,35 @@
             transform: translateY(0);
         }
 
+        /* Compact Modal Variant */
+        .compact-modal {
+            max-width: 320px;
+            padding: 30px 24px;
+        }
+
+        .compact-modal .error-modal-icon {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 16px;
+        }
+
+        .compact-modal .error-modal-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .compact-modal .error-modal-title {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .compact-modal .error-modal-message {
+            font-size: 12px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+            line-height: 1.5;
+        }
+
         /* Success Modal Styles */
         .success-modal-overlay {
             display: none;
@@ -247,6 +299,50 @@
             flex-direction: column;
             align-items: center;
             animation: slideIn 0.4s ease;
+        }
+
+        /* Delete Modal Extensions */
+        .delete-modal-actions {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-confirm-delete {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-confirm-delete:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
         }
 
         /* Success Header */
@@ -568,8 +664,13 @@
 
         /* Spinner animation */
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 
@@ -596,7 +697,8 @@
                         <span class="recipient-divider">|</span>
                         <span class="recipient-phone">(+62) 822 54554411</span>
                     </div>
-                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</p>
+                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan,
+                        Kalimantan Timur 76614</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>
@@ -613,14 +715,17 @@
                     <div id="checkoutItemsContainer">
                         <!-- Loading state -->
                         <div class="checkout-loading" style="text-align: center; padding: 40px; color: #fff;">
-                            <div style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(202, 120, 66, 0.3); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <div
+                                style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(202, 120, 66, 0.3); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;">
+                            </div>
                             <p style="margin-top: 16px; opacity: 0.7;">Loading cart items...</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Delivery Methods Section (Hidden by default, shown when Delivery is selected) -->
-                <div class="delivery-methods-section" id="deliveryMethodsSection" style="display: none; margin-top: 40px;">
+                <div class="delivery-methods-section" id="deliveryMethodsSection"
+                    style="display: none; margin-top: 40px;">
                     <p class="section-title">Metode Pengiriman</p>
 
                     <!-- J&T Express -->
@@ -693,20 +798,20 @@
             <!-- Right: Order Summary -->
             <div class="order-summary-section">
                 <p class="section-title">Jumlah Pesanan</p>
-                
+
                 <div class="order-summary-card">
                     <div class="summary-row">
-                        <span class="summary-label">Subtotal (3 Produk)</span>
-                        <span class="summary-value strikethrough">Rp. 1.000</span>
+                        <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
+                        <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-label">Biaya Layanan</span>
-                        <span class="summary-value">Rp. 1.000</span>
+                        <span class="summary-value" id="summaryServiceFee">Rp 1.000</span>
                     </div>
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
                         <span class="summary-total-label">Total</span>
-                        <span class="summary-total-value">RP 40.000</span>
+                        <span class="summary-total-value">RP 0</span>
                     </div>
                     <button class="checkout-btn" onclick="proceedToPayment()">Checkout</button>
                 </div>
@@ -781,21 +886,24 @@
                     <label>Label Alamat</label>
                     <div class="address-label-options">
                         <button type="button" class="label-btn active" onclick="selectAddressLabel(this, 'rumah')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                                 <polyline points="9 22 9 12 15 12 15 22"></polyline>
                             </svg>
                             Rumah
                         </button>
                         <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kantor')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                             Kantor
                         </button>
                         <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kos')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
                                 <path d="M9 21v-6h6v6"></path>
                                 <path d="M9 9h.01"></path>
@@ -823,7 +931,7 @@
         function toggleRadio(event, name, value) {
             event.preventDefault();
             const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-            
+
             if (name === 'payment_method') {
                 if (lastSelectedPayment === value) {
                     // Uncheck if clicking the same option
@@ -875,14 +983,14 @@
         }
 
         // Close modal when clicking outside
-        document.getElementById('errorModal').addEventListener('click', function(e) {
+        document.getElementById('errorModal').addEventListener('click', function (e) {
             if (e.target === this) {
                 closeErrorModal();
             }
         });
 
         // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeErrorModal();
             }
@@ -908,14 +1016,14 @@
         // Proceed to payment
         function proceedToPayment() {
             const orderType = document.getElementById('orderTypeDisplay').textContent;
-            
+
             // Check if at least one order item is selected
             const selectedItems = document.querySelectorAll('.order-item-checkbox:checked');
             if (selectedItems.length === 0) {
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
-            
+
             if (orderType === 'Delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
@@ -939,17 +1047,17 @@
         function showSuccessModal(orderType, paymentMethod) {
             // Generate order number
             const now = new Date();
-            const orderNumber = 'MRK-' + now.getFullYear() + 
-                String(now.getMonth() + 1).padStart(2, '0') + 
-                String(now.getDate()).padStart(2, '0') + '-' + 
+            const orderNumber = 'MRK-' + now.getFullYear() +
+                String(now.getMonth() + 1).padStart(2, '0') +
+                String(now.getDate()).padStart(2, '0') + '-' +
                 String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
-            
+
             // Format date
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            const orderDate = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() + 
-                             ' pukul ' + String(now.getHours()).padStart(2, '0') + ':' + 
-                             String(now.getMinutes()).padStart(2, '0');
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            const orderDate = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() +
+                ' pukul ' + String(now.getHours()).padStart(2, '0') + ':' +
+                String(now.getMinutes()).padStart(2, '0');
 
             // Payment method display names
             const paymentNames = {
@@ -1041,7 +1149,7 @@
             const provinceName = province.options[province.selectedIndex]?.text || '';
             const cityName = city.options[city.selectedIndex]?.text || '';
             const districtName = district.options[district.selectedIndex]?.text || '';
-            
+
             let fullAddressText = address;
             if (districtName) fullAddressText += ', Kec. ' + districtName;
             if (cityName) fullAddressText += ', ' + cityName;
@@ -1057,7 +1165,7 @@
         }
 
         // Toggle sections based on order type (called from navbar)
-        window.toggleDeliverySection = function(isDelivery) {
+        window.toggleDeliverySection = function (isDelivery) {
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
             const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
@@ -1078,7 +1186,7 @@
         async function loadCheckoutItems() {
             const token = localStorage.getItem('guest_token') || '';
             const container = document.getElementById('checkoutItemsContainer');
-            
+
             try {
                 const response = await fetch('/api/customer/cart', {
                     headers: {
@@ -1088,7 +1196,7 @@
                 });
 
                 if (!response.ok) throw new Error('Failed to fetch cart');
-                
+
                 const result = await response.json();
                 const items = result.data.items || [];
 
@@ -1110,7 +1218,7 @@
                 // Render items
                 container.innerHTML = items.map(item => `
                     <div class="order-item-card" data-item-id="${item.id}">
-                        <input type="checkbox" class="order-item-checkbox" checked onchange="updateOrderTotal()">
+                        <input type="checkbox" class="order-item-checkbox" checked onchange="updateOrderTotal()" data-subtotal="${item.subtotal}" data-quantity="${item.quantity}">
                         <div class="order-item-image" style="background-image: url('${item.menu_image || ''}'); background-size: cover; background-position: center;">
                             ${!item.menu_image ? '<span style="font-size: 24px;">☕</span>' : ''}
                         </div>
@@ -1122,7 +1230,7 @@
                                     <span style="min-width: 30px; text-align: center; color: #fff; font-weight: 500;">${item.quantity}</span>
                                     <button type="button" class="quantity-btn" onclick="updateQuantityCheckout(${item.id}, ${item.quantity + 1})" style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(202,120,66,0.3); background: rgba(202,120,66,0.1); color: #CA7842; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
                                 </div>
-                                <span class="order-item-delete" onclick="removeCheckoutItem(${item.id})">×</span>
+                                <span class="order-item-delete" onclick="showDeleteConfirm(${item.id})">×</span>
                             </div>
                         </div>
                         <span class="order-item-price">Rp ${formatRupiah(item.subtotal)}</span>
@@ -1163,13 +1271,34 @@
             }
         }
 
-        // Remove item from checkout
-        async function removeCheckoutItem(itemId) {
-            if (!confirm('Remove this item from cart?')) return;
-            
+        // Delete Logic
+        let itemToDelete = null;
+
+        function showDeleteConfirm(itemId) {
+            itemToDelete = itemId;
+            document.getElementById('deleteConfirmModal').classList.add('show'); // Using same class 'show' as error modal logic
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeleteConfirm() {
+            itemToDelete = null;
+            document.getElementById('deleteConfirmModal').classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        async function confirmDelete() {
+            if (!itemToDelete) return;
+
             const token = localStorage.getItem('guest_token') || '';
+
+            // Show loading state on button
+            const confirmBtn = document.querySelector('.btn-confirm-delete');
+            const originalText = confirmBtn.textContent;
+            confirmBtn.textContent = 'Menghapus...';
+            confirmBtn.disabled = true;
+
             try {
-                const response = await fetch(`/api/customer/cart/items/${itemId}`, {
+                const response = await fetch(`/api/customer/cart/items/${itemToDelete}`, {
                     method: 'DELETE',
                     headers: {
                         'X-GUEST-TOKEN': token,
@@ -1179,9 +1308,44 @@
 
                 if (response.ok) {
                     await loadCheckoutItems();
+                    closeDeleteConfirm();
+                } else {
+                    alert('Gagal menghapus produk');
                 }
             } catch (error) {
                 console.error('Error removing item:', error);
+                alert('Terjadi kesalahan saat menghapus produk');
+            } finally {
+                confirmBtn.textContent = originalText;
+                confirmBtn.disabled = false;
+            }
+        }
+
+        // Calculate and update order total
+        function updateOrderTotal() {
+            let subtotal = 0;
+            let totalQty = 0;
+            const serviceFee = 1000; // Fixed service fee
+
+            document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
+                subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
+                totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
+            });
+
+            const grandTotal = subtotal + serviceFee;
+
+            // Update labels
+            const subtotalLabel = document.getElementById('summarySubtotalLabel');
+            const subtotalValue = document.getElementById('summarySubtotalValue');
+            const serviceFeeValue = document.getElementById('summaryServiceFee');
+            const totalElement = document.querySelector('.summary-total-value');
+
+            if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
+            if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
+            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(serviceFee);
+
+            if (totalElement) {
+                totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
             }
         }
 
@@ -1194,11 +1358,12 @@
         document.addEventListener('DOMContentLoaded', function () {
             // Load cart items for checkout
             loadCheckoutItems();
-            
+
             // Add transition styles to order items
             document.querySelectorAll('.order-item-card').forEach(card => {
                 card.style.transition = 'all 0.3s ease';
             });
         });
     </script>
+
 </x-customer.checkout-layout>
