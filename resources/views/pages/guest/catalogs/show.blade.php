@@ -1,7 +1,6 @@
 <x-customer.layout title="{{ $menu->name }} - Meracikopi">
     <!-- Main Content Wrapper -->
-    <div
-        style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
+    <div style="min-height: 100vh; position: relative; padding-top: 40px; font-family: 'Inter', sans-serif;">
 
         <style>
             /* Hide announcement banner on product detail page */
@@ -48,23 +47,28 @@
 
                 .product-box {
                     height: auto !important;
-                    min-height: 500px;
+                    min-height: auto;
+                    padding: 20px 0;
                 }
 
                 .product-content {
                     flex-direction: column !important;
-                    gap: 30px !important;
-                    padding: 30px 20px !important;
+                    gap: 24px !important;
+                    padding: 20px !important;
+                    align-items: center !important;
                 }
 
                 .product-image {
-                    width: 200px !important;
-                    height: 200px !important;
+                    width: 250px !important;
+                    height: 250px !important;
+                    order: 1;
                 }
 
                 .product-details {
                     width: 100% !important;
+                    max-width: 350px;
                     text-align: center;
+                    order: 2;
                 }
 
                 .product-details h1 {
@@ -73,6 +77,12 @@
 
                 .product-quantity {
                     justify-content: center !important;
+                    margin-bottom: 20px !important;
+                }
+
+                .product-details button[type="button"] {
+                    max-width: 350px;
+                    margin: 0 auto;
                 }
 
                 .description-grid {

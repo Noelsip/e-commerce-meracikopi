@@ -8,17 +8,15 @@
         </div>
 
         <!-- Empty State -->
-        <div x-show="!loading && items.length === 0" class="text-center py-20" style="display: none;">
-            <svg class="w-16 h-16 mx-auto mb-4 text-[#CA7842] opacity-50" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
+        <div x-show="!loading && items.length === 0" class="empty-cart-container" style="display: none;">
+            <svg class="empty-cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
                 </path>
             </svg>
-            <h3 class="text-white text-xl font-medium mb-2">Keranjang Anda Kosong</h3>
-            <p class="text-white/60 mb-8">Silakan pilih menu favorit Anda terlebih dahulu</p>
-            <a href="{{ route('catalogs.index') }}"
-                class="inline-block px-8 py-3 bg-[#CA7842] text-white rounded-full hover:bg-[#b5693a] transition-colors">
+            <h3 class="empty-cart-title">Keranjang Anda Kosong</h3>
+            <p class="empty-cart-subtitle">Silakan pilih menu favorit Anda terlebih dahulu</p>
+            <a href="{{ route('catalogs.index') }}" class="empty-cart-btn">
                 Lihat Menu
             </a>
         </div>
@@ -409,6 +407,124 @@
 
         .error-modal-btn:active {
             transform: translateY(0);
+        }
+    </style>
+
+    <!-- Empty Cart Styles -->
+    <style>
+        /* Empty Cart Container */
+        .empty-cart-container {
+            text-align: center;
+            padding: 80px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .empty-cart-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            color: #CA7842;
+            opacity: 0.6;
+        }
+
+        .empty-cart-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .empty-cart-subtitle {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .empty-cart-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #CA7842;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(202, 120, 66, 0.3);
+        }
+
+        .empty-cart-btn:hover {
+            background-color: #b5693a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(202, 120, 66, 0.4);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .empty-cart-container {
+                padding: 60px 24px;
+                min-height: calc(100vh - 180px);
+            }
+
+            .empty-cart-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 20px;
+            }
+
+            .empty-cart-title {
+                font-size: 20px;
+                margin-bottom: 10px;
+                padding: 0 10px;
+            }
+
+            .empty-cart-subtitle {
+                font-size: 15px;
+                line-height: 1.5;
+                margin-bottom: 28px;
+                padding: 0 10px;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .empty-cart-btn {
+                padding: 12px 28px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .empty-cart-container {
+                padding: 50px 16px;
+            }
+
+            .empty-cart-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            .empty-cart-title {
+                font-size: 18px;
+            }
+
+            .empty-cart-subtitle {
+                font-size: 14px;
+                margin-bottom: 24px;
+            }
+
+            .empty-cart-btn {
+                padding: 11px 24px;
+                font-size: 14px;
+                width: auto;
+                max-width: 200px;
+            }
         }
     </style>
 </x-customer.cart-layout>

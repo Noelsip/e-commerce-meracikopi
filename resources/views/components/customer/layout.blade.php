@@ -28,10 +28,15 @@
             box-sizing: border-box;
         }
 
-        html,
-        body {
+        html {
             overscroll-behavior: none;
             overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: visible;
         }
 
         :root {
