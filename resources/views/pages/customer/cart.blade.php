@@ -131,6 +131,28 @@
             </div>
         </div>
 
+
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmModal" class="error-modal-overlay">
+            <div class="error-modal compact-modal">
+                <div class="error-modal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                </div>
+                <h3 class="error-modal-title">Hapus Produk?</h3>
+                <p class="error-modal-message">Apakah Anda yakin ingin menghapus produk ini dari pesanan?</p>
+                <div class="delete-modal-actions">
+                    <button class="btn-cancel" @click="closeDeleteConfirm()">Batal</button>
+                    <button class="btn-confirm-delete" @click="confirmDelete()">Iya</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Alpine Logic -->
@@ -211,6 +233,7 @@
                         }));
 
                         this.totalPrice = result.data.total_price || 0;
+                        this.itemToDelete = null; // Reset delete state
                     } catch (error) {
                         console.error('Error fetching cart:', error);
                     } finally {
@@ -248,8 +271,21 @@
                     }
                 },
 
-                async removeItem(itemId) {
-                    if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+                removeItem(itemId) {
+                    this.itemToDelete = itemId;
+                    const modal = document.getElementById('deleteConfirmModal');
+                    if (modal) modal.classList.add('show');
+                },
+
+                closeDeleteConfirm() {
+                    this.itemToDelete = null;
+                    const modal = document.getElementById('deleteConfirmModal');
+                    if (modal) modal.classList.remove('show');
+                },
+
+                async confirmDelete() {
+                    if (!this.itemToDelete) return;
+                    const itemId = this.itemToDelete;
 
                     try {
                         const response = await fetch(`/api/customer/cart/items/${itemId}`, {
@@ -261,10 +297,12 @@
                         });
 
                         if (response.ok) {
-                            this.fetchCart();
+                            await this.fetchCart();
+                            this.closeDeleteConfirm();
                         }
                     } catch (error) {
                         console.error('Error removing item:', error);
+                        this.closeDeleteConfirm();
                     }
                 },
 
@@ -290,6 +328,10 @@
             }));
         });
     </script>
+
+    </script>
+
+
 
     <!-- Error Modal (Reused) -->
     <div id="errorModal" class="error-modal-overlay">
@@ -407,6 +449,50 @@
 
         .error-modal-btn:active {
             transform: translateY(0);
+        }
+
+        /* Delete Modal Actions */
+        .delete-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .delete-modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .btn-confirm-delete {
+            background: #e74c3c !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-confirm-delete:hover {
+            background: #c0392b !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
         }
     </style>
 

@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         $guestToken = $request->attributes->get('guest_token');
 
-        $query = Orders::query();
+        $query = Orders::with(['order_items.menu', 'tables', 'payments']);
 
         // Filter by guest token or user_id
         if (auth()->check()) {
@@ -44,6 +44,20 @@ class OrderController extends Controller
                 'discount_amount' => (int) $order->discount_amount,
                 'final_price' => (int) $order->final_price,
                 'created_at' => $order->created_at->toIso8601String(),
+                'order_items' => $order->order_items->map(fn($item) => [
+                    'id' => $item->id,
+                    'menu_name' => $item->menu->name ?? 'Unknown',
+                    'quantity' => $item->quantity,
+                    'price' => (int) $item->price,
+                ]),
+                'tables' => $order->tables ? [
+                    'id' => $order->tables->id,
+                    'table_number' => $order->tables->table_number ?? $order->tables->number ?? null,
+                ] : null,
+                'payments' => $order->payments->map(fn($payment) => [
+                    'payment_method' => $payment->payment_method ?? 'Credit Card',
+                    'status' => $payment->status ?? null,
+                ]),
             ])
         ], 200);
     }
@@ -66,6 +80,8 @@ class OrderController extends Controller
             'address.postal_code' => 'required_if:order_type,delivery|string',
             'address.notes' => 'nullable|string',
             'notes' => 'nullable|string',
+            'selected_item_ids' => 'required|array|min:1', // Add validation for selected items
+            'selected_item_ids.*' => 'integer|exists:cart_items,id', // Each item must be valid cart_item ID
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -108,11 +124,20 @@ class OrderController extends Controller
                 abort(422, 'Cart is empty');
             }
 
-            // Menghitung total harga dari server dengan diskon
+            // Filter only selected items
+            $selectedItemIds = $request->input('selected_item_ids', []);
+            $selectedItems = $cart->items->whereIn('id', $selectedItemIds);
+
+            // Validate that we have selected items
+            if ($selectedItems->isEmpty()) {
+                abort(422, 'No items selected for checkout');
+            }
+
+            // Menghitung total harga dari server dengan diskon (hanya untuk item yang dipilih)
             $totalPrice = 0;
             $totalDiscountAmount = 0;
 
-            foreach ($cart->items as $item) {
+            foreach ($selectedItems as $item) {
                 if (!$item->menu->is_available) {
                     abort(422, "Menu '{$item->menu->name}' is not available");
                 }
@@ -120,7 +145,7 @@ class OrderController extends Controller
                 // Hitung dengan harga setelah diskon
                 $finalPrice = $item->menu->final_price;
                 $totalPrice += $finalPrice * $item->quantity;
-                
+
                 // Hitung total diskon
                 $totalDiscountAmount += $item->menu->discount_amount * $item->quantity;
             }
@@ -152,8 +177,8 @@ class OrderController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Copy cart_items ke order_items dengan harga final (setelah diskon)
-            foreach ($cart->items as $item) {
+            // Copy ONLY SELECTED cart_items ke order_items dengan harga final (setelah diskon)
+            foreach ($selectedItems as $item) {
                 OrderItems::create([
                     'order_id' => $order->id,
                     'menu_id' => $item->menu_id,

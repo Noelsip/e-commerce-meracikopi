@@ -417,6 +417,8 @@
                 padding: 12px 8px;
                 margin-bottom: 8px;
                 background: #241813;
+                position: relative;
+                /* Anchor for absolute price */
             }
 
             .cart-item-row:hover {
@@ -473,19 +475,31 @@
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
+                width: 100%;
+                grid-column: 2;
+                grid-row: 1;
+                /* Explicit row 1 */
             }
 
+            /* Price - Absolute Bottom Right */
             /* Price and quantity inline row */
             .cart-item-row>.product-price {
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
-                text-align: left;
+                text-align: right;
                 grid-column: 2;
-                padding-left: 92px;
-                /* Align with product name (80px image + 12px gap) */
-                margin-bottom: -8px;
+                grid-row: 2;
+                /* Explicit row 2 */
+                justify-self: end;
+                /* Push to end */
+                padding-left: 0;
+                align-self: center;
+                margin-top: 8px;
+                width: auto;
+                position: relative;
+                right: 0;
             }
 
             /* Hide standalone total price */
@@ -496,13 +510,17 @@
             /* Quantity controls - inline with price */
             .cart-item-row>.quantity-controls {
                 grid-column: 2;
+                grid-row: 2;
+                /* Explicit row 2 */
                 display: flex;
                 align-items: center;
-                justify-content: flex-end;
+                justify-content: flex-start;
+                /* Start align quantity */
                 gap: 8px;
-                padding-right: 8px;
-                margin-top: -32px;
-                /* Align with price row */
+                padding-right: 0;
+                margin-top: 8px;
+                width: fit-content;
+                /* Removed negative margins */
             }
 
             .quantity-btn {

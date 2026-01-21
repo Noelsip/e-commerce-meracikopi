@@ -318,16 +318,35 @@
                         <span>Find a Cafe</span>
                     </a>
 
-                    <!-- Cart Icon -->
-                    <!-- Cart Icon -->
+                    <!-- Cart Icon with Badge -->
                     <a href="/customer/cart"
-                        style="color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
+                        style="position: relative; color: white; text-decoration: none; opacity: 0.9; transition: opacity 0.3s ease;"
                         onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.9'">
                         <svg class="navbar-cart-icon" style="width: 25px; height: 25px;" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                 d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
+                        <!-- Cart Badge -->
+                        <span id="cartBadge" class="cart-badge" style="
+                            position: absolute;
+                            top: -8px;
+                            right: -10px;
+                            background: linear-gradient(135deg, #ef4444, #dc2626);
+                            color: white;
+                            font-size: 11px;
+                            font-weight: 700;
+                            min-width: 18px;
+                            height: 18px;
+                            border-radius: 9px;
+                            display: none;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 0 5px;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                            font-family: 'Poppins', sans-serif;
+                            line-height: 1;
+                        "></span>
                     </a>
 
                     <!-- Mobile Search Button -->
@@ -376,6 +395,9 @@
                 <a href="{{ url('/customer/catalogs') }}"
                     class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}"
                     style="font-weight: 600;">Catalog</a>
+                <a href="{{ url('/customer/order-history') }}"
+                    class="nav-link-main {{ request()->is('customer/order-history*') ? 'active' : '' }}"
+                    style="font-weight: 600;">Order History</a>
             </div>
         </div>
     </div>
@@ -426,6 +448,8 @@
         <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Home</a>
         <a href="{{ url('/customer/catalogs') }}"
             class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
+        <a href="{{ url('/customer/order-history') }}"
+            class="{{ request()->is('customer/order-history*') ? 'active' : '' }}">Order History</a>
     </div>
 </div>
 
@@ -461,6 +485,72 @@
             setTimeout(() => searchInput.focus(), 100);
         }
     }
+</script>
+
+<!-- Cart Badge Counter Script -->
+<script>
+    // Cart Badge Counter Functions
+    function updateCartBadge(count) {
+        const badge = document.getElementById('cartBadge');
+        if (!badge) return;
+
+        if (count > 0) {
+            // Display count or "99+" if more than 99
+            badge.textContent = count > 99 ? '99+' : count.toString();
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function fetchCartCount() {
+        const guestToken = localStorage.getItem('guest_token');
+        if (!guestToken) {
+            updateCartBadge(0);
+            return;
+        }
+
+        fetch('/api/customer/cart', {
+            headers: {
+                'X-GUEST-TOKEN': guestToken,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch cart');
+                return response.json();
+            })
+            .then(data => {
+                const items = data.data.items || [];
+                // Count total quantity of all items
+                const totalCount = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                updateCartBadge(totalCount);
+            })
+            .catch(error => {
+                console.error('Error fetching cart count:', error);
+                updateCartBadge(0);
+            });
+    }
+
+    // Load cart count on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchCartCount();
+
+        // Refresh cart count every 30 seconds
+        setInterval(fetchCartCount, 30000);
+    });
+
+    // Listen for storage events (cart updates from other tabs)
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'guest_token' || e.key === 'cart_updated') {
+            fetchCartCount();
+        }
+    });
+
+    // Custom event for cart updates
+    window.addEventListener('cartUpdate d', function () {
+        fetchCartCount();
+    });
 </script>
 
 <!-- Announcement Bar -->
