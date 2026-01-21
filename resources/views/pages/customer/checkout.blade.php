@@ -1014,7 +1014,7 @@
         }
 
         // Proceed to payment
-        function proceedToPayment() {
+        async function proceedToPayment() {
             const orderType = document.getElementById('orderTypeDisplay').textContent;
 
             // Check if at least one order item is selected
@@ -1024,22 +1024,95 @@
                 return;
             }
 
+            let paymentMethod = '';
+            
             if (orderType === 'Delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                // Show success modal with delivery info
-                showSuccessModal(orderType, selectedDelivery.value);
+                paymentMethod = selectedDelivery.value;
             } else {
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                     return;
                 }
-                // Show success modal with payment info
-                showSuccessModal(orderType, selectedPayment.value);
+                paymentMethod = selectedPayment.value;
+            }
+
+            // Get guest token
+            const guestToken = localStorage.getItem('guest_token');
+            if (!guestToken) {
+                showErrorModal('Error', 'Sesi telah berakhir. Silahkan muat ulang halaman.');
+                return;
+            }
+
+            // Build order type value for API
+            let orderTypeValue = 'dine_in';
+            if (orderType === 'Delivery') {
+                orderTypeValue = 'delivery';
+            } else if (orderType === 'Take Away') {
+                orderTypeValue = 'take_away';
+            }
+
+            // Get customer name (from address if delivery, or default)
+            const customerName = document.getElementById('receiverName')?.value || 'Guest Customer';
+            const customerPhone = document.getElementById('receiverPhone')?.value || '';
+
+            // Get table ID for dine-in
+            const tableInfo = document.getElementById('tableNumber')?.textContent || '';
+            const tableId = tableInfo.match(/\d+/)?.[0] || null;
+
+            // Build order data
+            const orderData = {
+                customer_name: customerName,
+                customer_phone: customerPhone,
+                order_type: orderTypeValue,
+                table_id: orderTypeValue === 'dine_in' ? (tableId ? parseInt(tableId) : 10) : null,
+                notes: document.getElementById('noteForBarista')?.value || ''
+            };
+
+            // Add address for delivery
+            if (orderTypeValue === 'delivery') {
+                orderData.address = {
+                    receiver_name: document.getElementById('receiverName')?.value || customerName,
+                    phone: document.getElementById('receiverPhone')?.value || '',
+                    full_address: document.getElementById('fullAddress')?.value || '',
+                    city: document.getElementById('city')?.value || 'Balikpapan',
+                    postal_code: document.getElementById('postalCode')?.value || '76114',
+                    notes: document.getElementById('addressNotes')?.value || ''
+                };
+            }
+
+            try {
+                // Create order via API
+                const response = await fetch('/api/customer/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Guest-Token': guestToken,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Gagal membuat pesanan');
+                }
+
+                const result = await response.json();
+                console.log('Order created:', result);
+
+                // Show success modal
+                showSuccessModal(orderType, paymentMethod);
+
+            } catch (error) {
+                console.error('Order creation error:', error);
+                showErrorModal('Gagal Membuat Pesanan', error.message || 'Terjadi kesalahan saat membuat pesanan. Silahkan coba lagi.');
             }
         }
 
@@ -1105,7 +1178,7 @@
 
         // Go to order history
         function goToRiwayat() {
-            window.location.href = '/customer/orders';
+            window.location.href = '/customer/order-history';
         }
 
         // Go back to home/catalogs
