@@ -10,11 +10,25 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    
+    <!-- Fonts - Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100">
-    {{ $slot }}
+<body class="font-sans antialiased bg-gray-50 dark:bg-zinc-900 text-gray-900 dark:text-gray-100" style="background-color: #1a1410;">
+    <!-- Navbar -->
+    @include('components.customer.navbar')
+    
+    <!-- Main Content -->
+    <main>
+        {{ $slot }}
+    </main>
 </body>
 </html>

@@ -1,7 +1,6 @@
 <x-customer.layout title="{{ $menu->name }} - Meracikopi">
     <!-- Main Content Wrapper -->
-    <div
-        style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
+    <div style="min-height: 100vh; position: relative; padding-top: 40px; font-family: 'Inter', sans-serif;">
 
         <style>
             /* Hide announcement banner on product detail page */
@@ -35,53 +34,166 @@
             /* Mobile Responsive */
             @media (max-width: 768px) {
                 .product-container {
-                    padding: 0 20px !important;
+                    padding: 0 16px !important;
                 }
 
                 .product-header {
-                    margin-bottom: 20px !important;
+                    margin-bottom: 16px !important;
                 }
 
                 .product-header span {
                     display: none;
                 }
 
+                .product-header a {
+                    font-size: 14px !important;
+                }
+
                 .product-box {
                     height: auto !important;
-                    min-height: 500px;
+                    min-height: auto;
+                    padding: 20px 0 24px 0;
+                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
+                }
+
+                .product-box > div:first-child,
+                .product-box > div:nth-child(2) {
+                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.6) 0%, transparent 60%) !important;
                 }
 
                 .product-content {
                     flex-direction: column !important;
-                    gap: 30px !important;
-                    padding: 30px 20px !important;
+                    gap: 16px !important;
+                    padding: 12px 16px !important;
+                    align-items: center !important;
+                    justify-content: flex-start !important;
                 }
 
                 .product-image {
-                    width: 200px !important;
-                    height: 200px !important;
+                    width: 140px !important;
+                    height: 140px !important;
+                    order: 1;
+                }
+
+                .product-image img {
+                    width: 90% !important;
+                    max-width: 130px !important;
                 }
 
                 .product-details {
                     width: 100% !important;
+                    max-width: 280px;
                     text-align: center;
+                    order: 2;
                 }
 
                 .product-details h1 {
-                    font-size: 28px !important;
+                    font-size: 20px !important;
+                    margin-bottom: 2px !important;
+                }
+
+                .product-details > div:nth-child(2) {
+                    font-size: 14px !important;
+                    margin-bottom: 0px !important;
+                }
+
+                .product-details > div:nth-child(3) {
+                    font-size: 10px !important;
+                    margin-bottom: 14px !important;
                 }
 
                 .product-quantity {
                     justify-content: center !important;
+                    margin-bottom: 12px !important;
+                    gap: 12px !important;
+                }
+
+                .product-quantity button {
+                    width: 32px !important;
+                    height: 32px !important;
+                    font-size: 16px !important;
+                }
+
+                .product-quantity input {
+                    font-size: 14px !important;
+                    width: 35px !important;
+                }
+
+                .product-details button[type="button"],
+                .product-details button:not(.product-quantity button) {
+                    width: 100% !important;
+                    max-width: 280px;
+                    margin: 0 auto;
+                    padding: 10px 0 !important;
+                    font-size: 14px !important;
+                    border-radius: 30px !important;
+                }
+
+                .description-section {
+                    padding: 20px 16px 40px 16px !important;
                 }
 
                 .description-grid {
                     grid-template-columns: 1fr !important;
-                    gap: 30px !important;
+                    gap: 24px !important;
                 }
 
-                .description-section {
-                    padding: 20px !important;
+                .description-grid h3 {
+                    font-size: 16px !important;
+                    margin-bottom: 12px !important;
+                    padding-bottom: 8px !important;
+                }
+
+                .description-grid p {
+                    font-size: 13px !important;
+                }
+
+                .note-wrapper {
+                    padding: 12px !important;
+                    border-radius: 10px !important;
+                }
+
+                .note-wrapper textarea {
+                    font-size: 13px !important;
+                }
+
+                /* Related Menus Mobile */
+                .related-menus-section {
+                    padding: 0 16px 60px 16px !important;
+                }
+
+                .related-menus-section h3 {
+                    font-size: 18px !important;
+                    margin-bottom: 20px !important;
+                }
+            }
+
+            /* Small Mobile (< 400px) */
+            @media (max-width: 400px) {
+                .product-image {
+                    width: 150px !important;
+                    height: 150px !important;
+                }
+
+                .product-image img {
+                    max-width: 140px !important;
+                }
+
+                .product-details {
+                    max-width: 260px;
+                }
+
+                .product-details h1 {
+                    font-size: 22px !important;
+                }
+
+                .product-details > div:nth-child(2) {
+                    font-size: 16px !important;
+                }
+
+                .product-quantity button {
+                    width: 32px !important;
+                    height: 32px !important;
                 }
             }
         </style>
@@ -385,19 +497,28 @@
                             </div>
 
                             <div class="menu-rec-name" title="{{ $related->name }}">{{ $related->name }}</div>
-                            <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
 
-                            <button class="menu-rec-btn">
-                                {{ $related->is_available ? 'Tersedia' : 'Habis' }}
-                            </button>
+                            <div class="menu-rec-footer">
+                                <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
+                                @if($related->is_available)
+                                    <span class="menu-rec-badge-available">
+                                        Tersedia
+                                    </span>
+                                @else
+                                    <span class="menu-rec-badge-unavailable">
+                                        Habis
+                                    </span>
+                                @endif
+                            </div>
                         </a>
                     @endforeach
                 </div>
 
                 <style>
-                    /* Horizontal Scroll Styles */
+                    /* Base Styles (Mobile & General) */
                     .other-menus-scroll-container {
                         display: flex;
+                        /* Mobile default: Flex for scrolling */
                         gap: 16px;
                         overflow-x: auto;
                         padding-bottom: 20px;
@@ -411,14 +532,6 @@
                         /* Padding inside scroll */
                     }
 
-                    /* Desktop Scroll Adjustment */
-                    @media (min-width: 769px) {
-                        .other-menus-scroll-container {
-                            margin: 0;
-                            padding: 0 0 20px 0;
-                        }
-                    }
-
                     .other-menus-scroll-container::-webkit-scrollbar {
                         display: none;
                         /* Chrome/Safari */
@@ -426,14 +539,16 @@
 
                     .menu-rec-card {
                         flex: 0 0 160px;
+                        /* Mobile width */
                         background: linear-gradient(145deg, rgba(42, 27, 20, 0.6), rgba(42, 27, 20, 0.3));
                         border: 1px solid rgba(202, 120, 66, 0.1);
                         border-radius: 12px;
                         padding: 12px;
                         display: flex;
                         flex-direction: column;
+                        justify-content: space-between;
                         gap: 8px;
-                        transition: transform 0.2s ease;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
                         text-decoration: none;
                         position: relative;
                         overflow: hidden;
@@ -443,6 +558,7 @@
                         transform: translateY(-4px);
                         background: linear-gradient(145deg, rgba(62, 37, 26, 0.7), rgba(42, 27, 20, 0.4));
                         border-color: rgba(202, 120, 66, 0.2);
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
                     }
 
                     .menu-rec-image {
@@ -455,37 +571,92 @@
                     }
 
                     .menu-rec-name {
-                        font-size: 13px;
-                        font-weight: 500;
+                        font-size: 14px;
+                        font-weight: 600;
                         color: white;
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
                         margin-top: 4px;
+                        margin-bottom: 4px;
+                        /* Space before footer */
+                    }
+
+                    .menu-rec-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: auto;
+                        gap: 8px;
                     }
 
                     .menu-rec-price {
                         font-size: 13px;
-                        font-weight: 600;
+                        font-weight: 700;
                         color: #CA7842;
+                        white-space: nowrap;
                     }
 
-                    .menu-rec-btn {
-                        margin-top: auto;
-                        width: 100%;
-                        padding: 8px;
-                        background: #CA7842;
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
+                    .menu-rec-badge-available {
+                        padding: 4px 12px;
+                        background: linear-gradient(135deg, #CA7842, #8B5E3C);
+                        color: #f0f2ae;
+                        font-size: 11px;
+                        font-weight: 600;
+                        border-radius: 20px;
+                        box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);
+                        white-space: nowrap;
+                    }
+
+                    .menu-rec-badge-unavailable {
+                        padding: 4px 12px;
+                        background-color: #3e302b;
+                        color: #a89890;
                         font-size: 11px;
                         font-weight: 500;
-                        cursor: pointer;
-                        transition: background 0.2s;
+                        border-radius: 20px;
+                        white-space: nowrap;
                     }
 
-                    .menu-rec-btn:hover {
-                        background: #d88a52;
+                    /* Desktop Styles (Grid Layout) */
+                    @media (min-width: 769px) {
+                        .other-menus-scroll-container {
+                            display: grid;
+                            /* Switch to Grid */
+                            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                            /* Responsive columns */
+                            gap: 32px;
+                            overflow: visible;
+                            /* No scroll */
+                            margin: 0;
+                            padding: 0;
+                        }
+
+                        .menu-rec-card {
+                            flex: none;
+                            /* Disable flex behavior */
+                            width: auto;
+                            padding: 16px;
+                            /* Larger padding */
+                            border-radius: 16px;
+                            gap: 12px;
+                        }
+
+                        .menu-rec-name {
+                            font-size: 18px;
+                            /* Larger font */
+                            margin-bottom: 0;
+                        }
+
+                        .menu-rec-price {
+                            font-size: 18px;
+                            /* Larger price */
+                        }
+
+                        .menu-rec-btn {
+                            font-size: 13px;
+                            padding: 8px 18px;
+                        }
                     }
                 </style>
 

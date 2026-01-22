@@ -188,7 +188,7 @@
             }
             
             .catalog-main-content {
-                padding: 20px 12px !important;
+                padding: 20px 12px 60px 12px !important;
             }
 
             .catalog-rating {
@@ -551,7 +551,7 @@
     </div>
 
     <!-- Main Content -->
-    <div style="background-color: #1a1410; min-height: 60vh;">
+    <div style="background-color: #1a1410; padding-bottom: 40px;">
         <div class="catalog-main-content" style="max-width: 1280px; margin: 0 auto; padding: 40px 16px;">
             @if(request('search'))
                 <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
@@ -690,6 +690,12 @@
     <script>
         let currentQuantity = 1;
 
+        // Reset body overflow on page load to fix scroll issues
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        });
+
         function isMobile() {
             return window.innerWidth <= 600;
         }
@@ -785,6 +791,7 @@
 
             // Disable button while processing
             addBtn.disabled = true;
+            const originalText = addBtn.textContent;
             addBtn.textContent = 'Menambahkan...';
 
             // Get or create guest token
@@ -816,27 +823,104 @@
                 return response.json();
             })
             .then(data => {
-                addBtn.textContent = '✓ Berhasil Ditambahkan';
-                addBtn.style.background = '#27ae60';
+                // Show success toast
+                showToast('Berhasil ditambahkan ke keranjang', 'success');
                 
+                // Trigger cart badge update
+                window.dispatchEvent(new Event('cartUpdated'));
+                
+                // Reset button and close sheet
                 setTimeout(() => {
                     closeBottomSheet();
-                    addBtn.textContent = 'Tambah ke Keranjang';
-                    addBtn.style.background = '#CA7842';
+                    addBtn.textContent = originalText;
                     addBtn.disabled = false;
-                }, 1200);
+                }, 800);
             })
             .catch(error => {
                 console.error('Error:', error);
-                addBtn.textContent = 'Gagal, Coba Lagi';
-                addBtn.style.background = '#e74c3c';
-                addBtn.disabled = false;
+                // Show error toast
+                showToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
                 
-                setTimeout(() => {
-                    addBtn.textContent = 'Tambah ke Keranjang';
-                    addBtn.style.background = '#CA7842';
-                }, 2000);
+                addBtn.textContent = originalText;
+                addBtn.disabled = false;
             });
+        }
+
+        // Toast Notification Function
+        function showToast(message, type = 'success') {
+            let toast = document.getElementById('catalog-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'catalog-toast';
+                
+                // Check if mobile
+                const isMobile = window.innerWidth <= 600;
+                
+                Object.assign(toast.style, {
+                    position: 'fixed',
+                    top: isMobile ? '100px' : '130px',
+                    right: isMobile ? '12px' : '20px',
+                    left: isMobile ? '12px' : 'auto',
+                    zIndex: '9999',
+                    minWidth: isMobile ? 'auto' : '320px',
+                    maxWidth: isMobile ? 'calc(100% - 24px)' : '420px',
+                    backgroundColor: '#2b211e',
+                    borderRadius: isMobile ? '10px' : '12px',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
+                    padding: isMobile ? '12px 14px' : '16px 20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: isMobile ? '10px' : '12px',
+                    transform: 'translateX(120%)',
+                    transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease',
+                    opacity: '0'
+                });
+
+                toast.onclick = function () {
+                    toast.style.transform = 'translateX(120%)';
+                    toast.style.opacity = '0';
+                };
+
+                document.body.appendChild(toast);
+            }
+
+            // Check if mobile
+            const isMobile = window.innerWidth <= 600;
+
+            // Update Content - using theme colors
+            const borderColor = type === 'error' ? '#ef4444' : '#D4A574';
+            const iconColor = type === 'error' ? '#ef4444' : '#D4A574';
+            const icon = type === 'error' 
+                ? '✕' 
+                : '✓';
+            
+            const iconSize = isMobile ? '28px' : '32px';
+            const iconFontSize = isMobile ? '18px' : '20px';
+            const textSize = isMobile ? '13px' : '14px';
+            const closeIconSize = isMobile ? '16px' : '18px';
+
+            toast.style.borderLeft = `4px solid ${borderColor}`;
+            toast.innerHTML = `
+                <div style="width: ${iconSize}; height: ${iconSize}; border-radius: 50%; background: ${iconColor}20; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-size: ${iconFontSize}; font-weight: 700; color: ${iconColor};">${icon}</span>
+                </div>
+                <p style="margin: 0; font-family: 'Poppins', sans-serif; font-size: ${textSize}; font-weight: 500; color: #ffffff; flex-grow: 1; line-height: 1.4;">${message}</p>
+                <span style="cursor: pointer; color: #ffffff; opacity: 0.5; flex-shrink: 0; padding: 4px;" onclick="this.parentElement.style.transform='translateX(120%)'; this.parentElement.style.opacity='0';">
+                    <svg width="${closeIconSize}" height="${closeIconSize}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </span>
+            `;
+
+            // Show toast
+            setTimeout(() => {
+                toast.style.transform = 'translateX(0)';
+                toast.style.opacity = '1';
+            }, 100);
+
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                toast.style.opacity = '0';
+            }, 3500);
         }
 
         // Close on escape key

@@ -941,7 +941,6 @@
                     // Select new option
                     radio.checked = true;
                     lastSelectedPayment = value;
-                    scrollToPayment();
                 }
             } else if (name === 'delivery_method') {
                 if (lastSelectedDelivery === value) {
@@ -952,21 +951,11 @@
                     // Select new option
                     radio.checked = true;
                     lastSelectedDelivery = value;
-                    scrollToPayment();
                 }
             }
         }
 
-        // Scroll to top of page
-        function scrollToPayment() {
-            // Small delay to let the selection complete visually
-            setTimeout(() => {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-            }, 150);
-        }
+
 
         // Show error modal
         function showErrorModal(title, message) {
@@ -1014,7 +1003,7 @@
         }
 
         // Proceed to payment
-        async function proceedToPayment() {
+        function proceedToPayment() {
             const orderType = document.getElementById('orderTypeDisplay').textContent;
 
             // Check if at least one order item is selected
@@ -1024,95 +1013,22 @@
                 return;
             }
 
-            let paymentMethod = '';
-            
             if (orderType === 'Delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                paymentMethod = selectedDelivery.value;
+                // Show success modal with delivery info
+                showSuccessModal(orderType, selectedDelivery.value);
             } else {
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                     return;
                 }
-                paymentMethod = selectedPayment.value;
-            }
-
-            // Get guest token
-            const guestToken = localStorage.getItem('guest_token');
-            if (!guestToken) {
-                showErrorModal('Error', 'Sesi telah berakhir. Silahkan muat ulang halaman.');
-                return;
-            }
-
-            // Build order type value for API
-            let orderTypeValue = 'dine_in';
-            if (orderType === 'Delivery') {
-                orderTypeValue = 'delivery';
-            } else if (orderType === 'Take Away') {
-                orderTypeValue = 'take_away';
-            }
-
-            // Get customer name (from address if delivery, or default)
-            const customerName = document.getElementById('receiverName')?.value || 'Guest Customer';
-            const customerPhone = document.getElementById('receiverPhone')?.value || '';
-
-            // Get table ID for dine-in
-            const tableInfo = document.getElementById('tableNumber')?.textContent || '';
-            const tableId = tableInfo.match(/\d+/)?.[0] || null;
-
-            // Build order data
-            const orderData = {
-                customer_name: customerName,
-                customer_phone: customerPhone,
-                order_type: orderTypeValue,
-                table_id: orderTypeValue === 'dine_in' ? (tableId ? parseInt(tableId) : 10) : null,
-                notes: document.getElementById('noteForBarista')?.value || ''
-            };
-
-            // Add address for delivery
-            if (orderTypeValue === 'delivery') {
-                orderData.address = {
-                    receiver_name: document.getElementById('receiverName')?.value || customerName,
-                    phone: document.getElementById('receiverPhone')?.value || '',
-                    full_address: document.getElementById('fullAddress')?.value || '',
-                    city: document.getElementById('city')?.value || 'Balikpapan',
-                    postal_code: document.getElementById('postalCode')?.value || '76114',
-                    notes: document.getElementById('addressNotes')?.value || ''
-                };
-            }
-
-            try {
-                // Create order via API
-                const response = await fetch('/api/customer/orders', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-Guest-Token': guestToken,
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
-                    },
-                    body: JSON.stringify(orderData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal membuat pesanan');
-                }
-
-                const result = await response.json();
-                console.log('Order created:', result);
-
-                // Show success modal
-                showSuccessModal(orderType, paymentMethod);
-
-            } catch (error) {
-                console.error('Order creation error:', error);
-                showErrorModal('Gagal Membuat Pesanan', error.message || 'Terjadi kesalahan saat membuat pesanan. Silahkan coba lagi.');
+                // Show success modal with payment info
+                showSuccessModal(orderType, selectedPayment.value);
             }
         }
 
@@ -1271,7 +1187,21 @@
                 if (!response.ok) throw new Error('Failed to fetch cart');
 
                 const result = await response.json();
-                const items = result.data.items || [];
+                let items = result.data.items || [];
+
+                // Filter items based on selection from cart page
+                const selectedIdsString = localStorage.getItem('selected_cart_items');
+                if (selectedIdsString) {
+                    try {
+                        const selectedIds = JSON.parse(selectedIdsString);
+                        // Convert to strings for safe comparison if needed, though usually IDs are integers/strings
+                        const selectedIdStrings = selectedIds.map(id => String(id));
+
+                        items = items.filter(item => selectedIdStrings.includes(String(item.id)));
+                    } catch (e) {
+                        console.error('Error parsing selected_cart_items', e);
+                    }
+                }
 
                 if (items.length === 0) {
                     container.innerHTML = `
@@ -1281,8 +1211,10 @@
                                 <circle cx="20" cy="21" r="1"></circle>
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
                             </svg>
-                            <p style="font-size: 18px; font-weight: 500;">Cart is empty</p>
-                            <p style="font-size: 14px; margin-top: 8px;">Add items to proceed with checkout</p>
+                            <p style="font-size: 18px; font-weight: 500;">No items selected</p>
+                            <p style="font-size: 14px; margin-top: 8px;">Please go back to cart and select items to checkout</p>
+                            <br>
+                            <a href="/customer/cart" class="back-to-cart-btn" style="display: inline-block; background: #CA7842; padding: 10px 20px; border-radius: 8px; margin-top: 10px;">Back to Cart</a>
                         </div>
                     `;
                     return;

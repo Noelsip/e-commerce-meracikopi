@@ -632,26 +632,141 @@
 
         /* Modal Responsive */
         @media (max-width: 768px) {
+            .order-modal-overlay {
+                padding: 0;
+                align-items: flex-end;
+            }
+
             .order-modal {
-                border-radius: 16px;
-                max-height: 85vh;
+                border-radius: 20px 20px 0 0;
+                max-height: 90vh;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
             }
 
             .order-modal-header {
-                padding: 16px 20px 12px;
+                padding: 20px 20px 16px;
             }
 
-            .order-modal-body {
-                padding: 0 20px 16px;
+            .order-modal-icon {
+                width: 32px;
+                height: 32px;
+                margin-bottom: 8px;
             }
 
-            .order-info-grid {
-                grid-template-columns: 1fr;
-                gap: 16px;
+            .order-modal-label {
+                font-size: 9px;
             }
 
             .order-modal-code {
-                font-size: 18px;
+                font-size: 16px;
+            }
+
+            .order-modal-date {
+                font-size: 10px;
+            }
+
+            .order-modal-body {
+                padding: 0 16px 20px;
+            }
+
+            .order-info-box {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .order-info-item {
+                padding: 10px 12px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .order-info-item:first-child {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .order-info-item:last-child {
+                border-bottom: none;
+            }
+
+            .order-info-label {
+                font-size: 9px;
+            }
+
+            .order-info-value {
+                font-size: 12px;
+            }
+
+            .order-info-sub {
+                font-size: 10px;
+            }
+
+            .order-info-value-with-icon {
+                font-size: 12px;
+            }
+
+            .order-info-value-with-icon svg {
+                width: 12px;
+                height: 12px;
+            }
+
+            .order-modal-section-title {
+                font-size: 11px;
+            }
+
+            .order-modal-items {
+                gap: 8px;
+            }
+
+            .order-modal-item-name {
+                font-size: 12px;
+            }
+
+            .order-modal-item-variant {
+                font-size: 10px;
+            }
+
+            .order-modal-item-price {
+                font-size: 12px;
+            }
+
+            .order-modal-summary {
+                padding: 10px 12px;
+                border-radius: 8px;
+            }
+
+            .order-modal-summary-row {
+                font-size: 11px;
+            }
+
+            .order-modal-summary-total {
+                font-size: 13px;
+                padding-top: 8px;
+            }
+
+            .order-modal-close {
+                top: 16px;
+                right: 16px;
+            }
+        }
+
+        /* Small Mobile */
+        @media (max-width: 400px) {
+            .order-modal-header {
+                padding: 16px 16px 14px;
+            }
+
+            .order-modal-body {
+                padding: 0 12px 16px;
+            }
+
+            .order-info-item {
+                padding: 8px 10px;
+            }
+
+            .order-modal-code {
+                font-size: 14px;
             }
         }
     </style>

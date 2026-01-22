@@ -173,6 +173,15 @@
                             gap: 40px !important;
                         }
 
+                        /* Reorder: Images first, then text */
+                        .hero-container>div:first-child {
+                            order: 2;
+                        }
+
+                        .hero-image-grid {
+                            order: 1;
+                        }
+
                         .hero-title {
                             font-size: 32px !important;
                             text-align: center;
@@ -213,6 +222,7 @@
                         .hero-image-grid {
                             max-width: 400px;
                             margin: 0 auto;
+                            margin-bottom: 20px;
                         }
 
                         .hero-ornament {

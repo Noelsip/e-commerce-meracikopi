@@ -147,7 +147,7 @@
             padding: 16px 20px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
-            background: transparent;
+            background: #241813;
             gap: 16px;
         }
 
@@ -805,13 +805,32 @@
             }
 
             .order-item-card {
-                flex-wrap: wrap;
+                position: relative;
+                /* Anchor for absolute price */
+                padding-bottom: 50px;
+                /* Ensure space for price/quantity row */
+                align-items: flex-start;
+                /* Align items to top */
+            }
+
+            .order-item-details {
+                margin-right: 0;
+                /* Let details take space */
+            }
+
+            .order-item-quantity {
+                margin-top: 8px;
+                /* Space between name and quantity */
             }
 
             .order-item-price {
-                width: 100%;
+                position: absolute;
+                bottom: 16px;
+                right: 20px;
+                width: auto !important;
                 text-align: right;
-                margin-top: 8px;
+                margin: 0 !important;
+                z-index: 5;
             }
         }
 
