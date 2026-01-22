@@ -2,6 +2,7 @@
     <!-- Alpine Data Scope -->
     <div x-data="cartManager" class="cart-page-container">
 
+
         <!-- Loading State -->
         <div x-show="loading" class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CA7842]"></div>
@@ -108,7 +109,12 @@
         </div>
 
         <!-- Cart Summary Footer -->
-        <div x-show="!loading && items.length > 0" class="cart-summary-wrapper" style="display: none;">
+        <!-- Cart Summary Footer - Forced Visible -->
+
+
+        <!-- Cart Summary Footer - Forced Visible -->
+        <div class="cart-summary-wrapper"
+            style="display: block !important; min-height: 80px !important; z-index: 99999 !important; bottom: 0 !important; position: fixed !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: #2A1B14 !important; border-top: 1px solid rgba(255,255,255,0.1) !important;">
             <div class="cart-summary-container">
                 <div class="cart-summary">
                     <!-- Left side: Checkbox + Pilih Semua -->
