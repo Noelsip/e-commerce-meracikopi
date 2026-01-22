@@ -26,6 +26,9 @@ class Orders extends Model
         'total_price',
         'notes',
         'delivery_fee',
+        'delivery_provider',
+        'delivery_service',
+        'delivery_meta',
         'discount_amount',
         'final_price',
     ];
@@ -37,6 +40,7 @@ class Orders extends Model
         'delivery_fee' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'final_price' => 'decimal:2',
+        'delivery_meta' => 'array',
     ];
 
     /**

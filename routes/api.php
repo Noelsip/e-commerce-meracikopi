@@ -12,6 +12,7 @@ use App\Http\Controllers\Customers\CartItemController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\PaymentController;
 use App\Http\Controllers\Customers\DeliveryController;
+use App\Http\Controllers\Customers\ShippingController;
 
 // Admin Login (no auth required)
 Route::post('/admin/login', [AuthAdminController::class, 'login']);
@@ -30,6 +31,11 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
     Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
+    
+    // Delivery Management
+    Route::post('/orders/{id}/delivery-request', [AdminOrderController::class, 'createDeliveryRequest']);
+    Route::get('/orders/{id}/delivery', [AdminOrderController::class, 'getDelivery']);
+    Route::patch('/orders/{id}/delivery', [AdminOrderController::class, 'updateDelivery']);
 
     // Tables
     Route::get('/tables', [TableApiController::class, 'index']);
@@ -57,6 +63,12 @@ Route::prefix('customer')->group(function () {
     // Delivery - Calculate Fee (public)
     Route::post('/delivery/calculate-fee', [DeliveryController::class, 'calculateFee'])->name('customer.delivery.calculate-fee');
     Route::get('/delivery/options', [DeliveryController::class, 'getOptions'])->name('customer.delivery.options');
+
+    // Shipping (public)
+    Route::get('/shipping/providers', [ShippingController::class, 'providers'])->name('customer.shipping.providers');
+    Route::post('/shipping/quote', [ShippingController::class, 'quote'])->name('customer.shipping.quote');
+    Route::get('/shipping/rajaongkir/provinces', [ShippingController::class, 'rajaOngkirProvinces'])->name('customer.shipping.rajaongkir.provinces');
+    Route::get('/shipping/rajaongkir/destinations', [ShippingController::class, 'rajaOngkirDestinations'])->name('customer.shipping.rajaongkir.destinations');
 });
 
 // Customer API - Cart & Orders (Guest Token Required)
@@ -78,4 +90,3 @@ Route::prefix('customer')->middleware('guest.token')->group(function () {
 
 // Midtrans webhook
 Route::post('/webhooks/midtrans', [PaymentController::class, 'midtransWebhook']);
-

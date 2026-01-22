@@ -12,6 +12,7 @@ use App\Models\OrderAddresses;
 use App\Models\OrderLogs;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Services\Shipping\ShippingQuoteService;
 
 class OrderController extends Controller
 {
@@ -76,7 +77,7 @@ class OrderController extends Controller
     /**
      * Checkout dari cart (rename dari checkout ke store)
      */
-    public function store(Request $request)
+    public function store(Request $request, ShippingQuoteService $shipping)
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -89,11 +90,17 @@ class OrderController extends Controller
             'address.full_address' => 'required_if:order_type,delivery|string',
             'address.city' => 'required_if:order_type,delivery|string',
             'address.postal_code' => 'required_if:order_type,delivery|string',
+            'address.province' => 'nullable|string',
+            'address.latitude' => 'nullable|numeric',
+            'address.longitude' => 'nullable|numeric',
+            'address.rajaongkir_destination_id' => 'nullable|integer',
             'address.notes' => 'nullable|string',
+            'shipping_quote_id' => 'required_if:order_type,delivery|string',
+            'shipping_option_id' => 'required_if:order_type,delivery|string',
             'notes' => 'nullable|string',
         ]);
 
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request, $shipping) {
             $guestToken = $request->attributes->get('guest_token');
 
             // #region agent log
@@ -152,10 +159,35 @@ class OrderController extends Controller
 
             // Hitung delivery fee (jika order type = delivery)
             $deliveryFee = 0;
+            $deliveryProvider = null;
+            $deliveryService = null;
+            $deliveryMeta = null;
             if ($request->order_type === 'delivery') {
-                // TODO: Integrate dengan third party delivery service
-                // Untuk sementara set default atau dari request
-                $deliveryFee = $request->input('delivery_fee', 0);
+                $quoteId = (string) $request->input('shipping_quote_id');
+                $optionId = (string) $request->input('shipping_option_id');
+
+                $quote = $shipping->getQuote($quoteId);
+                if (!$quote) {
+                    abort(422, 'Invalid shipping_quote_id');
+                }
+
+                $option = $shipping->getOptionFromQuote($quoteId, $optionId);
+                if (!$option || !is_numeric($option['price'] ?? null)) {
+                    abort(422, 'Invalid shipping_option_id');
+                }
+
+                $deliveryFee = (int) $option['price'];
+                $deliveryProvider = $option['provider'] ?? null;
+                $deliveryService = $option['service'] ?? null;
+                $deliveryMeta = [
+                    'quote_id' => $quoteId,
+                    'option_id' => $optionId,
+                    'channel' => $quote['channel'] ?? null,
+                    'origin' => $quote['origin'] ?? null,
+                    'destination' => $quote['destination'] ?? null,
+                    'selected_option' => $option,
+                    'meta' => $quote['meta'] ?? null,
+                ];
             }
 
             // Hitung final price
@@ -171,6 +203,9 @@ class OrderController extends Controller
                 'table_id' => $request->table_id,
                 'total_price' => $totalPrice,
                 'delivery_fee' => $deliveryFee,
+                'delivery_provider' => $deliveryProvider,
+                'delivery_service' => $deliveryService,
+                'delivery_meta' => $deliveryMeta,
                 'discount_amount' => $totalDiscountAmount,
                 'final_price' => $finalPrice,
                 'status' => OrderStatus::PENDING_PAYMENT,
@@ -195,8 +230,12 @@ class OrderController extends Controller
                     'phone' => $request->address['phone'],
                     'full_address' => $request->address['full_address'],
                     'city' => $request->address['city'],
+                    'province' => $request->address['province'] ?? null,
                     'postal_code' => $request->address['postal_code'],
-                    'notes' => $request->address['notes'] ?? null,
+                    'latitude' => $request->address['latitude'] ?? null,
+                    'longitude' => $request->address['longitude'] ?? null,
+                    'rajaongkir_destination_id' => $request->address['rajaongkir_destination_id'] ?? null,
+                    'notes' => $request->address['notes'] ?? '',
                 ]);
             }
 

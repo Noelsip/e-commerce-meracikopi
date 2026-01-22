@@ -592,11 +592,11 @@
             <div class="address-card">
                 <div class="address-info">
                     <div class="address-name-phone">
-                        <span class="recipient-name">Adwin Ahmad</span>
+                        <span class="recipient-name" id="deliveryRecipientName">-</span>
                         <span class="recipient-divider">|</span>
-                        <span class="recipient-phone">(+62) 822 54554411</span>
+                        <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</p>
+                    <p class="address-detail" id="deliveryAddressDetail">Belum ada alamat pengiriman.</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>

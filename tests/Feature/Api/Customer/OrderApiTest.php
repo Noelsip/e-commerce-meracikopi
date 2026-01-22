@@ -100,11 +100,26 @@ test('customer can create delivery order', function () {
         'quantity' => 2,
     ]);
 
+    $quoteResponse = $this->postJson('/api/customer/delivery/calculate-fee', [
+        'destination' => [
+            'latitude' => -1.2248893,
+            'longitude' => 116.8658594,
+            'address' => 'Meracikopi, Balikpapan',
+        ],
+    ]);
+
+    $quoteResponse->assertStatus(200);
+
+    $quoteId = $quoteResponse->json('data.quote_id');
+    $optionId = $quoteResponse->json('data.options.0.id');
+
     $response = $this->withHeaders(['X-GUEST-TOKEN' => $this->guestToken])
         ->postJson('/api/customer/orders', [
             'customer_name' => 'John Doe',
             'customer_phone' => '08123456789',
             'order_type' => 'delivery',
+            'shipping_quote_id' => $quoteId,
+            'shipping_option_id' => $optionId,
             'address' => [
                 'receiver_name' => 'John Doe',
                 'phone' => '08123456789',

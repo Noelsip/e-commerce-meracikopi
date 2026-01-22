@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Service untuk integrasi dengan third party delivery service
- * 
+ *
  * Contoh third party yang bisa digunakan:
  * - GoSend API
  * - Grab Express API
@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 class DeliveryService
 {
     protected $apiUrl;
+
     protected $apiKey;
 
     public function __construct()
@@ -29,10 +30,10 @@ class DeliveryService
 
     /**
      * Menghitung ongkir dari third party API
-     * 
-     * @param array $origin Koordinat atau alamat asal
-     * @param array $destination Koordinat atau alamat tujuan
-     * @param float $weight Berat dalam kg (opsional)
+     *
+     * @param  array  $origin  Koordinat atau alamat asal
+     * @param  array  $destination  Koordinat atau alamat tujuan
+     * @param  float  $weight  Berat dalam kg (opsional)
      * @return array
      */
     public function calculateDeliveryFee($origin, $destination, $weight = 1)
@@ -41,17 +42,17 @@ class DeliveryService
             // Contoh request ke third party API
             // Sesuaikan dengan API yang digunakan
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->apiUrl . '/calculate', [
+            ])->post($this->apiUrl.'/calculate', [
                 'origin' => $origin,
                 'destination' => $destination,
                 'weight' => $weight,
             ]);
 
-            if ($response->successful()) {
+            if ($response->ok()) {
                 $data = $response->json();
-                
+
                 return [
                     'success' => true,
                     'delivery_fee' => $data['fee'] ?? 0,
@@ -67,8 +68,8 @@ class DeliveryService
                 'delivery_fee' => 0,
             ];
         } catch (\Exception $e) {
-            Log::error('Delivery Service Error: ' . $e->getMessage());
-            
+            Log::error('Delivery Service Error: '.$e->getMessage());
+
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -79,14 +80,14 @@ class DeliveryService
 
     /**
      * Menghitung ongkir berdasarkan jarak (fallback method)
-     * 
+     *
      * Rumus sederhana:
      * - 0-5 km: Rp 10.000
      * - 5-10 km: Rp 15.000
      * - 10-15 km: Rp 20.000
      * - >15 km: Rp 25.000 + (Rp 2.000 per km)
-     * 
-     * @param float $distance Jarak dalam km
+     *
+     * @param  float  $distance  Jarak dalam km
      * @return int
      */
     public function calculateDeliveryFeeByDistance($distance)
@@ -99,17 +100,19 @@ class DeliveryService
             return 20000;
         } else {
             $extraDistance = $distance - 15;
-            return 25000 + ($extraDistance * 2000);
+            $extraKm = (int) ceil($extraDistance);
+
+            return 25000 + ($extraKm * 2000);
         }
     }
 
     /**
      * Menghitung jarak antara dua koordinat (Haversine formula)
-     * 
-     * @param float $lat1 Latitude titik 1
-     * @param float $lon1 Longitude titik 1
-     * @param float $lat2 Latitude titik 2
-     * @param float $lon2 Longitude titik 2
+     *
+     * @param  float  $lat1  Latitude titik 1
+     * @param  float  $lon1  Longitude titik 1
+     * @param  float  $lat2  Latitude titik 2
+     * @param  float  $lon2  Longitude titik 2
      * @return float Jarak dalam km
      */
     public function calculateDistance($lat1, $lon1, $lat2, $lon2)
@@ -130,19 +133,19 @@ class DeliveryService
 
     /**
      * Request pickup driver dari third party
-     * 
-     * @param int $orderId
-     * @param array $pickupAddress
-     * @param array $deliveryAddress
+     *
+     * @param  int  $orderId
+     * @param  array  $pickupAddress
+     * @param  array  $deliveryAddress
      * @return array
      */
     public function requestDriver($orderId, $pickupAddress, $deliveryAddress)
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Authorization' => 'Bearer '.$this->apiKey,
                 'Content-Type' => 'application/json',
-            ])->post($this->apiUrl . '/request-driver', [
+            ])->post($this->apiUrl.'/request-driver', [
                 'order_id' => $orderId,
                 'pickup' => $pickupAddress,
                 'delivery' => $deliveryAddress,
@@ -150,7 +153,7 @@ class DeliveryService
 
             if ($response->successful()) {
                 $data = $response->json();
-                
+
                 return [
                     'success' => true,
                     'driver_id' => $data['driver_id'] ?? null,
@@ -165,8 +168,8 @@ class DeliveryService
                 'message' => 'Failed to request driver',
             ];
         } catch (\Exception $e) {
-            Log::error('Request Driver Error: ' . $e->getMessage());
-            
+            Log::error('Request Driver Error: '.$e->getMessage());
+
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
@@ -176,18 +179,18 @@ class DeliveryService
 
     /**
      * Track delivery status
-     * 
-     * @param string $deliveryId
+     *
+     * @param  string  $deliveryId
      * @return array
      */
     public function trackDelivery($deliveryId)
     {
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-            ])->get($this->apiUrl . '/track/' . $deliveryId);
+                'Authorization' => 'Bearer '.$this->apiKey,
+            ])->get($this->apiUrl.'/track/'.$deliveryId);
 
-            if ($response->successful()) {
+            if ($response->ok()) {
                 return $response->json();
             }
 
@@ -196,8 +199,8 @@ class DeliveryService
                 'message' => 'Failed to track delivery',
             ];
         } catch (\Exception $e) {
-            Log::error('Track Delivery Error: ' . $e->getMessage());
-            
+            Log::error('Track Delivery Error: '.$e->getMessage());
+
             return [
                 'success' => false,
                 'message' => $e->getMessage(),
