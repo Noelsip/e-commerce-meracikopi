@@ -73,35 +73,12 @@ class OrderController extends Controller
         return DB::transaction(function () use ($request) {
             $guestToken = $request->attributes->get('guest_token');
 
-            // #region agent log
-            $logPath = base_path('.cursor/debug.log');
-            file_put_contents($logPath, json_encode([
-                'location' => 'OrderController.php:72',
-                'message' => 'Order store called',
-                'data' => ['guest_token' => $guestToken, 'order_type' => $request->order_type ?? null],
-                'timestamp' => time() * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'B'
-            ]) . "\n", FILE_APPEND);
-            // #endregion
+
 
             $cartQuery = Cart::with('items.menu')
-                ->where('guest_token', $guestToken)
-                ->where('status', 'active');
+                ->where('guest_token', $guestToken);
 
-            // #region agent log
-            $cartCount = $cartQuery->count();
-            file_put_contents($logPath, json_encode([
-                'location' => 'OrderController.php:79',
-                'message' => 'Cart query before firstOrFail',
-                'data' => ['guest_token' => $guestToken, 'cart_count' => $cartCount, 'has_items' => $cartQuery->first()?->items->count() ?? 0],
-                'timestamp' => time() * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'B,C,D'
-            ]) . "\n", FILE_APPEND);
-            // #endregion
+
 
             $cart = $cartQuery->lockForUpdate()->firstOrFail();
 
@@ -193,8 +170,8 @@ class OrderController extends Controller
                 'note' => 'Order created',
             ]);
 
-            // Update cart status
-            $cart->update(['status' => 'checked_out']);
+            // Empty the cart
+            $cart->items()->delete();
 
             return response()->json([
                 'message' => 'Order created successfully',

@@ -1003,32 +1003,105 @@
         }
 
         // Proceed to payment
-        function proceedToPayment() {
-            const orderType = document.getElementById('orderTypeDisplay').textContent;
+        async function proceedToPayment() {
+            const orderType = document.getElementById('orderTypeDisplay').textContent.toLowerCase().replace(' ', '_'); // dine_in, take_away
+            const token = localStorage.getItem('guest_token');
 
-            // Check if at least one order item is selected
-            const selectedItems = document.querySelectorAll('.order-item-checkbox:checked');
-            if (selectedItems.length === 0) {
+            // 1. Get Selected Item IDs
+            const selectedCheckbox = document.querySelectorAll('.order-item-checkbox:checked');
+            if (selectedCheckbox.length === 0) {
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
+            const selectedItemIds = Array.from(selectedCheckbox).map(cb => cb.closest('.order-item-card').dataset.itemId);
 
-            if (orderType === 'Delivery') {
+            // 2. Validate Payment/Delivery Method
+            let paymentMethod = null;
+            let deliveryMethod = null;
+
+            // Map order type text to enum value expected by backend
+            const orderTypeMap = {
+                'dine_in': 'dine_in',
+                'take_away': 'take_away',
+                'delivery': 'delivery'
+            };
+            const backendOrderType = orderTypeMap[orderType] || 'take_away';
+
+            if (orderType === 'delivery') {
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                // Show success modal with delivery info
-                showSuccessModal(orderType, selectedDelivery.value);
+                deliveryMethod = selectedDelivery.value;
             } else {
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                     return;
                 }
-                // Show success modal with payment info
-                showSuccessModal(orderType, selectedPayment.value);
+                paymentMethod = selectedPayment.value;
+            }
+
+            // 3. Prepare Payload
+            // Note: Using values from address modal inputs as default customer info since there is no separate form for Dine In/Takeaway
+            const customerName = document.getElementById('recipientName').value || 'Guest';
+            const customerPhone = document.getElementById('recipientPhone').value || '-';
+            const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
+
+            const payload = {
+                order_type: backendOrderType,
+                customer_name: customerName,
+                customer_phone: customerPhone,
+                notes: document.getElementById('receiptNote')?.textContent || '', // Assuming note is somewhere or empty
+                selected_item_ids: selectedItemIds,
+                // Delivery specific fields
+                address: orderType === 'delivery' ? {
+                    receiver_name: customerName,
+                    phone: customerPhone,
+                    full_address: document.getElementById('fullAddress').value,
+                    city: document.getElementById('city').value,
+                    postal_code: document.getElementById('postalCode').value,
+                    notes: document.getElementById('addressDetail').value
+                } : null,
+                table_id: orderType === 'dine_in' ? tableId : null
+            };
+
+            // 4. Submit Order
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            const originalText = checkoutBtn.innerText;
+            checkoutBtn.innerText = 'Memproses...';
+            checkoutBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/customer/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-GUEST-TOKEN': token,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Gagal memproses pesanan');
+                }
+
+                // Success! Show modal with real data
+                // Map backend order type back to display text if needed
+                showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), paymentMethod || deliveryMethod);
+
+                // Clear selected items from cart or refresh page logic could go here
+
+            } catch (error) {
+                console.error('Checkout error:', error);
+                showErrorModal('Gagal Checkout', error.message);
+            } finally {
+                checkoutBtn.innerText = originalText;
+                checkoutBtn.disabled = false;
             }
         }
 

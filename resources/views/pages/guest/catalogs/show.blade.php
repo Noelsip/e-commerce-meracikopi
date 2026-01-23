@@ -51,38 +51,22 @@
 
                 .product-box {
                     height: auto !important;
-                    min-height: auto;
-                    padding: 20px 0 24px 0;
-                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
-                }
-
-                .product-box > div:first-child,
-                .product-box > div:nth-child(2) {
-                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.6) 0%, transparent 60%) !important;
+                    min-height: 500px;
                 }
 
                 .product-content {
                     flex-direction: column !important;
-                    gap: 16px !important;
-                    padding: 12px 16px !important;
-                    align-items: center !important;
-                    justify-content: flex-start !important;
+                    gap: 30px !important;
+                    padding: 30px 20px !important;
                 }
 
                 .product-image {
-                    width: 140px !important;
-                    height: 140px !important;
-                    order: 1;
-                }
-
-                .product-image img {
-                    width: 90% !important;
-                    max-width: 130px !important;
+                    width: 200px !important;
+                    height: 200px !important;
                 }
 
                 .product-details {
                     width: 100% !important;
-                    max-width: 280px;
                     text-align: center;
                     order: 2;
                 }
@@ -104,33 +88,6 @@
 
                 .product-quantity {
                     justify-content: center !important;
-                    margin-bottom: 12px !important;
-                    gap: 12px !important;
-                }
-
-                .product-quantity button {
-                    width: 32px !important;
-                    height: 32px !important;
-                    font-size: 16px !important;
-                }
-
-                .product-quantity input {
-                    font-size: 14px !important;
-                    width: 35px !important;
-                }
-
-                .product-details button[type="button"],
-                .product-details button:not(.product-quantity button) {
-                    width: 100% !important;
-                    max-width: 280px;
-                    margin: 0 auto;
-                    padding: 10px 0 !important;
-                    font-size: 14px !important;
-                    border-radius: 30px !important;
-                }
-
-                .description-section {
-                    padding: 20px 16px 40px 16px !important;
                 }
 
                 .description-grid {

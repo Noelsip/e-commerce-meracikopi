@@ -31,17 +31,6 @@
         html {
             overscroll-behavior: none;
             overflow-x: hidden;
-            overflow-y: scroll;
-            height: 100%;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        body {
-            overflow-x: hidden;
-            overflow-y: auto;
-            min-height: 100%;
-            height: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         :root {

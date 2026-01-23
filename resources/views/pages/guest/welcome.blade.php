@@ -23,15 +23,30 @@
         /* Category Card Hover Effects */
         .category-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border-radius: 24px;
+            box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
         }
 
         .category-card:hover {
-            transform: scale(1.03) !important;
-            box-shadow: 0 25px 60px rgba(202, 120, 66, 0.3), 0 15px 40px rgba(0, 0, 0, 0.4) !important;
+            transform: scale(1.05) !important;
+            z-index: 10;
         }
 
         .category-card:hover .category-card-inner {
-            border-color: rgba(202, 120, 66, 0.4) !important;
+            border: 2px solid #CA7842 !important; /* Border emas menempel langsung di kotak cokelat */
+            box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
+        }
+
+        .category-card-inner {
+            box-shadow: none !important;
+            transition: all 0.4s ease;
+            height: 100%;
+            border-radius: 24px !important; 
+            overflow: hidden;
+            border: 2px solid transparent !important;
+            box-sizing: border-box;
         }
     </style>
 
@@ -315,7 +330,6 @@
                         justify-content: flex-end;
                         padding: 18px;
                         position: relative;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
                     ">
                         <!-- Orbiting small particle -->
                         <div
@@ -343,7 +357,6 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                      ">
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8C7B70" stroke-width="1.5"
                             style="transform: rotate(15deg);">
@@ -369,7 +382,6 @@
                         padding: 22px;
                         position: relative;
                         overflow: hidden;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
                     ">
                         <!-- Abstract Background Circle -->
                         <div
@@ -396,7 +408,6 @@
                         border-radius: 100px 20px 20px 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -412,7 +423,6 @@
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -428,7 +438,6 @@
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -444,7 +453,6 @@
                         border-radius: 20px 20px 100px 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -544,13 +552,12 @@
                         border-radius: 24px;
                         padding: 20px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
@@ -559,7 +566,6 @@
                             margin-bottom: 30px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80" alt="Food"
                                 style="width: 100%; height: 100%; object-fit: cover;">
@@ -577,13 +583,12 @@
                         border-radius: 24px;
                         padding: 20px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
@@ -592,10 +597,9 @@
                             margin-bottom: 30px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80"
-                                alt="Drink" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500&q=80" alt="Drink"
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
                             Drink</h3>
@@ -610,13 +614,12 @@
                         border-radius: 24px;
                         padding: 20px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
@@ -625,7 +628,6 @@
                             margin-bottom: 30px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&q=80"
                                 alt="Coffee Beans" style="width: 100%; height: 100%; object-fit: cover;">
@@ -635,7 +637,7 @@
                     </div>
                 </a>
 
-                <!-- Category 4: Kopi Botol -->
+                <!-- Category 4: Bottled Coffee -->
                 <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
@@ -643,13 +645,12 @@
                         border-radius: 24px;
                         padding: 20px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
@@ -658,13 +659,12 @@
                             margin-bottom: 30px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Kopi Botol"
+                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Bottled Coffee"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
-                            Kopi Botol</h3>
+                            Bottled Coffee</h3>
                     </div>
                 </a>
 
@@ -676,13 +676,12 @@
                         border-radius: 24px;
                         padding: 20px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
@@ -691,7 +690,6 @@
                             margin-bottom: 30px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80"
                                 alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
