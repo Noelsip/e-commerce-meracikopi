@@ -114,7 +114,7 @@
 
         <!-- Cart Summary Footer - Forced Visible -->
         <div class="cart-summary-wrapper"
-            style="display: block !important; min-height: 80px !important; z-index: 99999 !important; bottom: 0 !important; position: fixed !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: #2A1B14 !important; border-top: 1px solid rgba(255,255,255,0.1) !important;">
+            style="display: flex !important; align-items: center !important; justify-content: center !important; min-height: 80px !important; z-index: 99999 !important; bottom: 0 !important; position: fixed !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: #2A1B14 !important; border-top: 1px solid rgba(255,255,255,0.1) !important;">
             <div class="cart-summary-container">
                 <div class="cart-summary">
                     <!-- Left side: Checkbox + Pilih Semua -->
