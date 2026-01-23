@@ -238,6 +238,158 @@
         }
     }
 
+    /* Mobile Menu Drawer */
+    .mobile-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 280px;
+        height: 100vh;
+        background-color: #2a1b14;
+        z-index: 10001;
+        transition: right 0.3s ease;
+        box-shadow: -4px 0 16px rgba(0, 0, 0, 0.3);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-menu.active {
+        right: 0;
+    }
+
+    .mobile-menu-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: #2a1b14;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .mobile-menu-logo {
+        height: 32px;
+        width: auto;
+    }
+
+    .mobile-menu-close {
+        background: none;
+        border: none;
+        color: #ffffff;
+        cursor: pointer;
+        padding: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        border-radius: 50%;
+    }
+
+    .mobile-menu-close:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .mobile-menu-close svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .mobile-menu-content {
+        flex: 1;
+        padding: 8px 0;
+    }
+
+    .mobile-menu-links {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .mobile-menu-links a {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 14px 20px;
+        transition: all 0.2s ease;
+        display: block;
+        position: relative;
+    }
+
+    .mobile-menu-links a:active {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .mobile-menu-links a.active {
+        color: #CA7842;
+        font-weight: 600;
+        background-color: rgba(202, 120, 66, 0.1);
+    }
+
+    .mobile-menu-links a.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: #CA7842;
+    }
+
+    .mobile-menu-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+
+    .mobile-menu-cta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background-color: #2a1b14;
+        border: none;
+        border-radius: 25px;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.2s ease;
+        justify-content: center;
+    }
+
+    .mobile-menu-cta:active {
+        background-color: #1f150f;
+        transform: scale(0.98);
+    }
+
+    .mobile-menu-cta svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 10000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(2px);
+    }
+
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
     /* Mobile Search Overlay */
     .mobile-search-overlay {
         position: fixed;
@@ -390,7 +542,7 @@
         <!-- Bottom Row: Navigation Links -->
         <div class="navbar-desktop-menu" style="padding: 4px 40px 0 40px;">
             <div style="display: flex; align-items: center; gap: 32px; max-width: 1360px; margin: 0 auto;">
-                <a href="/" class="nav-link-main {{ request()->is('/') ? 'active' : '' }}"
+                <a href="/" class="nav-link-main {{ request()->is('/') || request()->is('customer') ? 'active' : '' }}"
                     style="font-weight: 600;">Home</a>
                 <a href="{{ url('/customer/catalogs') }}"
                     class="nav-link-main {{ request()->is('customer/catalogs*') ? 'active' : '' }}"
@@ -434,23 +586,31 @@
 <!-- Mobile Menu Overlay -->
 <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="toggleMobileMenu()"></div>
 
-<!-- Mobile Menu Drawer -->
+<!-- Mobile Menu Drawer - Starbucks Style -->
 <div class="mobile-menu" id="mobileMenu">
-    <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="Close menu">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-    </button>
-
-    <div class="mobile-menu-links">
-        <a href="/" class="{{ request()->is('/') ? 'active' : '' }}">Home</a>
-        <a href="{{ url('/customer/catalogs') }}"
-            class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
-        <a href="{{ url('/customer/order-history') }}"
-            class="{{ request()->is('customer/order-history*') ? 'active' : '' }}">Order History</a>
+    <!-- Menu Header -->
+    <div class="mobile-menu-header">
+        <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi" class="mobile-menu-logo">
+        <button class="mobile-menu-close" onclick="toggleMobileMenu()" aria-label="Close menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
     </div>
+
+    <!-- Menu Content -->
+    <div class="mobile-menu-content">
+        <div class="mobile-menu-links">
+            <a href="/" class="{{ request()->is('/') || request()->is('customer') ? 'active' : '' }}">Home</a>
+            <a href="{{ url('/customer/catalogs') }}"
+                class="{{ request()->is('customer/catalogs*') ? 'active' : '' }}">Catalog</a>
+            <a href="{{ url('/customer/order-history') }}"
+                class="{{ request()->is('customer/order-history*') ? 'active' : '' }}">Order History</a>
+        </div>
+    </div>
+
+    <!-- Menu Footer -->
 </div>
 
 <script>
@@ -535,6 +695,10 @@
     // Load cart count on page load
     document.addEventListener('DOMContentLoaded', function () {
         fetchCartCount();
+
+        // Reset body overflow on page load to fix any leftover hidden state
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
 
         // Refresh cart count every 30 seconds
         setInterval(fetchCartCount, 30000);

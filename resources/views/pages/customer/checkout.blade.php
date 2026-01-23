@@ -1167,7 +1167,7 @@
 
         // Go to order history
         function goToRiwayat() {
-            window.location.href = '/customer/orders';
+            window.location.href = '/customer/order-history';
         }
 
         // Go back to home/catalogs

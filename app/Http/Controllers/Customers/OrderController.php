@@ -19,7 +19,7 @@ class OrderController extends Controller
     {
         $guestToken = $request->attributes->get('guest_token');
 
-        $query = Orders::with(['order_items.menu', 'tables', 'payments']);
+        $query = Orders::query();
 
         // Filter by guest token or user_id
         if (auth()->check()) {
@@ -44,20 +44,6 @@ class OrderController extends Controller
                 'discount_amount' => (int) $order->discount_amount,
                 'final_price' => (int) $order->final_price,
                 'created_at' => $order->created_at->toIso8601String(),
-                'order_items' => $order->order_items->map(fn($item) => [
-                    'id' => $item->id,
-                    'menu_name' => $item->menu->name ?? 'Unknown',
-                    'quantity' => $item->quantity,
-                    'price' => (int) $item->price,
-                ]),
-                'tables' => $order->tables ? [
-                    'id' => $order->tables->id,
-                    'table_number' => $order->tables->table_number ?? $order->tables->number ?? null,
-                ] : null,
-                'payments' => $order->payments->map(fn($payment) => [
-                    'payment_method' => $payment->payment_method ?? 'Credit Card',
-                    'status' => $payment->status ?? null,
-                ]),
             ])
         ], 200);
     }

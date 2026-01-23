@@ -188,7 +188,7 @@
             }
             
             .catalog-main-content {
-                padding: 20px 12px !important;
+                padding: 20px 12px 60px 12px !important;
             }
 
             .catalog-rating {
@@ -551,7 +551,7 @@
     </div>
 
     <!-- Main Content -->
-    <div style="background-color: #1a1410; min-height: 60vh;">
+    <div style="background-color: #1a1410; padding-bottom: 40px;">
         <div class="catalog-main-content" style="max-width: 1280px; margin: 0 auto; padding: 40px 16px;">
             @if(request('search'))
                 <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
@@ -689,6 +689,12 @@
 
     <script>
         let currentQuantity = 1;
+
+        // Reset body overflow on page load to fix scroll issues
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.overflow = '';
+            document.documentElement.style.overflow = '';
+        });
 
         function isMobile() {
             return window.innerWidth <= 600;

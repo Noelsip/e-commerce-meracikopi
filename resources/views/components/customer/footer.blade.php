@@ -9,6 +9,41 @@
         color: #ffffff !important;
     }
 
+    /* Tablet Responsiveness */
+    @media (max-width: 900px) {
+        .footer-container {
+            padding: 50px 30px 40px 30px !important;
+        }
+
+        .footer-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 30px !important;
+        }
+
+        .footer-brand {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .footer-brand-inner {
+            justify-content: center !important;
+        }
+
+        .footer-social {
+            justify-content: center !important;
+        }
+
+        .footer-section {
+            text-align: center;
+        }
+
+        .footer-section h4 {
+            font-size: 16px !important;
+            margin-bottom: 16px !important;
+        }
+    }
+
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
         .footer-container {
             padding: 40px 20px 30px 20px !important;
@@ -16,27 +51,117 @@
 
         .footer-grid {
             grid-template-columns: 1fr !important;
-            gap: 30px !important;
+            gap: 24px !important;
             text-align: center;
         }
 
         .footer-brand-inner {
             flex-direction: column !important;
-            gap: 12px !important;
+            gap: 10px !important;
+        }
+
+        .footer-brand-inner img {
+            width: 50px !important;
+            height: 50px !important;
+        }
+
+        .footer-brand-inner h3 {
+            font-size: 20px !important;
+        }
+
+        .footer-brand-inner p {
+            font-size: 12px !important;
         }
 
         .footer-social {
             justify-content: center !important;
+            gap: 12px !important;
+        }
+
+        .footer-social svg {
+            width: 20px !important;
+            height: 20px !important;
         }
 
         .footer-section h4 {
-            font-size: 16px !important;
-            margin-bottom: 16px !important;
+            font-size: 14px !important;
+            margin-bottom: 12px !important;
         }
 
         .footer-section ul,
         .footer-section>div {
             align-items: center;
+        }
+
+        .footer-section ul li a,
+        .footer-section p {
+            font-size: 12px !important;
+        }
+
+        .footer-section ul {
+            gap: 8px !important;
+        }
+
+        .footer-section>div {
+            gap: 8px !important;
+        }
+
+        .footer-grid {
+            margin-bottom: 30px !important;
+        }
+
+        .footer-copyright {
+            padding-top: 20px !important;
+        }
+    }
+
+    /* Small Mobile Responsiveness */
+    @media (max-width: 480px) {
+        .footer-container {
+            padding: 30px 16px 24px 16px !important;
+        }
+
+        .footer-grid {
+            gap: 20px !important;
+            margin-bottom: 24px !important;
+        }
+
+        .footer-brand-inner {
+            gap: 8px !important;
+        }
+
+        .footer-brand-inner img {
+            width: 40px !important;
+            height: 40px !important;
+        }
+
+        .footer-brand-inner h3 {
+            font-size: 18px !important;
+        }
+
+        .footer-section h4 {
+            font-size: 13px !important;
+            margin-bottom: 10px !important;
+        }
+
+        .footer-section ul li a,
+        .footer-section p {
+            font-size: 11px !important;
+            line-height: 1.4 !important;
+        }
+
+        .footer-social svg {
+            width: 18px !important;
+            height: 18px !important;
+        }
+
+        .footer-copyright {
+            padding-top: 16px !important;
+        }
+
+        .footer-copyright p {
+            font-size: 10px !important;
+            letter-spacing: 0.5px !important;
         }
     }
 </style>
@@ -45,7 +170,7 @@
     style="background-color: #231812; padding: 80px 80px 40px 80px; color: white; border-top: 1px solid rgba(255,255,255,0.05);">
     <div style="max-width: 1200px; margin: 0 auto;">
         <div class="footer-grid"
-            style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 60px;">
+            style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 60px; margin-bottom: 40px;">
             <!-- Brand Column -->
             <div class="footer-brand">
                 <div class="footer-brand-inner"
@@ -137,7 +262,7 @@
         </div>
 
         <!-- Copyright -->
-        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; text-align: center;">
+        <div class="footer-copyright" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; text-align: center;">
             <p style="color: white; font-size: 12px; letter-spacing: 1px; margin: 0;">© 2026 | Meracikopi. All right
                 reserved.</p>
         </div>
