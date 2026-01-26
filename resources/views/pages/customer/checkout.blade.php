@@ -704,6 +704,49 @@
             </div>
         </div>
 
+        <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
+        <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
+        <div class="customer-info-section" id="customerInfoSection" style="margin-top: 24px; margin-bottom: 20px;">
+            <div class="address-header" style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CA7842" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span class="address-title" style="color: #FFF4D6; font-size: 16px; font-weight: 600;">Informasi Pemesan</span>
+            </div>
+            <div class="customer-form-card"
+                style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 244, 214, 0.1); border-radius: 12px; padding: 20px;">
+                <style>
+                    .customer-info-row {
+                        display: flex;
+                        gap: 20px;
+                    }
+                    @media (max-width: 600px) {
+                        .customer-info-row {
+                            flex-direction: column;
+                            gap: 16px;
+                        }
+                    }
+                </style>
+                <div class="customer-info-row">
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label
+                            style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nama
+                            Pemesan</label>
+                        <input type="text" id="dineInName" class="form-input" placeholder="Masukkan nama Anda"
+                            style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
+                    </div>
+                    <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <label
+                            style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nomor
+                            Telepon <span style="opacity: 0.5;">(Opsional)</span></label>
+                        <input type="text" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx"
+                            style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Main Content -->
         <div class="checkout-content">
             <!-- Left: Order Items + Payment/Delivery Options -->
@@ -1044,9 +1087,30 @@
             }
 
             // 3. Prepare Payload
-            // Note: Using values from address modal inputs as default customer info since there is no separate form for Dine In/Takeaway
-            const customerName = document.getElementById('recipientName').value || 'Guest';
-            const customerPhone = document.getElementById('recipientPhone').value || '-';
+            let customerName, customerPhone;
+
+            if (orderType === 'delivery') {
+                // For delivery, use the address modal inputs (or display values)
+                customerName = document.getElementById('recipientName').value || 'Guest';
+                customerPhone = document.getElementById('recipientPhone').value || '-';
+            } else {
+                // For dine in / takeaway, use the new inputs
+                customerName = document.getElementById('dineInName').value;
+                customerPhone = document.getElementById('dineInPhone').value;
+
+                if (!customerName || customerName.trim() === '') {
+                    showErrorModal('Nama Pemesan Kosong', 'Silahkan isi nama pemesan terlebih dahulu');
+                    // Focus on the input
+                    document.getElementById('dineInName').focus();
+
+                    // Reset button state
+                    const checkoutBtn = document.querySelector('.checkout-btn');
+                    checkoutBtn.innerText = 'Checkout';
+                    checkoutBtn.disabled = false;
+                    return;
+                }
+            }
+
             const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
 
             const payload = {
@@ -1232,14 +1296,18 @@
             const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
 
+            const customerInfoSection = document.getElementById('customerInfoSection');
+
             if (isDelivery) {
                 deliveryAddressSection.style.display = 'block';
                 deliveryMethodsSection.style.display = 'block';
                 paymentMethodsSection.style.display = 'none';
+                if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
                 deliveryAddressSection.style.display = 'none';
                 deliveryMethodsSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
+                if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }
 
