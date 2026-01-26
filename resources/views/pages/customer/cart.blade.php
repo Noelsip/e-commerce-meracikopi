@@ -2,23 +2,22 @@
     <!-- Alpine Data Scope -->
     <div x-data="cartManager" class="cart-page-container">
 
+
         <!-- Loading State -->
         <div x-show="loading" class="flex justify-center items-center py-20">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CA7842]"></div>
         </div>
 
         <!-- Empty State -->
-        <div x-show="!loading && items.length === 0" class="text-center py-20" style="display: none;">
-            <svg class="w-16 h-16 mx-auto mb-4 text-[#CA7842] opacity-50" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
+        <div x-show="!loading && items.length === 0" class="empty-cart-container" style="display: none;">
+            <svg class="empty-cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
                 </path>
             </svg>
-            <h3 class="text-white text-xl font-medium mb-2">Keranjang Anda Kosong</h3>
-            <p class="text-white text-xl font-medium mb-2">Silakan pilih menu favorit Anda terlebih dahulu</p>
-            <a href="{{ route('catalogs.index') }}"gular
-                class="inline-block px-8 py-3 bg-[#CA7842] text-white rounded-full hover:bg-[#b5693a] transition-colors">
+            <h3 class="empty-cart-title">Keranjang Anda Kosong</h3>
+            <p class="empty-cart-subtitle">Silakan pilih menu favorit Anda terlebih dahulu</p>
+            <a href="{{ route('catalogs.index') }}" class="empty-cart-btn">
                 Lihat Menu
             </a>
         </div>
@@ -30,10 +29,8 @@
             <div class="cart-table-header">
                 <!-- Select All Checkbox -->
                 <div class="header-checkbox">
-                    <input type="checkbox" 
-                           class="cart-checkbox select-all-checkbox" 
-                           :checked="allSelected" 
-                           @change="toggleSelectAll">
+                    <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
+                        @change="toggleSelectAll">
                 </div>
                 <span class="header-produk">Produk</span>
                 <span class="header-harga">Harga Satuan</span>
@@ -45,19 +42,15 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-wrapper" 
-                         x-data="{ swiped: false, startX: 0, currentX: 0 }"
-                         @touchstart="startX = $event.touches[0].clientX; currentX = 0"
-                         @touchmove="currentX = $event.touches[0].clientX - startX"
-                         @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }"
-                    >
+                    <div class="cart-item-wrapper" x-data="{ swiped: false, startX: 0, currentX: 0 }"
+                        @touchstart="startX = $event.touches[0].clientX; currentX = 0"
+                        @touchmove="currentX = $event.touches[0].clientX - startX"
+                        @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }">
                         <div class="cart-item-row" :class="{ 'swiped': swiped }">
                             <!-- Item Checkbox -->
                             <div class="flex justify-center">
-                                <input type="checkbox" 
-                                       class="cart-checkbox item-checkbox" 
-                                       :checked="item.selected" 
-                                       @change="toggleItemSelection(item.id)">
+                                <input type="checkbox" class="cart-checkbox item-checkbox" :checked="item.selected"
+                                    @change="toggleItemSelection(item.id)">
                             </div>
 
                             <!-- Product Info -->
@@ -93,12 +86,15 @@
                             <!-- Delete (Desktop only) -->
                             <button class="delete-btn delete-btn-desktop" @click="removeItem(item.id)">Hapus</button>
                         </div>
-                        
+
                         <!-- Swipe Delete Button (Mobile only) -->
                         <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
                                 <line x1="10" y1="11" x2="10" y2="17"></line>
                                 <line x1="14" y1="11" x2="14" y2="17"></line>
                             </svg>
@@ -113,23 +109,53 @@
         </div>
 
         <!-- Cart Summary Footer -->
-        <div x-show="!loading && items.length > 0" class="cart-summary-wrapper" style="display: none;">
-            <div class="cart-summary">
-                <div class="cart-summary-left">
-                    <!-- Select All Checkbox in Footer -->
-                    <label class="select-all-label">
-                        <input type="checkbox" 
-                               class="cart-checkbox" 
-                               :checked="allSelected" 
-                               @change="toggleSelectAll">
-                        <span>Pilih Semua</span>
-                    </label>
+        <!-- Cart Summary Footer - Forced Visible -->
+
+
+        <!-- Cart Summary Footer - Forced Visible -->
+        <div class="cart-summary-wrapper"
+            style="display: flex !important; align-items: center !important; justify-content: center !important; min-height: 80px !important; z-index: 99999 !important; bottom: 0 !important; position: fixed !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: #2A1B14 !important; border-top: 1px solid rgba(255,255,255,0.1) !important;">
+            <div class="cart-summary-container">
+                <div class="cart-summary">
+                    <!-- Left side: Checkbox + Pilih Semua -->
+                    <div class="cart-summary-left">
+                        <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
+                            @change="toggleSelectAll">
+                        <span class="select-all-text">Pilih Semua</span>
+                    </div>
+
+                    <!-- Right side: Total + Checkout -->
+                    <div class="cart-summary-right">
+                        <div class="cart-total-section">
+                            <span class="cart-total-label">Total (<span x-text="selectedCount"></span> Produk):</span>
+                            <span class="cart-total-amount" x-text="formatRupiah(selectedTotal)"></span>
+                        </div>
+                        <button class="checkout-btn" @click="proceedToCheckout"
+                            :disabled="selectedCount === 0">Checkout</button>
+                    </div>
                 </div>
-                <div class="cart-total-section">
-                    <span class="cart-total-label">Total (<span x-text="selectedCount"></span> Produk):</span>
-                    <span class="cart-total-amount" x-text="formatRupiah(selectedTotal)"></span>
+            </div>
+        </div>
+
+
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteConfirmModal" class="error-modal-overlay">
+            <div class="error-modal compact-modal">
+                <div class="error-modal-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18"></path>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
                 </div>
-                <button class="checkout-btn" @click="proceedToCheckout" :disabled="selectedCount === 0">Checkout</button>
+                <h3 class="error-modal-title">Hapus Produk?</h3>
+                <p class="error-modal-message">Apakah Anda yakin ingin menghapus produk ini dari pesanan?</p>
+                <div class="delete-modal-actions">
+                    <button class="btn-cancel" @click="closeDeleteConfirm()">Batal</button>
+                    <button class="btn-confirm-delete" @click="confirmDelete()">Iya</button>
+                </div>
             </div>
         </div>
 
@@ -213,6 +239,7 @@
                         }));
 
                         this.totalPrice = result.data.total_price || 0;
+                        this.itemToDelete = null; // Reset delete state
                     } catch (error) {
                         console.error('Error fetching cart:', error);
                     } finally {
@@ -250,8 +277,21 @@
                     }
                 },
 
-                async removeItem(itemId) {
-                    if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
+                removeItem(itemId) {
+                    this.itemToDelete = itemId;
+                    const modal = document.getElementById('deleteConfirmModal');
+                    if (modal) modal.classList.add('show');
+                },
+
+                closeDeleteConfirm() {
+                    this.itemToDelete = null;
+                    const modal = document.getElementById('deleteConfirmModal');
+                    if (modal) modal.classList.remove('show');
+                },
+
+                async confirmDelete() {
+                    if (!this.itemToDelete) return;
+                    const itemId = this.itemToDelete;
 
                     try {
                         const response = await fetch(`/api/customer/cart/items/${itemId}`, {
@@ -263,10 +303,12 @@
                         });
 
                         if (response.ok) {
-                            this.fetchCart();
+                            await this.fetchCart();
+                            this.closeDeleteConfirm();
                         }
                     } catch (error) {
                         console.error('Error removing item:', error);
+                        this.closeDeleteConfirm();
                     }
                 },
 
@@ -280,18 +322,22 @@
                         }
                         return;
                     }
-                    
+
                     // Store selected item IDs in localStorage for checkout
                     const selectedIds = this.items
                         .filter(item => item.selected)
                         .map(item => item.id);
                     localStorage.setItem('selected_cart_items', JSON.stringify(selectedIds));
-                    
+
                     window.location.href = '/customer/checkout';
                 }
             }));
         });
     </script>
+
+    </script>
+
+
 
     <!-- Error Modal (Reused) -->
     <div id="errorModal" class="error-modal-overlay">
@@ -409,6 +455,168 @@
 
         .error-modal-btn:active {
             transform: translateY(0);
+        }
+
+        /* Delete Modal Actions */
+        .delete-modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .delete-modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Poppins', sans-serif;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white !important;
+            border-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .btn-confirm-delete {
+            background: #e74c3c !important;
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-confirm-delete:hover {
+            background: #c0392b !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+        }
+    </style>
+
+    <!-- Empty Cart Styles -->
+    <style>
+        /* Empty Cart Container */
+        .empty-cart-container {
+            text-align: center;
+            padding: 80px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: calc(100vh - 200px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .empty-cart-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            color: #CA7842;
+            opacity: 0.6;
+        }
+
+        .empty-cart-title {
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .empty-cart-subtitle {
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .empty-cart-btn {
+            display: inline-block;
+            padding: 14px 32px;
+            background-color: #CA7842;
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(202, 120, 66, 0.3);
+        }
+
+        .empty-cart-btn:hover {
+            background-color: #b5693a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(202, 120, 66, 0.4);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .empty-cart-container {
+                padding: 60px 24px;
+                min-height: calc(100vh - 180px);
+            }
+
+            .empty-cart-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 20px;
+            }
+
+            .empty-cart-title {
+                font-size: 20px;
+                margin-bottom: 10px;
+                padding: 0 10px;
+            }
+
+            .empty-cart-subtitle {
+                font-size: 15px;
+                line-height: 1.5;
+                margin-bottom: 28px;
+                padding: 0 10px;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .empty-cart-btn {
+                padding: 12px 28px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .empty-cart-container {
+                padding: 50px 16px;
+            }
+
+            .empty-cart-icon {
+                width: 56px;
+                height: 56px;
+            }
+
+            .empty-cart-title {
+                font-size: 18px;
+            }
+
+            .empty-cart-subtitle {
+                font-size: 14px;
+                margin-bottom: 24px;
+            }
+
+            .empty-cart-btn {
+                padding: 11px 24px;
+                font-size: 14px;
+                width: auto;
+                max-width: 200px;
+            }
         }
     </style>
 </x-customer.cart-layout>

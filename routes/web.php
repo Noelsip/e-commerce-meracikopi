@@ -68,6 +68,11 @@ Route::get('/customer/checkout', function () {
 Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 
+// Order History
+Route::get('/customer/order-history', function () {
+    return view('pages.customer.order-history');
+})->name('order-history.index');
+
 /**
  * Admin Routes
  */

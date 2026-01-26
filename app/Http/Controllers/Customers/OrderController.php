@@ -98,40 +98,19 @@ class OrderController extends Controller
             'shipping_quote_id' => 'required_if:order_type,delivery|string',
             'shipping_option_id' => 'required_if:order_type,delivery|string',
             'notes' => 'nullable|string',
+            'selected_item_ids' => 'required|array|min:1', // Add validation for selected items
+            'selected_item_ids.*' => 'integer|exists:cart_items,id', // Each item must be valid cart_item ID
         ]);
 
         return DB::transaction(function () use ($request, $shipping) {
             $guestToken = $request->attributes->get('guest_token');
 
-            // #region agent log
-            $logPath = base_path('.cursor/debug.log');
-            file_put_contents($logPath, json_encode([
-                'location' => 'OrderController.php:72',
-                'message' => 'Order store called',
-                'data' => ['guest_token' => $guestToken, 'order_type' => $request->order_type ?? null],
-                'timestamp' => time() * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'B'
-            ]) . "\n", FILE_APPEND);
-            // #endregion
+
 
             $cartQuery = Cart::with('items.menu')
-                ->where('guest_token', $guestToken)
-                ->where('status', 'active');
+                ->where('guest_token', $guestToken);
 
-            // #region agent log
-            $cartCount = $cartQuery->count();
-            file_put_contents($logPath, json_encode([
-                'location' => 'OrderController.php:79',
-                'message' => 'Cart query before firstOrFail',
-                'data' => ['guest_token' => $guestToken, 'cart_count' => $cartCount, 'has_items' => $cartQuery->first()?->items->count() ?? 0],
-                'timestamp' => time() * 1000,
-                'sessionId' => 'debug-session',
-                'runId' => 'run1',
-                'hypothesisId' => 'B,C,D'
-            ]) . "\n", FILE_APPEND);
-            // #endregion
+
 
             $cart = $cartQuery->lockForUpdate()->firstOrFail();
 
@@ -140,11 +119,20 @@ class OrderController extends Controller
                 abort(422, 'Cart is empty');
             }
 
-            // Menghitung total harga dari server dengan diskon
+            // Filter only selected items
+            $selectedItemIds = $request->input('selected_item_ids', []);
+            $selectedItems = $cart->items->whereIn('id', $selectedItemIds);
+
+            // Validate that we have selected items
+            if ($selectedItems->isEmpty()) {
+                abort(422, 'No items selected for checkout');
+            }
+
+            // Menghitung total harga dari server dengan diskon (hanya untuk item yang dipilih)
             $totalPrice = 0;
             $totalDiscountAmount = 0;
 
-            foreach ($cart->items as $item) {
+            foreach ($selectedItems as $item) {
                 if (!$item->menu->is_available) {
                     abort(422, "Menu '{$item->menu->name}' is not available");
                 }
@@ -152,7 +140,7 @@ class OrderController extends Controller
                 // Hitung dengan harga setelah diskon
                 $finalPrice = $item->menu->final_price;
                 $totalPrice += $finalPrice * $item->quantity;
-                
+
                 // Hitung total diskon
                 $totalDiscountAmount += $item->menu->discount_amount * $item->quantity;
             }
@@ -212,8 +200,8 @@ class OrderController extends Controller
                 'notes' => $request->notes,
             ]);
 
-            // Copy cart_items ke order_items dengan harga final (setelah diskon)
-            foreach ($cart->items as $item) {
+            // Copy ONLY SELECTED cart_items ke order_items dengan harga final (setelah diskon)
+            foreach ($selectedItems as $item) {
                 OrderItems::create([
                     'order_id' => $order->id,
                     'menu_id' => $item->menu_id,
@@ -246,8 +234,8 @@ class OrderController extends Controller
                 'note' => 'Order created',
             ]);
 
-            // Update cart status
-            $cart->update(['status' => 'checked_out']);
+            // Empty the cart
+            $cart->items()->delete();
 
             return response()->json([
                 'message' => 'Order created successfully',

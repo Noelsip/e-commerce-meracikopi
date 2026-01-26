@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      * 
@@ -25,14 +24,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('menus', function (Blueprint $table) {
+            // Add category column
+            $table->string('category')->after('name');
+
             // Diskon dalam persen (0-100)
             // Contoh: 10 = diskon 10%
             $table->decimal('discount_percentage', 5, 2)->default(0)->after('price');
-            
+
             // Diskon dalam nominal rupiah
             // Contoh: 5000 = diskon Rp 5.000
             $table->decimal('discount_price', 10, 2)->default(0)->after('discount_percentage');
-            
+
+            // Add soft deletes
+            $table->softDeletes();
+
             // Index untuk query filtering menu dengan diskon
             $table->index('discount_percentage');
             $table->index('discount_price');
@@ -50,11 +55,13 @@ return new class extends Migration
             // Drop indexes terlebih dahulu
             $table->dropIndex(['discount_percentage']);
             $table->dropIndex(['discount_price']);
-            
+
             // Kemudian drop kolom
             $table->dropColumn([
+                'category',
                 'discount_percentage',
-                'discount_price'
+                'discount_price',
+                'deleted_at'
             ]);
         });
     }

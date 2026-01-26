@@ -89,8 +89,8 @@
                                 <td class="py-3 px-4 text-sm" style="color: #ccc;">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</td>
                                 <td class="py-3 px-4 text-sm">
                                     <span class="px-2 py-1 rounded-full text-xs font-medium" 
-                                          style="background-color: {{ $order->status == 'completed' ? '#22c55e' : ($order->status == 'pending' ? '#eab308' : '#3b82f6') }}; color: white;">
-                                        {{ ucfirst($order->status ?? 'pending') }}
+                                          style="background-color: {{ $order->status->value == 'completed' ? '#22c55e' : ($order->status->value == 'pending' ? '#eab308' : '#3b82f6') }}; color: white;">
+                                        {{ ucfirst(str_replace('_', ' ', $order->status->value ?? 'pending')) }}
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-sm" style="color: #ccc;">{{ $order->created_at->format('d M Y H:i') }}</td>

@@ -15,20 +15,27 @@
             border: 1px solid #3e302b;
             transition: all 0.3s ease;
         }
+
         .custom-search-container:focus-within {
             border-color: #f0f2bd;
             box-shadow: 0 0 0 1px #f0f2bd;
         }
+
         .custom-search-input {
             color: #f0f2bd;
         }
+
         .custom-search-input::placeholder {
-            color: rgba(240, 242, 189, 0.5); /* #f0f2bd with opacity */
+            color: rgba(240, 242, 189, 0.5);
+            /* #f0f2bd with opacity */
         }
+
         .custom-search-icon {
-            color: #6b7280; /* gray-500 */
+            color: #6b7280;
+            /* gray-500 */
             transition: color 0.3s ease;
         }
+
         .custom-search-container:focus-within .custom-search-icon {
             color: #f0f2bd;
         }
@@ -44,10 +51,12 @@
                     <!-- Flex Container Search Bar -->
                     <div class="custom-search-container flex items-center w-full rounded-xl px-4 py-3 shadow-sm group">
                         <!-- Icon -->
-                        <svg class="custom-search-icon h-5 w-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        <svg class="custom-search-icon h-5 w-5 mr-3 flex-shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        
+
                         <!-- Input -->
                         <input type="text" name="search" placeholder="Cari nama menu..." value="{{ request('search') }}"
                             class="custom-search-input w-full bg-transparent border-none focus:outline-none focus:ring-0 p-0 text-base font-medium">
@@ -60,39 +69,42 @@
         <div class="overflow-x-auto pb-2">
             <div class="flex gap-3 min-w-max">
                 <!-- Semua Kategori Pill -->
-                <a href="{{ route('admin.menus.index', ['search' => request('search')]) }}" 
-                   class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap"
-                   style="{{ !request('category') 
-                       ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;' 
-                       : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
+                <a href="{{ route('admin.menus.index', ['search' => request('search')]) }}"
+                    class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap" style="{{ !request('category')
+    ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;'
+    : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
                     Semua Produk
                 </a>
 
                 <!-- Category Items -->
                 @foreach($categories as $key => $label)
-                    <a href="{{ route('admin.menus.index', ['category' => $key, 'search' => request('search')]) }}"
-                       class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap"
-                       style="{{ request('category') == $key 
-                           ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;' 
-                           : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
-                        {{ $label }}
-                    </a>
+                            <a href="{{ route('admin.menus.index', ['category' => $key, 'search' => request('search')]) }}"
+                                class="px-4 py-2 rounded-full text-sm font-semibold transition-all border whitespace-nowrap" style="{{ request('category') == $key
+                    ? 'background-color: transparent; border-color: #f0f2bd; color: #f0f2bd;'
+                    : 'background-color: #3e302b; border-color: #3e302b; color: #a89890;' }}">
+                                {{ $label }}
+                            </a>
                 @endforeach
             </div>
         </div>
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed top-4 right-4 z-50 transform transition-all duration-300 translate-x-full opacity-0">
-        <div class="flex items-center gap-3 px-6 py-4 rounded-xl shadow-xl" style="background-color: #1e1715; border: 1px solid #D4A574;">
+    <div id="toast" class="fixed top-20 left-1/2 z-50 transform -translate-x-1/2 transition-all duration-300 opacity-0"
+        style="position: fixed !important; top: 5rem !important; left: 50% !important; transform: translateX(-50%) translateY(-100%) !important;">
+        <div class="flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl"
+            style="background: linear-gradient(135deg, #3e302b 0%, #2b211e 100%); border: 2px solid #D4A574;">
             <div class="flex-shrink-0">
-                <svg class="w-6 h-6 text-[#D4A574]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg class="w-6 h-6" style="color: #f0f2bd !important;" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
-            <p class="font-medium text-[#f0f2bd]" id="toast-message"></p>
-            <button onclick="hideToast()" class="ml-4 text-[#f0f2bd] hover:text-[#D4A574] transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <p class="font-semibold text-base" style="color: #f0f2bd !important;" id="toast-message"></p>
+            <button onclick="hideToast()" class="ml-2 hover:text-white transition-colors"
+                style="color: #f0f2bd !important;">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
@@ -102,8 +114,8 @@
     <!-- Trigger Toast if Session has Success/Error -->
     @if(session('success') || session('error'))
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const message = "{{ session('success') ?? session('error') }}";
+            document.addEventListener('DOMContentLoaded', function () {
+                const message = @json(session('success') ?? session('error'));
                 const type = "{{ session('success') ? 'success' : 'error' }}";
                 showToast(message, type);
             });
@@ -114,12 +126,13 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
-            
+
             toastMessage.textContent = message;
-            
-            // Show
-            toast.classList.remove('translate-x-full', 'opacity-0');
-            
+
+            // Show with fade in and slide down
+            toast.style.transform = 'translateX(-50%) translateY(0)';
+            toast.classList.remove('opacity-0');
+
             // Auto hide after 3 seconds
             setTimeout(() => {
                 hideToast();
@@ -128,7 +141,8 @@
 
         function hideToast() {
             const toast = document.getElementById('toast');
-            toast.classList.add('translate-x-full', 'opacity-0');
+            toast.style.transform = 'translateX(-50%) translateY(-100%)';
+            toast.classList.add('opacity-0');
         }
     </script>
 

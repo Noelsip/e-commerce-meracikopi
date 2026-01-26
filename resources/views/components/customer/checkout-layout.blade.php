@@ -41,12 +41,10 @@
             margin: 0;
             min-height: 100vh;
             /* Background linear gradient */
-            background: linear-gradient(
-                to right,
-                rgba(42, 27, 20, 0.75) 0%,
-                rgba(42, 27, 20, 0.45) 50%,
-                rgba(42, 27, 20, 0.75) 100%
-            );
+            background: linear-gradient(to right,
+                    rgba(42, 27, 20, 0.75) 0%,
+                    rgba(42, 27, 20, 0.45) 50%,
+                    rgba(42, 27, 20, 0.75) 100%);
             background-color: #1a1410;
         }
 
@@ -108,19 +106,6 @@
             color: white;
             font-size: 14px;
             font-weight: 500;
-            position: relative;
-            padding-bottom: 12px;
-            margin-bottom: -12px;
-        }
-
-        .order-type-tab-value::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--secondary);
         }
 
         /* Main Content Grid */
@@ -162,7 +147,7 @@
             padding: 16px 20px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
-            background: transparent;
+            background: #241813;
             gap: 16px;
         }
 
@@ -264,7 +249,7 @@
         }
 
         .order-item-price {
-            color: var(--secondary);
+            color: #ca7842;
             font-size: 16px;
             font-weight: 600;
             margin-left: auto;
@@ -798,6 +783,20 @@
                 position: relative;
                 top: 0;
             }
+
+            /* Price: Middle Row Left (Row 2) - Orange */
+            .order-item-price {
+                grid-column: 3;
+                grid-row: 2;
+                justify-self: start !important;
+                color: #ca7842 !important;
+                /* Updated color */
+                font-weight: 600 !important;
+                font-size: 15px !important;
+                margin: 0 !important;
+                text-align: left !important;
+                width: auto !important;
+            }
         }
 
         @media (max-width: 600px) {
@@ -806,19 +805,94 @@
             }
 
             .order-item-card {
-                flex-wrap: wrap;
+                position: relative;
+                /* Anchor for absolute price */
+                padding-bottom: 50px;
+                /* Ensure space for price/quantity row */
+                align-items: flex-start;
+                /* Align items to top */
+            }
+
+            .order-item-details {
+                margin-right: 0;
+                /* Let details take space */
+            }
+
+            .order-item-quantity {
+                margin-top: 8px;
+                /* Space between name and quantity */
             }
 
             .order-item-price {
-                width: 100%;
+                position: absolute;
+                bottom: 16px;
+                right: 20px;
+                width: auto !important;
                 text-align: right;
-                margin-top: 8px;
+                margin: 0 !important;
+                z-index: 5;
             }
         }
 
         /* Footer adjustments */
         .footer-container {
             margin-top: 60px;
+        }
+    </style>
+    <style>
+        /* Mobile Sticky Footer Styles */
+        @media (max-width: 768px) {
+            .checkout-content {
+                display: block;
+                /* Stack content vertically */
+                padding-bottom: 250px;
+                /* Ensure content isn't hidden behind fixed footer */
+            }
+
+            .order-summary-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                /* Ensure it doesn't stretch to top */
+                width: 100%;
+                z-index: 1000;
+                background: #1a1410;
+                /* Match theme background or slightly lighter */
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+                border-top: 1px solid rgba(255, 244, 214, 0.1);
+                animation: slideUp 0.3s ease-out;
+            }
+
+            .order-summary-card {
+                background: linear-gradient(145deg, #2A1B14, #221510);
+                border: none;
+                border-radius: 20px 20px 0 0;
+                /* Rounded top corners only */
+                padding: 20px;
+                margin-bottom: 0;
+            }
+
+            .section-title {
+                display: none;
+                /* Hide 'Jumlah Pesanan' title in mobile footer */
+            }
+
+            /* Ensure the order items take full width */
+            .order-items-section-wrapper {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -835,7 +909,7 @@
     <div class="back-button-container">
         <a href="{{ route('cart.index') }}" class="back-to-cart-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             <span>Back</span>
         </a>

@@ -48,7 +48,7 @@ class MenuAdminController extends Controller
 
         $data = $request->only(['name', 'category', 'description', 'price', 'discount_percentage', 'discount_price']);
         $data['is_available'] = $request->has('is_available');
-        
+
         // Set default 0 jika tidak ada diskon
         $data['discount_percentage'] = $request->input('discount_percentage', 0);
         $data['discount_price'] = $request->input('discount_price', 0);
@@ -58,9 +58,9 @@ class MenuAdminController extends Controller
             $data['image_path'] = 'storage/' . $path; // Adjust based on your storage link setup
         }
 
-        Menus::create($data);
+        $menu = Menus::create($data);
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu created successfully.');
+        return redirect()->route('admin.menus.index')->with('success', "Menu '{$menu->name}' berhasil ditambahkan.");
     }
 
     public function edit(Menus $menu)
@@ -84,7 +84,7 @@ class MenuAdminController extends Controller
 
         $data = $request->only(['name', 'category', 'description', 'price', 'discount_percentage', 'discount_price']);
         $data['is_available'] = $request->has('is_available');
-        
+
         // Set default 0 jika tidak ada diskon
         $data['discount_percentage'] = $request->input('discount_percentage', 0);
         $data['discount_price'] = $request->input('discount_price', 0);
@@ -102,11 +102,13 @@ class MenuAdminController extends Controller
 
         $menu->update($data);
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu updated successfully.');
+        return redirect()->route('admin.menus.index')->with('success', "Menu '{$menu->name}' berhasil diperbarui.");
     }
 
     public function destroy(Menus $menu)
     {
+        $menuName = $menu->name; // Store name before deletion
+
         if ($menu->image_path) {
             $oldPath = str_replace('storage/', '', $menu->image_path);
             Storage::disk('public')->delete($oldPath);
@@ -114,7 +116,7 @@ class MenuAdminController extends Controller
 
         $menu->delete();
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu deleted successfully.');
+        return redirect()->route('admin.menus.index')->with('success', "Menu '{$menuName}' berhasil dihapus.");
     }
 
     public function toggleVisibility(Menus $menu)
@@ -122,7 +124,7 @@ class MenuAdminController extends Controller
         $menu->is_available = !$menu->is_available;
         $menu->save();
 
-        $status = $menu->is_available ? 'visible' : 'hidden';
-        return back()->with('success', "Menu is now {$status}.");
+        $status = $menu->is_available ? 'ditampilkan' : 'disembunyikan';
+        return back()->with('success', "Menu '{$menu->name}' berhasil {$status}.");
     }
 }
