@@ -204,7 +204,7 @@
         <div class="order-type-section">
             <div class="order-type-dropdown">
                 <select class="order-type-select" id="orderTypeNavbar" onchange="syncOrderType(this.value)">
-                    <option value="dine_in" selected>Dine In, Meja 07</option>
+                    <option value="dine_in" selected>Dine In</option>
                     <option value="takeaway">Takeaway</option>
                     <option value="delivery">Delivery</option>
                 </select>

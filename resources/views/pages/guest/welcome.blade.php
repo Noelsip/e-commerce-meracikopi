@@ -25,8 +25,19 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             border-radius: 24px;
             box-shadow: none !important;
+<<<<<<< HEAD
             -webkit-tap-highlight-color: transparent;
             text-decoration: none;
+=======
+            display: flex !important;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0 !important;
+            border: 1px solid transparent;
+            /* Fix for potential sub-pixel rendering gaps */
+            width: 100%;
+            /* Fill grid column */
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
 
         .category-card:hover {
@@ -41,12 +52,27 @@
 
         .category-card-inner {
             box-shadow: none !important;
+<<<<<<< HEAD
             transition: all 0.4s ease;
             height: 100%;
             border-radius: 24px !important; 
             overflow: hidden;
             border: 2px solid transparent !important;
             box-sizing: border-box;
+=======
+            flex: 1;
+            /* Ensure inner fills outer */
+            width: 100%;
+        }
+
+        /* Mobile - Hover shadow exactly matching card edges */
+        @media (max-width: 768px) {
+            .category-card:hover {
+                /* Tighter shadow to eliminate gap appearance */
+                box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
+                transform: scale(1.01) !important;
+            }
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
     </style>
 
@@ -550,7 +576,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
                         height: 100%;
                         display: flex;
@@ -563,14 +589,14 @@
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
                         ">
                             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80" alt="Food"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Food</h3>
                     </div>
                 </a>
@@ -581,7 +607,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
                         height: 100%;
                         display: flex;
@@ -594,14 +620,14 @@
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
                         ">
                             <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500&q=80" alt="Drink"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Drink</h3>
                     </div>
                 </a>
@@ -612,7 +638,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
                         height: 100%;
                         display: flex;
@@ -625,14 +651,14 @@
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
                         ">
                             <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&q=80"
                                 alt="Coffee Beans" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Coffee Beans</h3>
                     </div>
                 </a>
@@ -643,7 +669,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
                         height: 100%;
                         display: flex;
@@ -656,14 +682,14 @@
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
                         ">
                             <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Bottled Coffee"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Bottled Coffee</h3>
                     </div>
                 </a>
@@ -674,7 +700,7 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
                         height: 100%;
                         display: flex;
@@ -687,14 +713,14 @@
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
                         ">
                             <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80"
                                 alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Sachet Drip</h3>
                     </div>
                 </a>

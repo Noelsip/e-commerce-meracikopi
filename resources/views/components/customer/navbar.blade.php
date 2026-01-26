@@ -647,6 +647,76 @@
     }
 </script>
 
+<!-- Cart Badge Counter Script -->
+<script>
+    // Cart Badge Counter Functions
+    function updateCartBadge(count) {
+        const badge = document.getElementById('cartBadge');
+        if (!badge) return;
+
+        if (count > 0) {
+            // Display count or "99+" if more than 99
+            badge.textContent = count > 99 ? '99+' : count.toString();
+            badge.style.display = 'flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    function fetchCartCount() {
+        const guestToken = localStorage.getItem('guest_token');
+        if (!guestToken) {
+            updateCartBadge(0);
+            return;
+        }
+
+        fetch('/api/customer/cart', {
+            headers: {
+                'X-GUEST-TOKEN': guestToken,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch cart');
+                return response.json();
+            })
+            .then(data => {
+                const items = data.data.items || [];
+                // Count total quantity of all items
+                const totalCount = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+                updateCartBadge(totalCount);
+            })
+            .catch(error => {
+                console.error('Error fetching cart count:', error);
+                updateCartBadge(0);
+            });
+    }
+
+    // Load cart count on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchCartCount();
+
+        // Reset body overflow on page load to fix any leftover hidden state
+        document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
+
+        // Refresh cart count every 30 seconds
+        setInterval(fetchCartCount, 30000);
+    });
+
+    // Listen for storage events (cart updates from other tabs)
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'guest_token' || e.key === 'cart_updated') {
+            fetchCartCount();
+        }
+    });
+
+    // Custom event for cart updates
+    window.addEventListener('cartUpdate d', function () {
+        fetchCartCount();
+    });
+</script>
+
 <!-- Announcement Bar -->
 <div class="announcement-bar" style="background-color: #1a1410; padding: 0; margin-top: 60px;">
     <div style="

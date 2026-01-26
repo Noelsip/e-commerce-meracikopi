@@ -120,7 +120,7 @@
             </div>
 
             <!-- Berhasil Button -->
-            <button class="berhasil-btn" onclick="closeSuccessModal()">Berhasil</button>
+            <button class="berhasil-btn" onclick="window.location.href = '/customer/catalogs'">Berhasil</button>
 
             <!-- Action Buttons -->
             <div class="success-action-buttons">
@@ -1170,9 +1170,9 @@
             window.location.href = '/customer/order-history';
         }
 
-        // Go back to home/catalogs
+        // Go back to home
         function goBackToHome() {
-            window.location.href = '/customer/catalogs';
+            window.location.href = '/';
         }
 
         // Edit address

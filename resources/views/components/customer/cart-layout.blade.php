@@ -124,6 +124,7 @@
             -webkit-appearance: none;
             position: relative;
             transition: all 0.2s ease;
+            margin: 0;
         }
 
         .cart-checkbox:checked {
@@ -271,8 +272,7 @@
             width: 100%;
             background-color: #2A1B14;
             padding: 16px 0;
-            z-index: 9999 !important;
-            bottom: 0 !important;
+            z-index: 1000;
             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
@@ -427,14 +427,13 @@
             .cart-item-row {
                 display: grid;
                 grid-template-columns: auto auto 1fr;
-                grid-template-rows: auto auto;
-                column-gap: 12px;
-                row-gap: 4px;
+                gap: 12px;
                 border: 1px solid #D9D9D9;
                 border-radius: 8px;
-                padding: 12px;
+                padding: 12px 8px;
                 margin-bottom: 8px;
                 background: #241813;
+<<<<<<<<< Temporary merge branch 1
                 align-items: start;
                 position: relative;
             }
@@ -443,19 +442,14 @@
                 background: rgba(255, 255, 255, 0.02);
             }
 
-            /* Use display: contents to unwrap product-info layers */
-            .product-info {
-                display: contents;
-            }
-
-            /* Checkbox column - Spans 2 rows */
+            /* Checkbox column - Grid Column 1 */
             .cart-item-row>div:first-child {
+                display: flex;
+                align-items: flex-start;
+                padding-top: 4px;
                 grid-column: 1;
                 grid-row: 1 / span 2;
-                display: flex;
-                align-items: center;
-                height: 100%;
-                padding-top: 0;
+                align-self: start;
             }
 
             .cart-checkbox {
@@ -463,7 +457,12 @@
                 height: 18px;
             }
 
-            /* Image - Col 2, Spans 2 rows */
+            /* Main content: Unwrap flex to use Grid */
+            .product-info {
+                display: contents;
+            }
+
+            /* Image - Grid Column 2 */
             .product-image,
             .product-image-placeholder {
                 grid-column: 2;
@@ -472,18 +471,16 @@
                 height: 80px;
                 flex-shrink: 0;
                 border-radius: 4px;
-                margin: 0;
             }
 
-            /* Product Name - Col 3, Row 1 */
+            /* Name - Grid Column 3, Row 1 */
             .product-name {
                 grid-column: 3;
                 grid-row: 1;
-                font-size: 14px;
-                font-weight: 500;
+                font-size: 13px;
+                font-weight: 400;
                 line-height: 1.4;
                 color: rgba(255, 255, 255, 0.9);
-                margin-bottom: 4px;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
@@ -492,29 +489,37 @@
                 align-self: start;
             }
 
-            /* Quantity controls - Col 3, Row 2 (Left aligned) */
+            /* Quantity controls - Grid Column 3, Row 2 (Left side) */
             .cart-item-row>.quantity-controls {
                 grid-column: 3;
                 grid-row: 2;
                 display: flex;
                 align-items: center;
+                justify-content: flex-start;
                 gap: 8px;
-                padding-right: 0;
                 margin-top: auto;
-                width: fit-content;
+                /* Push to bottom */
                 align-self: end;
-                justify-self: start;
+                width: fit-content;
             }
 
             /* Price - Col 3, Row 2 (Right aligned) */
+=========
+                grid-column: 2;
+                grid-row: 1;
+                /* Explicit row 1 */
+            }
+
+            /* Price - Absolute Bottom Right */
+            /* Price and quantity inline row */
+>>>>>>>>> Temporary merge branch 2
             .cart-item-row>.product-price {
-                grid-column: 3;
-                grid-row: 2;
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
                 text-align: right;
+<<<<<<<<< Temporary merge branch 1
                 align-self: end;
                 justify-self: end;
                 position: relative;
@@ -522,6 +527,19 @@
                 width: auto;
                 padding-left: 0 !important;
                 margin-top: 0;
+=========
+                grid-column: 2;
+                grid-row: 2;
+                /* Explicit row 2 */
+                justify-self: end;
+                /* Push to end */
+                padding-left: 0;
+                align-self: center;
+                margin-top: 8px;
+                width: auto;
+                position: relative;
+                right: 0;
+>>>>>>>>> Temporary merge branch 2
             }
 
             /* Hide standalone total price */
@@ -529,7 +547,26 @@
                 display: none;
             }
 
+<<<<<<<<< Temporary merge branch 1
             /* Button Styling */
+=========
+            /* Quantity controls - inline with price */
+            .cart-item-row>.quantity-controls {
+                grid-column: 2;
+                grid-row: 2;
+                /* Explicit row 2 */
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                /* Start align quantity */
+                gap: 8px;
+                padding-right: 0;
+                margin-top: 8px;
+                width: fit-content;
+                /* Removed negative margins */
+            }
+
+>>>>>>>>> Temporary merge branch 2
             .quantity-btn {
                 width: 24px;
                 height: 24px;
@@ -551,21 +588,23 @@
             }
 
             .quantity-value {
-                font-size: 14px;
+                font-size: 13px;
                 min-width: 24px;
-                font-weight: 500;
+                font-weight: 400;
                 color: rgba(255, 255, 255, 0.9);
             }
 
             /* Delete button */
             .delete-btn {
-                grid-column: 2;
+                grid-column: 3;
                 justify-self: end;
                 color: rgba(255, 255, 255, 0.5);
                 font-size: 11px;
                 padding: 4px 8px;
                 margin-top: 4px;
                 text-align: right;
+                display: none;
+                /* Hide standard delete matching previous */
             }
 
             /* Hide desktop delete button on mobile */
@@ -609,6 +648,7 @@
                 opacity: 1;
             }
 
+<<<<<<<<< Temporary merge branch 1
 
 
             .swipe-delete-btn:hover {
@@ -694,6 +734,103 @@
                 line-height: 1.2;
             }
 
+=========
+            .swipe-delete-btn {
+                gap: 4px;
+                font-size: 11px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: background 0.2s ease;
+            }
+
+            .swipe-delete-btn:hover {
+                background: #c0392b;
+            }
+
+            .swipe-delete-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* Remove ::after subtotal */
+            .cart-item-row::after {
+                display: none;
+            }
+
+            /* Fixed Bottom Bar */
+            .cart-summary-wrapper {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                background: #2A1B14;
+                padding: 8px 12px;
+                box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                z-index: 1000;
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+
+            .cart-summary {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                max-width: 100%;
+                padding: 0;
+                border: none;
+                background: transparent;
+            }
+
+            .cart-summary-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .select-all-text {
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            .cart-summary-right {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .delete-selected-btn {
+                display: none;
+            }
+
+            .cart-total-section {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: center;
+                gap: 0;
+                margin-right: 4px;
+            }
+
+            .cart-total-label {
+                font-size: 10px;
+                color: rgba(255, 255, 255, 0.6);
+                line-height: 1.2;
+                text-align: right;
+            }
+
+            .cart-total-amount {
+                font-size: 14px;
+                font-weight: 700;
+                color: #ca7842;
+                line-height: 1.2;
+            }
+
+>>>>>>>>> Temporary merge branch 2
             /* Checkout button */
             .checkout-btn {
                 padding: 8px 16px;
@@ -711,6 +848,11 @@
             .cart-page-container {
                 padding: 6px;
                 padding-bottom: 160px;
+            }
+
+            .cart-summary-wrapper {
+                padding: 0 15px !important;
+                /* 6px container + 1px border + 8px card padding = 15px */
             }
 
             .product-image,

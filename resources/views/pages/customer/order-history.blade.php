@@ -830,7 +830,6 @@
 
                         <div class="order-bottom-section">
                             <div class="order-card-footer-left">
-                                <span class="order-table-number" x-show="order.table_number" x-text="'Meja Nomor: ' + order.table_number"></span>
                                 <span class="order-view-detail">Klik untuk lihat detail</span>
                             </div>
                             <a href="{{ route('catalogs.index') }}" class="order-again-btn" @click.stop>Order Again</a>
@@ -870,7 +869,6 @@
                             <div class="order-info-item">
                                 <span class="order-info-label">Order Type</span>
                                 <span class="order-info-value" x-text="getOrderTypeLabel(selectedOrder?.order_type)"></span>
-                                <span class="order-info-sub" x-show="selectedOrder?.table_number" x-text="'Meja ' + selectedOrder?.table_number"></span>
                             </div>
                             <div class="order-info-item">
                                 <span class="order-info-label">Payment Method</span>
@@ -961,7 +959,6 @@
                             final_price: 40000,
                             discount_amount: 0,
                             delivery_fee: 0,
-                            table_number: 10,
                             notes: 'No sugar ya mas',
                             items: [
                                 { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
@@ -979,7 +976,6 @@
                             final_price: 40000,
                             discount_amount: 0,
                             delivery_fee: 0,
-                            table_number: 10,
                             notes: '',
                             items: [
                                 { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
@@ -997,7 +993,6 @@
                             final_price: 40000,
                             discount_amount: 0,
                             delivery_fee: 0,
-                            table_number: 10,
                             notes: 'Less ice please',
                             items: [
                                 { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
@@ -1034,7 +1029,6 @@
                                         ...item,
                                         variant: item.variant || item.notes || 'Hot'
                                     })),
-                                    table_number: order.tables?.table_number || null,
                                     payment_method: order.payments?.[0]?.payment_method || 'Credit Card'
                                 }));
                                 // Combine real orders with dummy orders

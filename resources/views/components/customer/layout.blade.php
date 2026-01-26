@@ -31,6 +31,25 @@
         html {
             overscroll-behavior: none;
             overflow-x: hidden;
+<<<<<<<<< Temporary merge branch 1
+            overflow-y: auto;
+=========
+            overflow-y: scroll;
+            height: 100%;
+            -webkit-overflow-scrolling: touch;
+>>>>>>>>> Temporary merge branch 2
+        }
+
+        body {
+            overflow-x: hidden;
+<<<<<<<<< Temporary merge branch 1
+            overflow-y: visible;
+=========
+            overflow-y: auto;
+            min-height: 100%;
+            height: auto;
+            -webkit-overflow-scrolling: touch;
+>>>>>>>>> Temporary merge branch 2
         }
 
         :root {
