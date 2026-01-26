@@ -24,42 +24,21 @@
         .category-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             border-radius: 24px;
-            overflow: hidden;
             box-shadow: none !important;
-            display: flex !important;
-            flex-direction: column;
-            align-items: stretch;
-            padding: 0 !important;
-            border: 1px solid transparent;
-            /* Fix for potential sub-pixel rendering gaps */
-            width: 100%;
-            /* Fill grid column */
         }
 
         .category-card:hover {
-            transform: scale(1.03) !important;
-            /* Only colored glow, no black shadow */
-            box-shadow: 0 25px 60px rgba(202, 120, 66, 0.3) !important;
+            transform: scale(1.05) !important;
+            z-index: 10;
         }
 
         .category-card:hover .category-card-inner {
-            /* No border on hover */
+            border: 2px solid #CA7842 !important; /* Border emas menempel langsung di kotak cokelat */
+            box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
         }
 
         .category-card-inner {
             box-shadow: none !important;
-            flex: 1;
-            /* Ensure inner fills outer */
-            width: 100%;
-        }
-
-        /* Mobile - Hover shadow exactly matching card edges */
-        @media (max-width: 768px) {
-            .category-card:hover {
-                /* Tighter shadow to eliminate gap appearance */
-                box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
-                transform: scale(1.01) !important;
-            }
         }
     </style>
 

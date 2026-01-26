@@ -704,7 +704,6 @@
         </div>
 
         <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
-        <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
         <div class="customer-info-section" id="customerInfoSection" style="margin-top: 24px; margin-bottom: 20px;">
             <div class="address-header" style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CA7842" stroke-width="2">
@@ -1055,7 +1054,7 @@
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
-            const selectedItemIds = Array.from(selectedCheckbox).map(cb => cb.closest('.order-item-card').dataset.itemId);
+            const selectedItemIds = Array.from(selectedCheckbox).map(cb => parseInt(cb.closest('.order-item-card').dataset.itemId));
 
             // 2. Validate Payment/Delivery Method
             let paymentMethod = null;
@@ -1110,24 +1109,36 @@
                 }
             }
 
-            const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
+            const tableIdStr = localStorage.getItem('table_id');
+            const tableId = tableIdStr ? parseInt(tableIdStr) : null;
+
+            // Validate table_id for dine_in orders
+            if (orderType === 'dine_in' && !tableId) {
+                showErrorModal('Meja Belum Dipilih', 'Silahkan scan QR code meja atau pilih meja terlebih dahulu');
+                return;
+            }
 
             const payload = {
                 order_type: backendOrderType,
                 customer_name: customerName,
-                customer_phone: customerPhone,
-                notes: document.getElementById('receiptNote')?.textContent || '', // Assuming note is somewhere or empty
+                customer_phone: customerPhone || null,
+                notes: '', // Notes field - can be enhanced with a notes input later
                 selected_item_ids: selectedItemIds,
-                // Delivery specific fields
-                address: orderType === 'delivery' ? {
-                    receiver_name: customerName,
-                    phone: customerPhone,
-                    full_address: document.getElementById('fullAddress').value,
-                    city: document.getElementById('city').value,
-                    postal_code: document.getElementById('postalCode').value,
-                    notes: document.getElementById('addressDetail').value
-                } : null,
-                table_id: orderType === 'dine_in' ? tableId : null
+                // Delivery specific fields (only for delivery order type)
+                ...(orderType === 'delivery' ? {
+                    address: {
+                        receiver_name: customerName,
+                        phone: customerPhone,
+                        full_address: document.getElementById('fullAddress').value,
+                        city: document.getElementById('city').value,
+                        postal_code: document.getElementById('postalCode').value,
+                        notes: document.getElementById('addressDetail').value || ''
+                    },
+                    shipping_quote_id: localStorage.getItem('shipping_quote_id') || '',
+                    shipping_option_id: localStorage.getItem('shipping_option_id') || ''
+                } : {}),
+                // Table ID only for dine_in
+                ...(orderType === 'dine_in' && tableId ? { table_id: tableId } : {})
             };
 
             // 4. Submit Order
@@ -1141,15 +1152,29 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-GUEST-TOKEN': token,
                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
                     },
                     body: JSON.stringify(payload)
                 });
 
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Server error. Silahkan coba lagi.');
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
+                    // Handle validation errors
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0];
+                        throw new Error(Array.isArray(firstError) ? firstError[0] : firstError);
+                    }
                     throw new Error(data.message || 'Gagal memproses pesanan');
                 }
 
