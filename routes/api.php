@@ -69,6 +69,9 @@ Route::prefix('customer')->group(function () {
     Route::post('/shipping/quote', [ShippingController::class, 'quote'])->name('customer.shipping.quote');
     Route::get('/shipping/rajaongkir/provinces', [ShippingController::class, 'rajaOngkirProvinces'])->name('customer.shipping.rajaongkir.provinces');
     Route::get('/shipping/rajaongkir/destinations', [ShippingController::class, 'rajaOngkirDestinations'])->name('customer.shipping.rajaongkir.destinations');
+
+    // Order Settings (service fee, etc.)
+    Route::get('/checkout/settings', [OrderController::class, 'getCheckoutSettings'])->name('customer.checkout.settings');
 });
 
 // Customer API - Cart & Orders (Guest Token Required)

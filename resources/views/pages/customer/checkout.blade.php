@@ -845,9 +845,9 @@
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row" id="serviceFeeRow" style="display: none;">
                         <span class="summary-label">Biaya Layanan</span>
-                        <span class="summary-value" id="summaryServiceFee">Rp 1.000</span>
+                        <span class="summary-value" id="summaryServiceFee">Rp 0</span>
                     </div>
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
@@ -1491,28 +1491,65 @@
             }
         }
 
+        // Global variable for service fee from backend
+        let checkoutServiceFee = 0;
+
+        // Fetch checkout settings from backend (service fee, etc.)
+        async function loadCheckoutSettings() {
+            try {
+                const response = await fetch('/api/customer/checkout/settings', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    checkoutServiceFee = result.data.service_fee || 0;
+
+                    // Show/hide service fee row based on value
+                    const serviceFeeRow = document.getElementById('serviceFeeRow');
+                    if (serviceFeeRow) {
+                        serviceFeeRow.style.display = checkoutServiceFee > 0 ? 'flex' : 'none';
+                    }
+
+                    // Update totals with new service fee
+                    updateOrderTotal();
+                }
+            } catch (error) {
+                console.error('Error loading checkout settings:', error);
+                // Keep service fee as 0 if failed to load
+                checkoutServiceFee = 0;
+            }
+        }
+
         // Calculate and update order total
         function updateOrderTotal() {
             let subtotal = 0;
             let totalQty = 0;
-            const serviceFee = 1000; // Fixed service fee
 
             document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
                 subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
                 totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
             });
 
-            const grandTotal = subtotal + serviceFee;
+            const grandTotal = subtotal + checkoutServiceFee;
 
             // Update labels
             const subtotalLabel = document.getElementById('summarySubtotalLabel');
             const subtotalValue = document.getElementById('summarySubtotalValue');
             const serviceFeeValue = document.getElementById('summaryServiceFee');
+            const serviceFeeRow = document.getElementById('serviceFeeRow');
             const totalElement = document.querySelector('.summary-total-value');
 
             if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
-            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(serviceFee);
+            
+            // Only show service fee if it's greater than 0
+            if (serviceFeeRow) {
+                serviceFeeRow.style.display = checkoutServiceFee > 0 ? 'flex' : 'none';
+            }
+            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(checkoutServiceFee);
 
             if (totalElement) {
                 totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
@@ -1526,6 +1563,9 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function () {
+            // Load checkout settings first (service fee from backend)
+            loadCheckoutSettings();
+
             // Load cart items for checkout
             loadCheckoutItems();
 

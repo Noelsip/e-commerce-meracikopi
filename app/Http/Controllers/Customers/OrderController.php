@@ -16,6 +16,19 @@ use App\Services\Shipping\ShippingQuoteService;
 
 class OrderController extends Controller
 {
+    /**
+     * Get checkout settings (service fee, etc.)
+     * This endpoint is used by frontend to display fees from backend/third-party services
+     */
+    public function getCheckoutSettings()
+    {
+        return response()->json([
+            'data' => [
+                'service_fee' => (int) config('order.service_fee', 0),
+            ]
+        ]);
+    }
+
     public function index(Request $request)
     {
         $guestToken = $request->attributes->get('guest_token');
@@ -178,8 +191,11 @@ class OrderController extends Controller
                 ];
             }
 
-            // Hitung final price
-            $finalPrice = $totalPrice + $deliveryFee;
+            // Get service fee from config (can be from third-party payment gateway)
+            $serviceFee = (int) config('order.service_fee', 0);
+
+            // Hitung final price (including service fee)
+            $finalPrice = $totalPrice + $deliveryFee + $serviceFee - $totalDiscountAmount;
 
             // Membuat order
             $order = Orders::create([
@@ -191,6 +207,7 @@ class OrderController extends Controller
                 'table_id' => $request->table_id,
                 'total_price' => $totalPrice,
                 'delivery_fee' => $deliveryFee,
+                'service_fee' => $serviceFee,
                 'delivery_provider' => $deliveryProvider,
                 'delivery_service' => $deliveryService,
                 'delivery_meta' => $deliveryMeta,
@@ -245,6 +262,7 @@ class OrderController extends Controller
                     'status' => $order->status,
                     'total_price' => (int) $order->total_price,
                     'delivery_fee' => (int) $order->delivery_fee,
+                    'service_fee' => (int) $order->service_fee,
                     'discount_amount' => (int) $order->discount_amount,
                     'final_price' => (int) $order->final_price,
                 ]
