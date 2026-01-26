@@ -714,11 +714,10 @@
                     <!-- Dynamic order items will be loaded here by JavaScript -->
                     <div id="checkoutItemsContainer">
                         <!-- Loading state -->
-                        <div class="checkout-loading" style="text-align: center; padding: 40px; color: #fff;">
-                            <div
-                                style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(202, 120, 66, 0.3); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;">
-                            </div>
-                            <p style="margin-top: 16px; opacity: 0.7;">Loading cart items...</p>
+                        <div class="checkout-loading" id="checkoutLoading" style="text-align: center; padding: 60px 40px; color: #fff;">
+                            <div style="display: inline-block; width: 50px; height: 50px; border: 4px solid rgba(202, 120, 66, 0.2); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                            <p style="margin-top: 20px; font-size: 16px; font-weight: 500;">Loading cart items...</p>
+                            <p style="margin-top: 8px; font-size: 13px; opacity: 0.6;" id="loadingTimer">0s</p>
                         </div>
                     </div>
                 </div>
@@ -1015,6 +1014,20 @@
             }
             const selectedItemIds = Array.from(selectedCheckbox).map(cb => cb.closest('.order-item-card').dataset.itemId);
 
+            // 1.5. Validate Table Selection for Dine In
+            let tableId = null;
+            if (orderType === 'dine_in') {
+                tableId = localStorage.getItem('selected_table_id');
+                const tableNumber = localStorage.getItem('selected_table_number');
+                
+                if (!tableId || !tableNumber) {
+                    showErrorModal('Meja Belum Dipilih', 'Silahkan pilih meja terlebih dahulu untuk Dine In');
+                    return;
+                }
+                
+                console.log('✓ Table selected:', { id: tableId, number: tableNumber });
+            }
+
             // 2. Validate Payment/Delivery Method
             let paymentMethod = null;
             let deliveryMethod = null;
@@ -1244,35 +1257,80 @@
         }
 
 
+        // Prevent multiple simultaneous loads
+        let isLoadingCheckoutItems = false;
+
         // Fetch and render cart items
         async function loadCheckoutItems() {
+            // Prevent multiple simultaneous calls
+            if (isLoadingCheckoutItems) {
+                console.log('⏳ Already loading checkout items, skipping...');
+                return;
+            }
+            
+            isLoadingCheckoutItems = true;
+            console.log('🔄 Starting loadCheckoutItems...');
+            const startTime = Date.now();
             const token = localStorage.getItem('guest_token') || '';
             const container = document.getElementById('checkoutItemsContainer');
 
+            if (!token) {
+                console.warn('⚠️ No guest token found');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <p>Session tidak ditemukan. Silakan kembali ke cart.</p>
+                        <a href="/customer/cart" class="back-to-cart-btn" style="display: inline-block; background: #CA7842; padding: 10px 20px; border-radius: 8px; margin-top: 10px;">Back to Cart</a>
+                    </div>
+                `;
+                isLoadingCheckoutItems = false;
+                return;
+            }
+
             try {
+                console.log('📡 Fetching cart from API...');
+                
+                // Add timeout to prevent infinite loading
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => {
+                    controller.abort();
+                    console.error('⏱️ Request timeout after 10 seconds');
+                }, 10000); // 10 second timeout
+
                 const response = await fetch('/api/customer/cart', {
                     headers: {
                         'X-GUEST-TOKEN': token,
                         'Accept': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
 
-                if (!response.ok) throw new Error('Failed to fetch cart');
+                clearTimeout(timeoutId);
+
+                const fetchTime = Date.now() - startTime;
+                console.log(`✓ API response received in ${fetchTime}ms`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const result = await response.json();
+                console.log('📦 Cart data:', result);
+                
                 let items = result.data.items || [];
+                console.log(`Found ${items.length} items in cart`);
 
                 // Filter items based on selection from cart page
                 const selectedIdsString = localStorage.getItem('selected_cart_items');
                 if (selectedIdsString) {
                     try {
                         const selectedIds = JSON.parse(selectedIdsString);
-                        // Convert to strings for safe comparison if needed, though usually IDs are integers/strings
+                        console.log('🎯 Selected items:', selectedIds);
+                        
                         const selectedIdStrings = selectedIds.map(id => String(id));
-
                         items = items.filter(item => selectedIdStrings.includes(String(item.id)));
+                        console.log(`Filtered to ${items.length} selected items`);
                     } catch (e) {
-                        console.error('Error parsing selected_cart_items', e);
+                        console.error('❌ Error parsing selected_cart_items:', e);
                     }
                 }
 
@@ -1290,6 +1348,7 @@
                             <a href="/customer/cart" class="back-to-cart-btn" style="display: inline-block; background: #CA7842; padding: 10px 20px; border-radius: 8px; margin-top: 10px;">Back to Cart</a>
                         </div>
                     `;
+                    isLoadingCheckoutItems = false;
                     return;
                 }
 
@@ -1315,15 +1374,36 @@
                     </div>
                 `).join('');
 
+                const renderTime = Date.now() - startTime;
+                console.log(`✅ Checkout items loaded successfully in ${renderTime}ms`);
+                
                 updateOrderTotal();
+                isLoadingCheckoutItems = false;
             } catch (error) {
-                console.error('Error loading checkout items:', error);
+                const errorTime = Date.now() - startTime;
+                console.error(`❌ Error loading checkout items after ${errorTime}ms:`, error);
+                
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Request timeout. Server tidak merespons dalam 10 detik.';
+                }
+                
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ef4444;">
-                        <p>Failed to load cart items. Please try again.</p>
-                        <button onclick="loadCheckoutItems()" style="margin-top: 16px; padding: 8px 24px; background: #CA7842; color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 16px; opacity: 0.6;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p style="font-size: 16px; font-weight: 600;">Gagal memuat items</p>
+                        <p style="font-size: 14px; margin-top: 8px; color: rgba(239, 68, 68, 0.8);">${errorMessage}</p>
+                        <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+                            <button onclick="loadCheckoutItems()" style="padding: 10px 24px; background: #CA7842; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Coba Lagi</button>
+                            <a href="/customer/cart" style="padding: 10px 24px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block;">Kembali ke Cart</a>
+                        </div>
                     </div>
                 `;
+                isLoadingCheckoutItems = false;
             }
         }
 
@@ -1434,14 +1514,82 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function () {
+            // Start loading timer
+            let loadingSeconds = 0;
+            const loadingTimerElement = document.getElementById('loadingTimer');
+            const loadingTimerInterval = setInterval(() => {
+                loadingSeconds++;
+                if (loadingTimerElement) {
+                    loadingTimerElement.textContent = `${loadingSeconds}s`;
+                    if (loadingSeconds > 5) {
+                        loadingTimerElement.style.color = '#ff6b6b';
+                        loadingTimerElement.textContent = `${loadingSeconds}s - Koneksi lambat...`;
+                    }
+                }
+            }, 1000);
+
+            // Store interval ID to clear it later
+            window.loadingTimerInterval = loadingTimerInterval;
+
             // Load cart items for checkout
-            loadCheckoutItems();
+            loadCheckoutItems().then(() => {
+                clearInterval(window.loadingTimerInterval);
+            });
 
             // Add transition styles to order items
             document.querySelectorAll('.order-item-card').forEach(card => {
                 card.style.transition = 'all 0.3s ease';
             });
+
+            // Listen for table selection changes
+            window.addEventListener('tableSelected', function(event) {
+                console.log('Table selected event received:', event.detail);
+                validateCheckoutButton();
+            });
+
+            window.addEventListener('tableCleared', function() {
+                console.log('Table cleared event received');
+                validateCheckoutButton();
+            });
+
+            // Initial validation
+            validateCheckoutButton();
         });
+
+        // Validate checkout button state
+        function validateCheckoutButton() {
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            if (!checkoutBtn) return;
+
+            const orderType = document.getElementById('orderTypeDisplay')?.textContent.toLowerCase().replace(' ', '_');
+            
+            if (orderType === 'dine_in') {
+                const tableId = localStorage.getItem('selected_table_id');
+                const tableNumber = localStorage.getItem('selected_table_number');
+                
+                if (!tableId || !tableNumber) {
+                    // Disable checkout button if no table selected for dine in
+                    checkoutBtn.disabled = true;
+                    checkoutBtn.title = 'Silahkan pilih meja terlebih dahulu';
+                    checkoutBtn.style.cursor = 'not-allowed';
+                    checkoutBtn.style.opacity = '0.6';
+                    console.log('⚠️ Checkout disabled: No table selected for Dine In');
+                } else {
+                    // Enable checkout button
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.title = '';
+                    checkoutBtn.style.cursor = 'pointer';
+                    checkoutBtn.style.opacity = '1';
+                    console.log('✓ Checkout enabled: Table', tableNumber, 'selected');
+                }
+            } else {
+                // Enable checkout button for non-dine-in orders
+                checkoutBtn.disabled = false;
+                checkoutBtn.title = '';
+                checkoutBtn.style.cursor = 'pointer';
+                checkoutBtn.style.opacity = '1';
+            }
+        }
     </script>
 
 </x-customer.checkout-layout>
