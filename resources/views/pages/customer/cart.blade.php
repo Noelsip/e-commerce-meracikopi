@@ -48,7 +48,7 @@
                         @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }">
                         <div class="cart-item-row" :class="{ 'swiped': swiped }">
                             <!-- Item Checkbox -->
-                            <div class="flex justify-center">
+                            <div class="header-checkbox">
                                 <input type="checkbox" class="cart-checkbox item-checkbox" :checked="item.selected"
                                     @change="toggleItemSelection(item.id)">
                             </div>

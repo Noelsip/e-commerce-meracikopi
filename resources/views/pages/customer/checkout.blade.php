@@ -849,10 +849,7 @@
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Biaya Layanan</span>
-                        <span class="summary-value" id="summaryServiceFee">Rp 1.000</span>
-                    </div>
+
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
                         <span class="summary-total-label">Total</span>
@@ -1473,24 +1470,20 @@
         function updateOrderTotal() {
             let subtotal = 0;
             let totalQty = 0;
-            const serviceFee = 1000; // Fixed service fee
-
             document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
                 subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
                 totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
             });
 
-            const grandTotal = subtotal + serviceFee;
+            const grandTotal = subtotal;
 
             // Update labels
             const subtotalLabel = document.getElementById('summarySubtotalLabel');
             const subtotalValue = document.getElementById('summarySubtotalValue');
-            const serviceFeeValue = document.getElementById('summaryServiceFee');
             const totalElement = document.querySelector('.summary-total-value');
 
             if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
-            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(serviceFee);
 
             if (totalElement) {
                 totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);

@@ -294,6 +294,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            padding-left: 16px;
         }
 
         .cart-summary-right {
