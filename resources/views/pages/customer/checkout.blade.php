@@ -712,7 +712,8 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span class="address-title" style="color: #FFF4D6; font-size: 16px; font-weight: 600;">Informasi Pemesan</span>
+                <span class="address-title" style="color: #FFF4D6; font-size: 16px; font-weight: 600;">Informasi
+                    Pemesan</span>
             </div>
             <div class="customer-form-card"
                 style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 244, 214, 0.1); border-radius: 12px; padding: 20px;">
@@ -721,6 +722,7 @@
                         display: flex;
                         gap: 20px;
                     }
+
                     @media (max-width: 600px) {
                         .customer-info-row {
                             flex-direction: column;
@@ -732,7 +734,7 @@
                     <div class="form-group" style="flex: 1; margin-bottom: 0;">
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nama
-                            Pemesan</label>
+                            Pemesan <span style="color: #e74c3c;">*</span></label>
                         <input type="text" id="dineInName" class="form-input" placeholder="Masukkan nama Anda"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
@@ -1508,6 +1510,40 @@
             // Add transition styles to order items
             document.querySelectorAll('.order-item-card').forEach(card => {
                 card.style.transition = 'all 0.3s ease';
+            });
+
+            // Hide order summary when typing (input focused) on mobile
+            // We use direct style manipulation to ensure it works regardless of Tailwind build config
+            let mobileFocusTimeout;
+            const summarySection = document.querySelector('.order-summary-section');
+
+            document.addEventListener('focusin', function (e) {
+                const target = e.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    // Check if it's a text-like input
+                    if (target.type === 'text' || target.type === 'number' || target.type === 'tel' || target.type === 'email' || target.tagName === 'TEXTAREA') {
+                        if (window.innerWidth <= 900 && summarySection) {
+                            if (mobileFocusTimeout) clearTimeout(mobileFocusTimeout);
+                            // Force hide with !important equivalent
+                            summarySection.style.setProperty('display', 'none', 'important');
+                        }
+                    }
+                }
+            });
+
+            document.addEventListener('focusout', function (e) {
+                if (window.innerWidth <= 900 && summarySection) {
+                    // Delay showing to check if focus moved to another input
+                    mobileFocusTimeout = setTimeout(() => {
+                        const active = document.activeElement;
+                        // If focus moved to another input, don't show yet
+                        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                            return;
+                        }
+                        // Restore display
+                        summarySection.style.display = '';
+                    }, 100);
+                }
             });
         });
     </script>
