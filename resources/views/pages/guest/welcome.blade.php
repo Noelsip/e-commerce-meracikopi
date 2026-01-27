@@ -25,6 +25,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             border-radius: 24px;
             box-shadow: none !important;
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
         }
 
         .category-card:hover {
@@ -33,12 +35,26 @@
         }
 
         .category-card:hover .category-card-inner {
-            border: 2px solid #CA7842 !important; /* Border emas menempel langsung di kotak cokelat */
+            border: 2px solid #CA7842 !important;
             box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
         }
 
         .category-card-inner {
             box-shadow: none !important;
+            transition: all 0.4s ease;
+            height: 100%;
+            border-radius: 24px !important; 
+            overflow: hidden;
+            border: 2px solid transparent !important;
+            box-sizing: border-box;
+        }
+
+        /* Mobile - Hover shadow exactly matching card edges */
+        @media (max-width: 768px) {
+            .category-card:hover {
+                box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
+                transform: scale(1.01) !important;
+            }
         }
     </style>
 

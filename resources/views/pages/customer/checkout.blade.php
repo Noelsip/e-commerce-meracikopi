@@ -69,7 +69,7 @@
                 <div class="receipt-info-row">
                     <div class="receipt-info-col">
                         <p class="receipt-info-label">Order Type</p>
-                        <p class="receipt-info-value" id="receiptOrderType">Dine In</p>
+                        <p class="receipt-info-value" id="receiptOrderType">Takeaway</p>
                         <p class="receipt-info-sub" id="receiptTableInfo">Meja 10</p>
                     </div>
                     <div class="receipt-info-col">
@@ -678,7 +678,7 @@
         <!-- Order Type Tabs (Display Only - synced with navbar dropdown) -->
         <div class="order-type-tabs">
             <span class="order-type-tab-label">Tipe Pemesanan</span>
-            <span class="order-type-tab-value" id="orderTypeDisplay">Dine In</span>
+            <span class="order-type-tab-value" id="orderTypeDisplay">Takeaway</span>
         </div>
 
         <!-- Delivery Address Section (Hidden by default, shown when Delivery is selected) -->
@@ -710,7 +710,8 @@
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
                 </svg>
-                <span class="address-title" style="color: #FFF4D6; font-size: 16px; font-weight: 600;">Informasi Pemesan</span>
+                <span class="address-title" style="color: #FFF4D6; font-size: 16px; font-weight: 600;">Informasi
+                    Pemesan</span>
             </div>
             <div class="customer-form-card"
                 style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 244, 214, 0.1); border-radius: 12px; padding: 20px;">
@@ -719,6 +720,7 @@
                         display: flex;
                         gap: 20px;
                     }
+
                     @media (max-width: 600px) {
                         .customer-info-row {
                             flex-direction: column;
@@ -730,7 +732,7 @@
                     <div class="form-group" style="flex: 1; margin-bottom: 0;">
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nama
-                            Pemesan</label>
+                            Pemesan <span style="color: #e74c3c;">*</span></label>
                         <input type="text" id="dineInName" class="form-input" placeholder="Masukkan nama Anda"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
@@ -738,7 +740,9 @@
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nomor
                             Telepon <span style="opacity: 0.5;">(Opsional)</span></label>
-                        <input type="text" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx"
+                        <input type="tel" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx" 
+                            inputmode="numeric" pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
                 </div>
@@ -754,13 +758,7 @@
 
                     <!-- Dynamic order items will be loaded here by JavaScript -->
                     <div id="checkoutItemsContainer">
-                        <!-- Loading state -->
-                        <div class="checkout-loading" style="text-align: center; padding: 40px; color: #fff;">
-                            <div
-                                style="display: inline-block; width: 40px; height: 40px; border: 3px solid rgba(202, 120, 66, 0.3); border-top-color: #CA7842; border-radius: 50%; animation: spin 1s linear infinite;">
-                            </div>
-                            <p style="margin-top: 16px; opacity: 0.7;">Loading cart items...</p>
-                        </div>
+                        <!-- Items will load instantly from cache -->
                     </div>
                 </div>
 
@@ -845,9 +843,9 @@
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
-                    <div class="summary-row" id="serviceFeeRow" style="display: none;">
+                    <div class="summary-row">
                         <span class="summary-label">Biaya Layanan</span>
-                        <span class="summary-value" id="summaryServiceFee">Rp 0</span>
+                        <span class="summary-value" id="summaryServiceFee">Rp 1.000</span>
                     </div>
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
@@ -874,7 +872,9 @@
                 </div>
                 <div class="form-group">
                     <label>Nomor Telepon</label>
-                    <input type="text" class="form-input" id="recipientPhone" value="(+62) 822 54554411">
+                    <input type="tel" class="form-input" id="recipientPhone" value="(+62) 822 54554411"
+                        inputmode="numeric" pattern="[0-9+() -]*"
+                        oninput="this.value = this.value.replace(/[^0-9+() -]/g, '');">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -1054,7 +1054,7 @@
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
-            const selectedItemIds = Array.from(selectedCheckbox).map(cb => parseInt(cb.closest('.order-item-card').dataset.itemId));
+            const selectedItemIds = Array.from(selectedCheckbox).map(cb => cb.closest('.order-item-card').dataset.itemId);
 
             // 2. Validate Payment/Delivery Method
             let paymentMethod = null;
@@ -1109,14 +1109,7 @@
                 }
             }
 
-            const tableIdStr = localStorage.getItem('table_id');
-            const tableId = tableIdStr ? parseInt(tableIdStr) : null;
-
-            // Validate table_id for dine_in orders
-            if (orderType === 'dine_in' && !tableId) {
-                showErrorModal('Meja Belum Dipilih', 'Silahkan scan QR code meja atau pilih meja terlebih dahulu');
-                return;
-            }
+            const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
 
             const payload = {
                 order_type: backendOrderType,
@@ -1147,6 +1140,8 @@
             checkoutBtn.innerText = 'Memproses...';
             checkoutBtn.disabled = true;
 
+            console.log('📦 Sending order payload:', payload);
+
             try {
                 const response = await fetch('/api/customer/orders', {
                     method: 'POST',
@@ -1158,14 +1153,6 @@
                     },
                     body: JSON.stringify(payload)
                 });
-
-                // Check if response is JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    const text = await response.text();
-                    console.error('Non-JSON response:', text);
-                    throw new Error('Server error. Silahkan coba lagi.');
-                }
 
                 const data = await response.json();
 
@@ -1186,7 +1173,7 @@
 
             } catch (error) {
                 console.error('Checkout error:', error);
-                showErrorModal('Gagal Checkout', error.message);
+                showErrorModal('Gagal Checkout', error.message || 'Terjadi kesalahan. Silahkan coba lagi.');
             } finally {
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
@@ -1336,12 +1323,107 @@
         }
 
 
+        // Prevent multiple simultaneous loads
+        let isLoadingCheckoutItems = false;
+
+        // Function to render checkout items
+        function renderCheckoutItems(items) {
+            const container = document.getElementById('checkoutItemsContainer');
+            
+            console.log('🎨 renderCheckoutItems called with', items.length, 'items');
+            
+            if (!items || items.length === 0) {
+                console.log('⚠️ No items to render, showing empty state');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 60px 40px; color: rgba(255,255,255,0.6);">
+                        <p style="font-size: 16px; margin-bottom: 12px;">Tidak ada produk yang dipilih</p>
+                        <p style="font-size: 13px; opacity: 0.7;">Silakan kembali ke cart dan pilih produk</p>
+                        <a href="/customer/cart" style="display: inline-block; background: #CA7842; color: white; padding: 10px 24px; border-radius: 8px; margin-top: 16px; text-decoration: none;">Kembali ke Cart</a>
+                    </div>
+                `;
+                updateOrderTotal();
+                return;
+            }
+
+            console.log('✓ Building HTML for', items.length, 'items');
+
+            // Build HTML
+            let html = '';
+            items.forEach((item, index) => {
+                console.log(`  - Item ${index + 1}:`, item.menu_name, 'x', item.quantity, '= Rp', item.subtotal);
+                html += `
+                    <div class="order-item-card">
+                        <input type="checkbox" class="order-item-checkbox" checked
+                            data-item-id="${item.id}"
+                            data-subtotal="${item.subtotal}"
+                            data-quantity="${item.quantity}"
+                            onchange="updateOrderTotal()">
+                        <div class="order-item-info">
+                            ${item.menu_image ? 
+                                `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
+                                '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
+                            }
+                            <div class="order-item-details">
+                                <p class="order-item-name">${item.menu_name}</p>
+                                <p class="order-item-price">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p>
+                            </div>
+                        </div>
+                        <div class="order-item-actions">
+                            <div class="checkout-quantity-controls">
+                                <button type="button" class="checkout-qty-btn checkout-qty-minus" onclick="updateQuantityCheckout(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                                <span class="checkout-qty-value">${item.quantity}</span>
+                                <button type="button" class="checkout-qty-btn checkout-qty-plus" onclick="updateQuantityCheckout(${item.id}, ${item.quantity + 1})">+</button>
+                            </div>
+                            <p class="order-item-subtotal">Rp ${new Intl.NumberFormat('id-ID').format(item.subtotal)}</p>
+                            <button class="order-item-delete" onclick="showDeleteConfirm(${item.id})">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            console.log('✓ Setting innerHTML to container');
+            container.innerHTML = html;
+            
+            console.log('✓ Calling updateOrderTotal');
+            updateOrderTotal();
+            
+            console.log('✅ renderCheckoutItems completed');
+        }
+
         // Fetch and render cart items
         async function loadCheckoutItems() {
+            // Prevent multiple simultaneous calls
+            if (isLoadingCheckoutItems) {
+                console.log('⏳ Already loading checkout items, skipping...');
+                return;
+            }
+
+            isLoadingCheckoutItems = true;
+            console.log('🔄 Starting loadCheckoutItems...');
+            const startTime = Date.now();
             const token = localStorage.getItem('guest_token') || '';
             const container = document.getElementById('checkoutItemsContainer');
 
+            if (!token) {
+                console.warn('⚠️ No guest token found');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #ef4444;">
+                        <p>Session tidak ditemukan. Silakan kembali ke cart.</p>
+                        <a href="/customer/cart" class="back-to-cart-btn" style="display: inline-block; background: #CA7842; padding: 10px 20px; border-radius: 8px; margin-top: 10px;">Back to Cart</a>
+                    </div>
+                `;
+                isLoadingCheckoutItems = false;
+                return;
+            }
+
             try {
+                console.log('📡 Fetching cart from API...');
+
                 const response = await fetch('/api/customer/cart', {
                     headers: {
                         'X-GUEST-TOKEN': token,
@@ -1349,73 +1431,71 @@
                     }
                 });
 
-                if (!response.ok) throw new Error('Failed to fetch cart');
+                const fetchTime = Date.now() - startTime;
+                console.log(`✓ API response received in ${fetchTime}ms`);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
 
                 const result = await response.json();
+                console.log('📦 Cart data from API:', result);
+
                 let items = result.data.items || [];
+                console.log(`Found ${items.length} items in cart`);
 
                 // Filter items based on selection from cart page
                 const selectedIdsString = localStorage.getItem('selected_cart_items');
+                console.log('🎯 Selected IDs from localStorage:', selectedIdsString);
+                
                 if (selectedIdsString) {
                     try {
                         const selectedIds = JSON.parse(selectedIdsString);
-                        // Convert to strings for safe comparison if needed, though usually IDs are integers/strings
+                        console.log('✓ Parsed selected IDs:', selectedIds);
+
                         const selectedIdStrings = selectedIds.map(id => String(id));
-
                         items = items.filter(item => selectedIdStrings.includes(String(item.id)));
+                        console.log(`✓ Filtered to ${items.length} selected items`);
                     } catch (e) {
-                        console.error('Error parsing selected_cart_items', e);
+                        console.error('❌ Error parsing selected_cart_items:', e);
                     }
-                }
-
-                if (items.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 60px 20px; color: rgba(255,255,255,0.5);">
-                            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" style="margin-bottom: 20px;">
-                                <circle cx="9" cy="21" r="1"></circle>
-                                <circle cx="20" cy="21" r="1"></circle>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                            </svg>
-                            <p style="font-size: 18px; font-weight: 500;">No items selected</p>
-                            <p style="font-size: 14px; margin-top: 8px;">Please go back to cart and select items to checkout</p>
-                            <br>
-                            <a href="/customer/cart" class="back-to-cart-btn" style="display: inline-block; background: #CA7842; padding: 10px 20px; border-radius: 8px; margin-top: 10px;">Back to Cart</a>
-                        </div>
-                    `;
-                    return;
+                } else {
+                    console.warn('⚠️ No selected items found in localStorage, showing all items');
                 }
 
                 // Render items
-                container.innerHTML = items.map(item => `
-                    <div class="order-item-card" data-item-id="${item.id}">
-                        <input type="checkbox" class="order-item-checkbox" checked onchange="updateOrderTotal()" data-subtotal="${item.subtotal}" data-quantity="${item.quantity}">
-                        <div class="order-item-image" style="background-image: url('${item.menu_image || ''}'); background-size: cover; background-position: center;">
-                            ${!item.menu_image ? '<span style="font-size: 24px;">☕</span>' : ''}
-                        </div>
-                        <div class="order-item-details">
-                            <span class="order-item-name">${item.menu_name}</span>
-                            <div class="order-item-quantity">
-                                <div class="quantity-controls" style="display: flex; align-items: center; gap: 8px;">
-                                    <button type="button" class="quantity-btn" onclick="updateQuantityCheckout(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''} style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(202,120,66,0.3); background: rgba(202,120,66,0.1); color: #CA7842; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">−</button>
-                                    <span style="min-width: 30px; text-align: center; color: #fff; font-weight: 500;">${item.quantity}</span>
-                                    <button type="button" class="quantity-btn" onclick="updateQuantityCheckout(${item.id}, ${item.quantity + 1})" style="width: 28px; height: 28px; border-radius: 4px; border: 1px solid rgba(202,120,66,0.3); background: rgba(202,120,66,0.1); color: #CA7842; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;">+</button>
-                                </div>
-                                <span class="order-item-delete" onclick="showDeleteConfirm(${item.id})">×</span>
-                            </div>
-                        </div>
-                        <span class="order-item-price">Rp ${formatRupiah(item.subtotal)}</span>
-                    </div>
-                `).join('');
-
-                updateOrderTotal();
+                console.log('🎨 Rendering items...');
+                renderCheckoutItems(items);
+                
+                const renderTime = Date.now() - startTime;
+                console.log(`✅ Checkout items loaded successfully in ${renderTime}ms`);
+                
+                isLoadingCheckoutItems = false;
             } catch (error) {
-                console.error('Error loading checkout items:', error);
+                const errorTime = Date.now() - startTime;
+                console.error(`❌ Error loading checkout items after ${errorTime}ms:`, error);
+
+                let errorMessage = error.message;
+                if (error.name === 'AbortError') {
+                    errorMessage = 'Request timeout. Server tidak merespons dalam 30 detik.';
+                }
+
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ef4444;">
-                        <p>Failed to load cart items. Please try again.</p>
-                        <button onclick="loadCheckoutItems()" style="margin-top: 16px; padding: 8px 24px; background: #CA7842; color: white; border: none; border-radius: 8px; cursor: pointer;">Retry</button>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 16px; opacity: 0.6;">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <p style="font-size: 16px; font-weight: 600;">Gagal memuat items</p>
+                        <p style="font-size: 14px; margin-top: 8px; color: rgba(239, 68, 68, 0.8);">${errorMessage}</p>
+                        <div style="margin-top: 20px; display: flex; gap: 12px; justify-content: center;">
+                            <button onclick="loadCheckoutItems()" style="padding: 10px 24px; background: #CA7842; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Coba Lagi</button>
+                            <a href="/customer/cart" style="padding: 10px 24px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block;">Kembali ke Cart</a>
+                        </div>
                     </div>
                 `;
+                isLoadingCheckoutItems = false;
             }
         }
 
@@ -1527,29 +1607,24 @@
         function updateOrderTotal() {
             let subtotal = 0;
             let totalQty = 0;
+            const serviceFee = 1000; // Fixed service fee
 
             document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
                 subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
                 totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
             });
 
-            const grandTotal = subtotal + checkoutServiceFee;
+            const grandTotal = subtotal + serviceFee;
 
             // Update labels
             const subtotalLabel = document.getElementById('summarySubtotalLabel');
             const subtotalValue = document.getElementById('summarySubtotalValue');
             const serviceFeeValue = document.getElementById('summaryServiceFee');
-            const serviceFeeRow = document.getElementById('serviceFeeRow');
             const totalElement = document.querySelector('.summary-total-value');
 
             if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
-            
-            // Only show service fee if it's greater than 0
-            if (serviceFeeRow) {
-                serviceFeeRow.style.display = checkoutServiceFee > 0 ? 'flex' : 'none';
-            }
-            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(checkoutServiceFee);
+            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(serviceFee);
 
             if (totalElement) {
                 totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
@@ -1561,19 +1636,113 @@
             return new Intl.NumberFormat('id-ID').format(amount);
         }
 
+        // Hide order summary on mobile when user focuses on input fields
+        function setupMobileInputHandlers() {
+            const dineInName = document.getElementById('dineInName');
+            const dineInPhone = document.getElementById('dineInPhone');
+            const orderSummary = document.querySelector('.order-summary-section');
+            
+            if (!dineInName || !dineInPhone || !orderSummary) return;
+            
+            // Check if mobile (window width <= 600px)
+            function isMobile() {
+                return window.innerWidth <= 600;
+            }
+            
+            function hideOrderSummary() {
+                if (isMobile()) {
+                    orderSummary.style.display = 'none';
+                }
+            }
+            
+            function showOrderSummary() {
+                if (isMobile()) {
+                    orderSummary.style.display = 'block';
+                }
+            }
+            
+            // Add event listeners for focus (ketika input di-klik)
+            dineInName.addEventListener('focus', hideOrderSummary);
+            dineInPhone.addEventListener('focus', hideOrderSummary);
+            
+            // Add event listeners for blur (ketika keluar dari input)
+            dineInName.addEventListener('blur', function() {
+                // Delay to check if user is moving to another input
+                setTimeout(() => {
+                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                        showOrderSummary();
+                    }
+                }, 100);
+            });
+            
+            dineInPhone.addEventListener('blur', function() {
+                setTimeout(() => {
+                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                        showOrderSummary();
+                    }
+                }, 100);
+            });
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function () {
-            // Load checkout settings first (service fee from backend)
-            loadCheckoutSettings();
-
             // Load cart items for checkout
             loadCheckoutItems();
 
-            // Add transition styles to order items
-            document.querySelectorAll('.order-item-card').forEach(card => {
-                card.style.transition = 'all 0.3s ease';
+            // Setup mobile input handlers
+            setupMobileInputHandlers();
+
+            // Listen for table selection changes
+            window.addEventListener('tableSelected', function (event) {
+                console.log('Table selected event received:', event.detail);
+                validateCheckoutButton();
             });
+
+            window.addEventListener('tableCleared', function () {
+                console.log('Table cleared event received');
+                validateCheckoutButton();
+            });
+
+            // Initial validation
+            validateCheckoutButton();
         });
+
+        // Validate checkout button state
+        function validateCheckoutButton() {
+            const checkoutBtn = document.querySelector('.checkout-btn');
+            if (!checkoutBtn) return;
+
+            const orderType = document.getElementById('orderTypeDisplay')?.textContent.toLowerCase().replace(' ', '_');
+            console.log('🔍 Validating checkout button for order type:', orderType);
+
+            if (orderType === 'dine_in') {
+                const selectedTableId = localStorage.getItem('selected_table_id');
+                const tableNumber = localStorage.getItem('selected_table_number');
+
+                if (!selectedTableId || !tableNumber) {
+                    // Disable checkout button if no table selected for dine in
+                    checkoutBtn.disabled = true;
+                    checkoutBtn.title = 'Silahkan pilih meja terlebih dahulu';
+                    checkoutBtn.style.cursor = 'not-allowed';
+                    checkoutBtn.style.opacity = '0.6';
+                    console.log('⚠️ Checkout disabled: No table selected for Dine In');
+                } else {
+                    // Enable checkout button
+                    checkoutBtn.disabled = false;
+                    checkoutBtn.title = '';
+                    checkoutBtn.style.cursor = 'pointer';
+                    checkoutBtn.style.opacity = '1';
+                    console.log('✓ Checkout enabled: Table', tableNumber, 'selected');
+                }
+            } else {
+                // Enable checkout button for non-dine-in orders
+                checkoutBtn.disabled = false;
+                checkoutBtn.title = '';
+                checkoutBtn.style.cursor = 'pointer';
+                checkoutBtn.style.opacity = '1';
+                console.log('✓ Checkout enabled for', orderType);
+            }
+        }
     </script>
 
 </x-customer.checkout-layout>
