@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Menus;
+use Illuminate\Support\Facades\Cache;
 
 class CartItemController extends Controller
 {
@@ -61,6 +62,9 @@ class CartItemController extends Controller
             ]);
         }
 
+        // Clear cache untuk cart ini agar data fresh
+        Cache::forget('cart_' . $guestToken);
+
         return response()->json([
             'message' => 'Item added to cart'
         ], 201);
@@ -102,6 +106,9 @@ class CartItemController extends Controller
         $item->quantity = $request->quantity;
         $item->save();
 
+        // Clear cache untuk cart ini agar data fresh
+        Cache::forget('cart_' . $guestToken);
+
         return response()->json([
             'message' => 'Cart item updated'
         ], 200);
@@ -133,6 +140,9 @@ class CartItemController extends Controller
         }
 
         $cartItem->delete();
+
+        // Clear cache untuk cart ini agar data fresh
+        Cache::forget('cart_' . $guestToken);
 
         return response()->json([
             'message' => 'Item removed from cart'

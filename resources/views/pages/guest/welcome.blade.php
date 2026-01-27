@@ -23,15 +23,56 @@
         /* Category Card Hover Effects */
         .category-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            border-radius: 24px;
+            box-shadow: none !important;
+<<<<<<< HEAD
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+=======
+            display: flex !important;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0 !important;
+            border: 1px solid transparent;
+            /* Fix for potential sub-pixel rendering gaps */
+            width: 100%;
+            /* Fill grid column */
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
 
         .category-card:hover {
-            transform: scale(1.03) !important;
-            box-shadow: 0 25px 60px rgba(202, 120, 66, 0.3), 0 15px 40px rgba(0, 0, 0, 0.4) !important;
+            transform: scale(1.05) !important;
+            z-index: 10;
         }
 
         .category-card:hover .category-card-inner {
-            border-color: rgba(202, 120, 66, 0.4) !important;
+            border: 2px solid #CA7842 !important; /* Border emas menempel langsung di kotak cokelat */
+            box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
+        }
+
+        .category-card-inner {
+            box-shadow: none !important;
+<<<<<<< HEAD
+            transition: all 0.4s ease;
+            height: 100%;
+            border-radius: 24px !important; 
+            overflow: hidden;
+            border: 2px solid transparent !important;
+            box-sizing: border-box;
+=======
+            flex: 1;
+            /* Ensure inner fills outer */
+            width: 100%;
+        }
+
+        /* Mobile - Hover shadow exactly matching card edges */
+        @media (max-width: 768px) {
+            .category-card:hover {
+                /* Tighter shadow to eliminate gap appearance */
+                box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
+                transform: scale(1.01) !important;
+            }
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
     </style>
 
@@ -173,6 +214,15 @@
                             gap: 40px !important;
                         }
 
+                        /* Reorder: Images first, then text */
+                        .hero-container>div:first-child {
+                            order: 2;
+                        }
+
+                        .hero-image-grid {
+                            order: 1;
+                        }
+
                         .hero-title {
                             font-size: 32px !important;
                             text-align: center;
@@ -213,6 +263,7 @@
                         .hero-image-grid {
                             max-width: 400px;
                             margin: 0 auto;
+                            margin-bottom: 20px;
                         }
 
                         .hero-ornament {
@@ -305,7 +356,6 @@
                         justify-content: flex-end;
                         padding: 18px;
                         position: relative;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
                     ">
                         <!-- Orbiting small particle -->
                         <div
@@ -333,7 +383,6 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                      ">
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#8C7B70" stroke-width="1.5"
                             style="transform: rotate(15deg);">
@@ -359,7 +408,6 @@
                         padding: 22px;
                         position: relative;
                         overflow: hidden;
-                        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
                     ">
                         <!-- Abstract Background Circle -->
                         <div
@@ -386,7 +434,6 @@
                         border-radius: 100px 20px 20px 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -402,7 +449,6 @@
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -418,7 +464,6 @@
                         border-radius: 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -434,7 +479,6 @@
                         border-radius: 20px 20px 100px 20px;
                         overflow: hidden;
                         position: relative;
-                        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         border: 1px solid rgba(255,255,255,0.05);
                     ">
                         <!-- Placeholder Content -->
@@ -532,29 +576,27 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80" alt="Food"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Food</h3>
                     </div>
                 </a>
@@ -565,29 +607,27 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=500&q=80"
-                                alt="Drink" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=500&q=80" alt="Drink"
+                                style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Drink</h3>
                     </div>
                 </a>
@@ -598,63 +638,59 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=500&q=80"
                                 alt="Coffee Beans" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Coffee Beans</h3>
                     </div>
                 </a>
 
-                <!-- Category 4: Kopi Botol -->
+                <!-- Category 4: Bottled Coffee -->
                 <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
-                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Kopi Botol"
+                            <img src="{{ asset('images/categories/category-kopi-botolan.jpg') }}" alt="Bottled Coffee"
                                 style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
-                            Kopi Botol</h3>
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
+                            Bottled Coffee</h3>
                     </div>
                 </a>
 
@@ -664,29 +700,27 @@
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
                         border-radius: 24px;
-                        padding: 20px;
+                        padding: 12px;
                         text-align: center;
-                        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-                        border: 1px solid rgba(255,255,255,0.05);
                         height: 100%;
                         display: flex;
                         flex-direction: column;
                         align-items: center;
                         justify-content: center;
+                        overflow: hidden;
                     ">
                         <!-- Image Container (Squircle) -->
                         <div style="
                             width: 160px;
                             height: 160px;
-                            margin-bottom: 30px;
+                            margin-bottom: 15px;
                             border-radius: 40px;
                             overflow: hidden;
-                            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
                         ">
                             <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80"
                                 alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 class="category-title" style="color: white; font-size: 30px; font-weight: 700; margin: 0;">
+                        <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
                             Sachet Drip</h3>
                     </div>
                 </a>

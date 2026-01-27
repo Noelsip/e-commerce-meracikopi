@@ -41,12 +41,10 @@
             margin: 0;
             min-height: 100vh;
             /* Background linear gradient */
-            background: linear-gradient(
-                to right,
-                rgba(42, 27, 20, 0.75) 0%,
-                rgba(42, 27, 20, 0.45) 50%,
-                rgba(42, 27, 20, 0.75) 100%
-            );
+            background: linear-gradient(to right,
+                    rgba(42, 27, 20, 0.75) 0%,
+                    rgba(42, 27, 20, 0.45) 50%,
+                    rgba(42, 27, 20, 0.75) 100%);
             background-color: #1a1410;
         }
 
@@ -108,19 +106,6 @@
             color: white;
             font-size: 14px;
             font-weight: 500;
-            position: relative;
-            padding-bottom: 12px;
-            margin-bottom: -12px;
-        }
-
-        .order-type-tab-value::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--secondary);
         }
 
         /* Main Content Grid */
@@ -162,7 +147,7 @@
             padding: 16px 20px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
-            background: transparent;
+            background: #241813;
             gap: 16px;
         }
 
@@ -264,10 +249,58 @@
         }
 
         .order-item-price {
-            color: var(--secondary);
+            color: #ca7842;
             font-size: 16px;
             font-weight: 600;
             margin-left: auto;
+        }
+
+        /* Checkout Quantity Controls */
+        .checkout-quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkout-qty-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .checkout-qty-minus {
+            background-color: #4b3c35;
+            color: white;
+        }
+
+        .checkout-qty-minus:disabled {
+            background-color: rgba(75, 60, 53, 0.5);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .checkout-qty-plus {
+            background-color: #CA7842;
+            color: white;
+        }
+
+        .checkout-qty-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+        }
+
+        .checkout-qty-value {
+            color: white;
+            font-size: 14px;
+            min-width: 20px;
+            text-align: center;
         }
 
         .order-summary-card {
@@ -294,11 +327,13 @@
         .summary-label {
             color: rgba(255, 255, 255, 0.7);
             font-size: 14px;
+            font-weight: 400;
         }
 
         .summary-value {
             color: white;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .summary-value.strikethrough {
@@ -319,13 +354,13 @@
         }
 
         .summary-total-label {
-            color: white;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .summary-total-value {
-            color: var(--secondary);
+            color: #CA7842;
             font-size: 20px;
             font-weight: 700;
         }
@@ -333,7 +368,7 @@
         /* Checkout Button */
         .checkout-btn {
             width: 100%;
-            background-color: var(--secondary);
+            background-color: #CA7842;
             color: white;
             border: none;
             border-radius: 24px;
@@ -346,10 +381,17 @@
             margin-top: 8px;
         }
 
-        .checkout-btn:hover {
+        .checkout-btn:hover:not(:disabled) {
             background-color: #d4864c;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(202, 120, 66, 0.4);
+        }
+
+        .checkout-btn:disabled {
+            background-color: #6b5c54;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
         }
 
         /* Payment Methods Section */
@@ -798,6 +840,20 @@
                 position: relative;
                 top: 0;
             }
+
+            /* Price: Middle Row Left (Row 2) - Orange */
+            .order-item-price {
+                grid-column: 3;
+                grid-row: 2;
+                justify-self: start !important;
+                color: #ca7842 !important;
+                /* Updated color */
+                font-weight: 600 !important;
+                font-size: 15px !important;
+                margin: 0 !important;
+                text-align: left !important;
+                width: auto !important;
+            }
         }
 
         @media (max-width: 600px) {
@@ -806,19 +862,182 @@
             }
 
             .order-item-card {
-                flex-wrap: wrap;
+                display: grid;
+                grid-template-columns: auto 70px 1fr;
+                grid-template-rows: auto auto;
+                gap: 12px;
+                padding: 12px;
+                align-items: start;
             }
 
-            .order-item-price {
+            /* Checkbox - Column 1, Row 1-2 span */
+            .order-item-checkbox {
+                grid-column: 1;
+                grid-row: 1 / span 2;
+                align-self: start;
+                margin-top: 4px;
+            }
+
+            /* Image - Column 2, Row 1-2 span */
+            .order-item-image {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                width: 70px;
+                height: 70px;
+            }
+
+            /* Product Info - Unwrap untuk grid */
+            .order-item-info {
+                display: contents;
+            }
+
+            .order-item-details {
+                grid-column: 3;
+                grid-row: 1;
+                margin-right: 0;
                 width: 100%;
+            }
+
+            /* Name - Column 3, Row 1 */
+            .order-item-name {
+                font-size: 13px;
+                line-height: 1.4;
+                margin-bottom: 4px;
+                color: white;
+                font-weight: 500;
+            }
+
+            /* Price - Column 3, Row 2 (kanan, sejajar dengan qty) */
+            .order-item-price {
+                grid-column: 3;
+                grid-row: 2;
+                font-size: 15px;
+                color: #CA7842;
+                font-weight: 600;
                 text-align: right;
+                justify-self: end;
+                align-self: center;
+            }
+
+            /* Actions (Qty) - Column 3, Row 2 (kiri, sejajar dengan price) */
+            .order-item-actions {
+                grid-column: 3;
+                grid-row: 2;
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                width: 100%;
                 margin-top: 8px;
+            }
+
+            .order-item-qty {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            /* Checkout Quantity Controls - Mobile */
+            .checkout-quantity-controls {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .checkout-qty-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 14px;
+            }
+
+            .checkout-qty-value {
+                font-size: 13px;
+                min-width: 18px;
+            }
+
+            .order-item-subtotal {
+                display: none;
+            }
+
+            .order-item-delete {
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.5);
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 4px 8px;
+                margin-left: auto;
+            }
+
+            .order-item-delete:hover {
+                color: #e74c3c;
+            }
+
+            .order-item-quantity {
+                margin-top: 0;
             }
         }
 
         /* Footer adjustments */
         .footer-container {
             margin-top: 60px;
+        }
+    </style>
+    <style>
+        /* Mobile Sticky Footer Styles */
+        @media (max-width: 768px) {
+            .checkout-content {
+                display: block;
+                /* Stack content vertically */
+                padding-bottom: 250px;
+                /* Ensure content isn't hidden behind fixed footer */
+            }
+
+            .order-summary-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                top: auto;
+                /* Ensure it doesn't stretch to top */
+                width: 100%;
+                z-index: 1000;
+                background: #1a1410;
+                /* Match theme background or slightly lighter */
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+                border-top: 1px solid rgba(255, 244, 214, 0.1);
+                animation: slideUp 0.3s ease-out;
+            }
+
+            .order-summary-card {
+                background: linear-gradient(145deg, #2A1B14, #221510);
+                border: none;
+                border-radius: 20px 20px 0 0;
+                /* Rounded top corners only */
+                padding: 20px;
+                margin-bottom: 0;
+            }
+
+            .section-title {
+                display: none;
+                /* Hide 'Jumlah Pesanan' title in mobile footer */
+            }
+
+            /* Ensure the order items take full width */
+            .order-items-section-wrapper {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+
+            to {
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
@@ -835,7 +1054,7 @@
     <div class="back-button-container">
         <a href="{{ route('cart.index') }}" class="back-to-cart-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
             <span>Back</span>
         </a>

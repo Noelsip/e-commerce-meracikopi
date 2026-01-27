@@ -1,7 +1,6 @@
 <x-customer.layout title="{{ $menu->name }} - Meracikopi">
     <!-- Main Content Wrapper -->
-    <div
-        style="min-height: 100vh; position: relative; overflow: hidden; padding-top: 40px; font-family: 'Inter', sans-serif;">
+    <div style="min-height: 100vh; position: relative; padding-top: 40px; font-family: 'Inter', sans-serif;">
 
         <style>
             /* Hide announcement banner on product detail page */
@@ -35,53 +34,195 @@
             /* Mobile Responsive */
             @media (max-width: 768px) {
                 .product-container {
-                    padding: 0 20px !important;
+                    padding: 0 16px !important;
                 }
 
                 .product-header {
-                    margin-bottom: 20px !important;
+                    margin-bottom: 16px !important;
                 }
 
                 .product-header span {
                     display: none;
                 }
 
+                .product-header a {
+                    font-size: 14px !important;
+                }
+
                 .product-box {
                     height: auto !important;
-                    min-height: 500px;
+                    min-height: auto;
+<<<<<<<<< Temporary merge branch 1
+                    padding: 20px 0;
+=========
+                    padding: 20px 0 24px 0;
+                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
+                }
+
+                .product-box > div:first-child,
+                .product-box > div:nth-child(2) {
+                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.6) 0%, transparent 60%) !important;
+>>>>>>>>> Temporary merge branch 2
                 }
 
                 .product-content {
                     flex-direction: column !important;
-                    gap: 30px !important;
-                    padding: 30px 20px !important;
+<<<<<<<<< Temporary merge branch 1
+                    gap: 24px !important;
+                    padding: 20px !important;
+                    align-items: center !important;
                 }
 
                 .product-image {
-                    width: 200px !important;
-                    height: 200px !important;
+                    width: 250px !important;
+                    height: 250px !important;
+                    order: 1;
+=========
+                    gap: 16px !important;
+                    padding: 12px 16px !important;
+                    align-items: center !important;
+                    justify-content: flex-start !important;
+                }
+
+                .product-image {
+                    width: 140px !important;
+                    height: 140px !important;
+                    order: 1;
+                }
+
+                .product-image img {
+                    width: 90% !important;
+                    max-width: 130px !important;
+>>>>>>>>> Temporary merge branch 2
                 }
 
                 .product-details {
                     width: 100% !important;
+<<<<<<<<< Temporary merge branch 1
+                    max-width: 350px;
+=========
+                    max-width: 280px;
+>>>>>>>>> Temporary merge branch 2
                     text-align: center;
+                    order: 2;
                 }
 
                 .product-details h1 {
-                    font-size: 28px !important;
+                    font-size: 20px !important;
+                    margin-bottom: 2px !important;
+                }
+
+                .product-details > div:nth-child(2) {
+                    font-size: 14px !important;
+                    margin-bottom: 0px !important;
+                }
+
+                .product-details > div:nth-child(3) {
+                    font-size: 10px !important;
+                    margin-bottom: 14px !important;
                 }
 
                 .product-quantity {
                     justify-content: center !important;
+<<<<<<<<< Temporary merge branch 1
+                    margin-bottom: 20px !important;
+                }
+
+                .product-details button[type="button"] {
+                    max-width: 350px;
+                    margin: 0 auto;
+=========
+                    margin-bottom: 12px !important;
+                    gap: 12px !important;
+                }
+
+                .product-quantity button {
+                    width: 32px !important;
+                    height: 32px !important;
+                    font-size: 16px !important;
+                }
+
+                .product-quantity input {
+                    font-size: 14px !important;
+                    width: 35px !important;
+                }
+
+                .product-details button[type="button"],
+                .product-details button:not(.product-quantity button) {
+                    width: 100% !important;
+                    max-width: 280px;
+                    margin: 0 auto;
+                    padding: 10px 0 !important;
+                    font-size: 14px !important;
+                    border-radius: 30px !important;
+                }
+
+                .description-section {
+                    padding: 20px 16px 40px 16px !important;
+>>>>>>>>> Temporary merge branch 2
                 }
 
                 .description-grid {
                     grid-template-columns: 1fr !important;
-                    gap: 30px !important;
+                    gap: 24px !important;
                 }
 
-                .description-section {
-                    padding: 20px !important;
+                .description-grid h3 {
+                    font-size: 16px !important;
+                    margin-bottom: 12px !important;
+                    padding-bottom: 8px !important;
+                }
+
+                .description-grid p {
+                    font-size: 13px !important;
+                }
+
+                .note-wrapper {
+                    padding: 12px !important;
+                    border-radius: 10px !important;
+                }
+
+                .note-wrapper textarea {
+                    font-size: 13px !important;
+                }
+
+                /* Related Menus Mobile */
+                .related-menus-section {
+                    padding: 0 16px 60px 16px !important;
+                }
+
+                .related-menus-section h3 {
+                    font-size: 18px !important;
+                    margin-bottom: 20px !important;
+                }
+            }
+
+            /* Small Mobile (< 400px) */
+            @media (max-width: 400px) {
+                .product-image {
+                    width: 150px !important;
+                    height: 150px !important;
+                }
+
+                .product-image img {
+                    max-width: 140px !important;
+                }
+
+                .product-details {
+                    max-width: 260px;
+                }
+
+                .product-details h1 {
+                    font-size: 22px !important;
+                }
+
+                .product-details > div:nth-child(2) {
+                    font-size: 16px !important;
+                }
+
+                .product-quantity button {
+                    width: 32px !important;
+                    height: 32px !important;
                 }
             }
         </style>
@@ -371,49 +512,182 @@
                 <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
                     Lainnya</h3>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
-                    @foreach($relatedMenus as $related)
-                        <a href="{{ route('catalogs.show', $related->id) }}"
-                            style="background: #2b211e; border-radius: 16px; overflow: hidden; text-decoration: none; border: 1px solid #3e302b; display: block; transition: transform 0.3s;"
-                            onmouseover="this.style.transform='translateY(-4px)'"
-                            onmouseout="this.style.transform='translateY(0)'">
 
-                            <!-- Image -->
-                            <!-- Image -->
-                            <div style="aspect-ratio: 1; background-color: #3e302b; overflow: hidden; position: relative; display: flex; align-items: center; justify-content: center;">
-                                <img src="{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}"
-                                    alt="{{ $related->name }}"
-                                    style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;"
-                                    onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'font-size:40px;\'>☕</span>'">
+                <!-- Horizontal Scroll Container -->
+                <div class="other-menus-scroll-container">
+                    @foreach($relatedMenus as $related)
+                        <a href="{{ route('catalogs.show', $related->id) }}" class="menu-rec-card">
+                            <div class="menu-rec-image"
+                                style="background-image: url('{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}');">
+                                @if(!$related->image_path)
+                                    <span
+                                        style="display:flex; height:100%; align-items:center; justify-content:center; font-size:24px;">☕</span>
+                                @endif
                             </div>
 
-                            <!-- Content -->
-                            <div style="padding: 20px;">
-                                <h4
-                                    style="font-weight: 600; color: #f0f2bd; font-size: 18px; margin-bottom: 4px; margin-top: 0;">
-                                    {{ $related->name }}</h4>
-                                <p
-                                    style="color: #a89890; font-size: 14px; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-top: 0;">
-                                    {{ $related->description }}
-                                </p>
-                                <div style="display: flex; justify-content: space-between; align-items: center;">
-                                    <span style="font-size: 18px; font-weight: bold; color: #CA7842;">Rp
-                                        {{ number_format($related->price, 0, ',', '.') }}</span>
-                                    
-                                    @if($related->is_available)
-                                        <span style="background: #C27C4E; color: #fff; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 4px 10px rgba(194, 124, 78, 0.3);">
-                                            Tersedia
-                                        </span>
-                                    @else
-                                        <span style="background: #3e302b; color: #aaa; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid #555;">
-                                            Habis
-                                        </span>
-                                    @endif
-                                </div>
+                            <div class="menu-rec-name" title="{{ $related->name }}">{{ $related->name }}</div>
+
+                            <div class="menu-rec-footer">
+                                <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
+                                @if($related->is_available)
+                                    <span class="menu-rec-badge-available">
+                                        Tersedia
+                                    </span>
+                                @else
+                                    <span class="menu-rec-badge-unavailable">
+                                        Habis
+                                    </span>
+                                @endif
                             </div>
                         </a>
                     @endforeach
                 </div>
+
+                <style>
+                    /* Base Styles (Mobile & General) */
+                    .other-menus-scroll-container {
+                        display: flex;
+                        /* Mobile default: Flex for scrolling */
+                        gap: 16px;
+                        overflow-x: auto;
+                        padding-bottom: 20px;
+                        scrollbar-width: none;
+                        /* Firefox */
+                        -ms-overflow-style: none;
+                        /* IE 10+ */
+                        margin: 0 -20px;
+                        /* Values to hit edges on mobile */
+                        padding: 0 20px 20px 20px;
+                        /* Padding inside scroll */
+                    }
+
+                    .other-menus-scroll-container::-webkit-scrollbar {
+                        display: none;
+                        /* Chrome/Safari */
+                    }
+
+                    .menu-rec-card {
+                        flex: 0 0 160px;
+                        /* Mobile width */
+                        background: linear-gradient(145deg, rgba(42, 27, 20, 0.6), rgba(42, 27, 20, 0.3));
+                        border: 1px solid rgba(202, 120, 66, 0.1);
+                        border-radius: 12px;
+                        padding: 12px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                        gap: 8px;
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                        text-decoration: none;
+                        position: relative;
+                        overflow: hidden;
+                    }
+
+                    .menu-rec-card:hover {
+                        transform: translateY(-4px);
+                        background: linear-gradient(145deg, rgba(62, 37, 26, 0.7), rgba(42, 27, 20, 0.4));
+                        border-color: rgba(202, 120, 66, 0.2);
+                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+                    }
+
+                    .menu-rec-image {
+                        width: 100%;
+                        aspect-ratio: 1/1;
+                        border-radius: 8px;
+                        background-size: cover;
+                        background-position: center;
+                        background-color: #1a1410;
+                    }
+
+                    .menu-rec-name {
+                        font-size: 14px;
+                        font-weight: 600;
+                        color: white;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        margin-top: 4px;
+                        margin-bottom: 4px;
+                        /* Space before footer */
+                    }
+
+                    .menu-rec-footer {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-top: auto;
+                        gap: 8px;
+                    }
+
+                    .menu-rec-price {
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #CA7842;
+                        white-space: nowrap;
+                    }
+
+                    .menu-rec-badge-available {
+                        padding: 4px 12px;
+                        background: linear-gradient(135deg, #CA7842, #8B5E3C);
+                        color: #f0f2ae;
+                        font-size: 11px;
+                        font-weight: 600;
+                        border-radius: 20px;
+                        box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);
+                        white-space: nowrap;
+                    }
+
+                    .menu-rec-badge-unavailable {
+                        padding: 4px 12px;
+                        background-color: #3e302b;
+                        color: #a89890;
+                        font-size: 11px;
+                        font-weight: 500;
+                        border-radius: 20px;
+                        white-space: nowrap;
+                    }
+
+                    /* Desktop Styles (Grid Layout) */
+                    @media (min-width: 769px) {
+                        .other-menus-scroll-container {
+                            display: grid;
+                            /* Switch to Grid */
+                            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                            /* Responsive columns */
+                            gap: 32px;
+                            overflow: visible;
+                            /* No scroll */
+                            margin: 0;
+                            padding: 0;
+                        }
+
+                        .menu-rec-card {
+                            flex: none;
+                            /* Disable flex behavior */
+                            width: auto;
+                            padding: 16px;
+                            /* Larger padding */
+                            border-radius: 16px;
+                            gap: 12px;
+                        }
+
+                        .menu-rec-name {
+                            font-size: 18px;
+                            /* Larger font */
+                            margin-bottom: 0;
+                        }
+
+                        .menu-rec-price {
+                            font-size: 18px;
+                            /* Larger price */
+                        }
+
+                        .menu-rec-btn {
+                            font-size: 13px;
+                            padding: 8px 18px;
+                        }
+                    }
+                </style>
 
                 <!-- Mobile padding fix style -->
                 <style>

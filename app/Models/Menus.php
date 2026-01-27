@@ -46,13 +46,13 @@ class Menus extends Model
         if ($this->discount_price > 0) {
             return max(0, $this->price - $this->discount_price);
         }
-        
+
         // Jika ada diskon persen, hitung dari persen
         if ($this->discount_percentage > 0) {
             $discountAmount = ($this->price * $this->discount_percentage) / 100;
             return max(0, $this->price - $discountAmount);
         }
-        
+
         // Tidak ada diskon, return harga normal
         return $this->price;
     }
@@ -81,7 +81,7 @@ class Menus extends Model
         'food' => 'Food',
         'drink' => 'Drink',
         'coffee_beans' => 'Coffee Beans',
-        'kopi_botolan' => 'Kopi Botol',
+        'kopi_botolan' => 'Bottled Coffee',
         'sachet-drip' => 'Sachet Drip',
     ];
 
