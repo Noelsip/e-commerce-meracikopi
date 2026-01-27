@@ -301,6 +301,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            padding-left: 16px;
         }
 
         .cart-summary-right {
@@ -433,7 +434,6 @@
                 padding: 12px 8px;
                 margin-bottom: 8px;
                 background: #241813;
-<<<<<<<<< Temporary merge branch 1
                 align-items: start;
                 position: relative;
             }
@@ -498,28 +498,17 @@
                 justify-content: flex-start;
                 gap: 8px;
                 margin-top: auto;
-                /* Push to bottom */
                 align-self: end;
                 width: fit-content;
             }
 
             /* Price - Col 3, Row 2 (Right aligned) */
-=========
-                grid-column: 2;
-                grid-row: 1;
-                /* Explicit row 1 */
-            }
-
-            /* Price - Absolute Bottom Right */
-            /* Price and quantity inline row */
->>>>>>>>> Temporary merge branch 2
             .cart-item-row>.product-price {
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
                 text-align: right;
-<<<<<<<<< Temporary merge branch 1
                 align-self: end;
                 justify-self: end;
                 position: relative;
@@ -527,46 +516,14 @@
                 width: auto;
                 padding-left: 0 !important;
                 margin-top: 0;
-=========
-                grid-column: 2;
-                grid-row: 2;
-                /* Explicit row 2 */
-                justify-self: end;
-                /* Push to end */
-                padding-left: 0;
-                align-self: center;
-                margin-top: 8px;
-                width: auto;
-                position: relative;
-                right: 0;
->>>>>>>>> Temporary merge branch 2
             }
 
-            /* Hide standalone total price */
+            /* Total price visible on desktop, hidden on mobile */
             .cart-item-row>.total-price {
                 display: none;
             }
 
-<<<<<<<<< Temporary merge branch 1
             /* Button Styling */
-=========
-            /* Quantity controls - inline with price */
-            .cart-item-row>.quantity-controls {
-                grid-column: 2;
-                grid-row: 2;
-                /* Explicit row 2 */
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-                /* Start align quantity */
-                gap: 8px;
-                padding-right: 0;
-                margin-top: 8px;
-                width: fit-content;
-                /* Removed negative margins */
-            }
-
->>>>>>>>> Temporary merge branch 2
             .quantity-btn {
                 width: 24px;
                 height: 24px;
@@ -648,7 +605,6 @@
                 opacity: 1;
             }
 
-<<<<<<<<< Temporary merge branch 1
 
 
             .swipe-delete-btn:hover {
@@ -734,7 +690,6 @@
                 line-height: 1.2;
             }
 
-=========
             .swipe-delete-btn {
                 gap: 4px;
                 font-size: 11px;
@@ -830,7 +785,6 @@
                 line-height: 1.2;
             }
 
->>>>>>>>> Temporary merge branch 2
             /* Checkout button */
             .checkout-btn {
                 padding: 8px 16px;

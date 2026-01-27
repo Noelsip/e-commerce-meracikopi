@@ -700,8 +700,8 @@
         document.body.style.overflow = '';
         document.documentElement.style.overflow = '';
 
-        // Refresh cart count every 30 seconds
-        setInterval(fetchCartCount, 30000);
+        // Refresh cart count every 60 seconds (optimized for performance)
+        setInterval(fetchCartCount, 60000);
     });
 
     // Listen for storage events (cart updates from other tabs)
