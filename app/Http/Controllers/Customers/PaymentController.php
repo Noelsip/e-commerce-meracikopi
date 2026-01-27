@@ -14,15 +14,31 @@ use App\Enums\OrderStatus;
 use App\Enums\StatusPayments;
 
 use App\Services\MidtransService;
-use Midtrans\Snap;
 
 class PaymentController extends Controller
 {
+    /**
+     * Map frontend payment method to Midtrans enabled_payments
+     */
+    private function mapPaymentMethod(?string $paymentMethod): ?array
+    {
+        $mapping = [
+            'qris' => ['other_qris'],
+            'dana' => ['other_qris'], // DANA uses QRIS in Midtrans Snap
+            'gopay' => ['gopay'],
+            'shopeepay' => ['shopeepay'],
+            'transfer_bank' => ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'other_va'],
+        ];
+
+        return $mapping[$paymentMethod] ?? null;
+    }
+
     public function pay(Request $request, $orderId)
     {
         $guestToken = $request->attributes->get('guest_token');
+        $selectedPaymentMethod = $request->input('payment_method');
 
-        return DB::transaction(function () use ($orderId, $guestToken) {
+        return DB::transaction(function () use ($orderId, $guestToken, $selectedPaymentMethod) {
             
             // Mengambil order berdasarkan ID
             $order = Orders::where('id', $orderId)
@@ -47,15 +63,12 @@ class PaymentController extends Controller
             $payment = Payments::create([
                 'order_id' => $order->id,
                 'payment_gateway' => 'midtrans',
-                'payment_method' => 'snap',
+                'payment_method' => $selectedPaymentMethod ?? 'snap',
                 'transaction_id' => $transactionId,
-                'amount' => $order->final_price, // Gunakan final_price (setelah diskon + delivery fee)
+                'amount' => $order->final_price,
                 'status' => StatusPayments::PENDING,
-                'payload' => [], // Initialize empty payload
+                'payload' => [],
             ]);
-
-            // Init Midtrans
-            MidtransService::init();
 
             // Payload Snap
             $snapPayload = [
@@ -65,17 +78,38 @@ class PaymentController extends Controller
                 ],
                 'customer_details' => [
                     'first_name' => $order->customer_name,
+                    'phone' => $order->customer_phone ?? '',
                 ],
             ];
 
-            // Request Snap token
-            $snapToken = Snap::getSnapToken($snapPayload);
+            // If payment method is selected, only show that method in Snap
+            $enabledPayments = $this->mapPaymentMethod($selectedPaymentMethod);
+            if ($enabledPayments) {
+                $snapPayload['enabled_payments'] = $enabledPayments;
+            }
+
+            // Request Snap token using custom HTTP client (bypasses Midtrans library CURL issues)
+            try {
+                $snapToken = MidtransService::getSnapToken($snapPayload);
+            } catch (\Exception $e) {
+                Log::error('Midtrans Snap Error', [
+                    'error' => $e->getMessage(),
+                    'order_id' => $order->id,
+                    'payload' => $snapPayload,
+                ]);
+                
+                // Delete the pending payment record
+                $payment->delete();
+                
+                abort(500, 'Gagal terhubung ke payment gateway. Silahkan coba lagi.');
+            }
 
             // Menyimpan payload token
             $payment->update([
                 'payload' => [
                     'snap_request' => $snapPayload,
                     'snap_token' => $snapToken,
+                    'selected_payment_method' => $selectedPaymentMethod,
                 ]
             ]);
 
@@ -84,6 +118,7 @@ class PaymentController extends Controller
                 'data' => [
                     'snap_token' => $snapToken,
                     'payment_id' => $payment->id,
+                    'payment_method' => $selectedPaymentMethod,
                 ]
             ]);
         });

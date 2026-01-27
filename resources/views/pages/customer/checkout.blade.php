@@ -843,10 +843,6 @@
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Biaya Layanan</span>
-                        <span class="summary-value" id="summaryServiceFee">Rp 1.000</span>
-                    </div>
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
                         <span class="summary-total-label">Total</span>
@@ -1054,7 +1050,14 @@
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
-            const selectedItemIds = Array.from(selectedCheckbox).map(cb => cb.closest('.order-item-card').dataset.itemId);
+            const selectedItemIds = Array.from(selectedCheckbox)
+                .map(cb => {
+                    const itemId = cb.dataset.itemId || cb.getAttribute('data-item-id');
+                    return itemId ? parseInt(itemId, 10) : null;
+                })
+                .filter(id => id !== null && !isNaN(id));
+            
+            console.log('📋 Selected item IDs:', selectedItemIds);
 
             // 2. Validate Payment/Delivery Method
             let paymentMethod = null;
@@ -1076,6 +1079,7 @@
                 }
                 deliveryMethod = selectedDelivery.value;
             } else {
+                // Payment method is required - will be passed to Midtrans
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
@@ -1165,16 +1169,76 @@
                     throw new Error(data.message || 'Gagal memproses pesanan');
                 }
 
-                // Success! Show modal with real data
-                // Map backend order type back to display text if needed
-                showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), paymentMethod || deliveryMethod);
+                console.log('✅ Order created successfully:', data);
+                const orderId = data.data.id;
 
-                // Clear selected items from cart or refresh page logic could go here
+                // Step 2: Call payment API to get snap_token
+                checkoutBtn.innerText = 'Memproses Pembayaran...';
+                
+                const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-GUEST-TOKEN': token,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({
+                        payment_method: paymentMethod // Pass selected payment method
+                    })
+                });
+
+                const paymentData = await paymentResponse.json();
+
+                if (!paymentResponse.ok) {
+                    throw new Error(paymentData.message || 'Gagal memproses pembayaran');
+                }
+
+                console.log('✅ Payment initiated:', paymentData);
+                const snapToken = paymentData.data.snap_token;
+
+                // Step 3: Open Midtrans Snap popup
+                checkoutBtn.innerText = originalText;
+                checkoutBtn.disabled = false;
+
+                // Check if Midtrans Snap is loaded
+                if (typeof window.snap === 'undefined') {
+                    throw new Error('Payment gateway belum siap. Silahkan refresh halaman dan coba lagi.');
+                }
+
+                window.snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        console.log('✅ Payment success:', result);
+                        // Clear cart selection
+                        localStorage.removeItem('selected_cart_items');
+                        // Show success modal
+                        showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
+                    },
+                    onPending: function(result) {
+                        console.log('⏳ Payment pending:', result);
+                        // Clear cart selection
+                        localStorage.removeItem('selected_cart_items');
+                        // Show pending message
+                        showErrorModal('Pembayaran Pending', 'Silahkan selesaikan pembayaran Anda. Status akan diupdate otomatis.');
+                        // Redirect to order history after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/customer/order-history';
+                        }, 2000);
+                    },
+                    onError: function(result) {
+                        console.error('❌ Payment error:', result);
+                        showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
+                    },
+                    onClose: function() {
+                        console.log('ℹ️ Payment popup closed');
+                        // User closed the popup without completing payment
+                        showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
+                    }
+                });
 
             } catch (error) {
                 console.error('Checkout error:', error);
                 showErrorModal('Gagal Checkout', error.message || 'Terjadi kesalahan. Silahkan coba lagi.');
-            } finally {
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
             }
@@ -1607,27 +1671,22 @@
         function updateOrderTotal() {
             let subtotal = 0;
             let totalQty = 0;
-            const serviceFee = 1000; // Fixed service fee
 
             document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
                 subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
                 totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
             });
 
-            const grandTotal = subtotal + serviceFee;
-
             // Update labels
             const subtotalLabel = document.getElementById('summarySubtotalLabel');
             const subtotalValue = document.getElementById('summarySubtotalValue');
-            const serviceFeeValue = document.getElementById('summaryServiceFee');
             const totalElement = document.querySelector('.summary-total-value');
 
             if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
-            if (serviceFeeValue) serviceFeeValue.textContent = 'Rp ' + formatRupiah(serviceFee);
 
             if (totalElement) {
-                totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
+                totalElement.textContent = 'Rp ' + formatRupiah(subtotal);
             }
         }
 

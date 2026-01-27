@@ -112,7 +112,7 @@ class OrderController extends Controller
             'shipping_option_id' => 'required_if:order_type,delivery|string',
             'notes' => 'nullable|string',
             'selected_item_ids' => 'required|array|min:1', // Add validation for selected items
-            'selected_item_ids.*' => 'integer|exists:cart_items,id', // Each item must be valid cart_item ID
+            'selected_item_ids.*' => 'integer', // Ownership validation is done in transaction
         ]);
 
         return DB::transaction(function () use ($request, $shipping) {
