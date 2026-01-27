@@ -1032,9 +1032,18 @@
                 margin-bottom: 0;
             }
 
-            .section-title {
+            /* Hide 'Jumlah Pesanan' title only in mobile order summary footer */
+            .order-summary-section > .section-title {
                 display: none;
-                /* Hide 'Jumlah Pesanan' title in mobile footer */
+            }
+
+            /* Show section titles for payment and delivery methods */
+            .payment-methods-section .section-title,
+            .delivery-methods-section .section-title {
+                display: block;
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 16px;
             }
 
             /* Ensure the order items take full width */

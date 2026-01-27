@@ -804,6 +804,12 @@
                 <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
                     <p class="section-title">Metode Pembayaran</p>
 
+                    <!-- COD - Only shown for Delivery -->
+                    <label class="payment-method-card" id="codPaymentOption" style="display: none;" onclick="toggleRadio(event, 'payment_method', 'cod')">
+                        <input type="radio" name="payment_method" value="cod" class="payment-radio">
+                        <span class="payment-method-name">Cash On Delivery (COD)</span>
+                    </label>
+
                     <!-- DANA -->
                     <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
                         <input type="radio" name="payment_method" value="dana" class="payment-radio">
@@ -1090,12 +1096,21 @@
             const backendOrderType = orderTypeMap[orderType] || 'take_away';
 
             if (orderType === 'delivery') {
+                // Validate delivery method
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
                 deliveryMethod = selectedDelivery.value;
+
+                // Validate payment method for delivery
+                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+                if (!selectedPayment) {
+                    showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+                    return;
+                }
+                paymentMethod = selectedPayment.value;
             } else {
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
@@ -1329,18 +1344,21 @@
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
             const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
+            const codPaymentOption = document.getElementById('codPaymentOption');
 
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
                 deliveryAddressSection.style.display = 'block';
                 deliveryMethodsSection.style.display = 'block';
-                paymentMethodsSection.style.display = 'none';
+                paymentMethodsSection.style.display = 'block';
+                if (codPaymentOption) codPaymentOption.style.display = 'flex'; // Show COD for delivery
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
                 deliveryAddressSection.style.display = 'none';
                 deliveryMethodsSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
+                if (codPaymentOption) codPaymentOption.style.display = 'none'; // Hide COD for non-delivery
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }

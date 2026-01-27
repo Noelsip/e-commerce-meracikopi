@@ -254,6 +254,8 @@ class OrderController extends Controller
                 'payments' => $order->payments->map(fn($payment) => [
                     'amount' => (int) $payment->amount,
                     'status' => $payment->status,
+                    'payment_method' => $payment->payment_method,
+                    'payment_gateway' => $payment->payment_gateway,
                     'paid_at' => $payment->paid_at?->toIso8601String(),
                 ]),
                 'logs' => $order->order_logs->map(fn($log) => [
