@@ -69,7 +69,7 @@
                 <div class="receipt-info-row">
                     <div class="receipt-info-col">
                         <p class="receipt-info-label">Order Type</p>
-                        <p class="receipt-info-value" id="receiptOrderType">Dine In</p>
+                        <p class="receipt-info-value" id="receiptOrderType">Takeaway</p>
                         <p class="receipt-info-sub" id="receiptTableInfo">Meja 10</p>
                     </div>
                     <div class="receipt-info-col">
@@ -678,7 +678,7 @@
         <!-- Order Type Tabs (Display Only - synced with navbar dropdown) -->
         <div class="order-type-tabs">
             <span class="order-type-tab-label">Tipe Pemesanan</span>
-            <span class="order-type-tab-value" id="orderTypeDisplay">Dine In</span>
+            <span class="order-type-tab-value" id="orderTypeDisplay">Takeaway</span>
         </div>
 
         <!-- Delivery Address Section (Hidden by default, shown when Delivery is selected) -->
@@ -742,7 +742,9 @@
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nomor
                             Telepon <span style="opacity: 0.5;">(Opsional)</span></label>
-                        <input type="text" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx"
+                        <input type="tel" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx" 
+                            inputmode="numeric" pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
                 </div>
@@ -869,7 +871,9 @@
                 </div>
                 <div class="form-group">
                     <label>Nomor Telepon</label>
-                    <input type="text" class="form-input" id="recipientPhone" value="(+62) 822 54554411">
+                    <input type="tel" class="form-input" id="recipientPhone" value="(+62) 822 54554411"
+                        inputmode="numeric" pattern="[0-9+() -]*"
+                        oninput="this.value = this.value.replace(/[^0-9+() -]/g, '');">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
