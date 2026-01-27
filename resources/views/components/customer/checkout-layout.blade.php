@@ -288,7 +288,7 @@
         }
 
         .checkout-qty-plus {
-            background-color: #CA7842;
+            background-color: var(--secondary);
             color: white;
         }
 
@@ -949,11 +949,25 @@
                 width: 24px;
                 height: 24px;
                 font-size: 14px;
+                border-radius: 4px;
+                background-color: rgba(255, 255, 255, 0.1);
+                color: rgba(255, 255, 255, 0.8);
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
 
             .checkout-qty-value {
                 font-size: 13px;
                 min-width: 18px;
+            }
+
+            .checkout-qty-minus {
+                background-color: rgba(255, 255, 255, 0.08);
+            }
+
+            .checkout-qty-plus {
+                background-color: rgba(202, 120, 66, 0.3);
+                color: #CA7842;
+                border-color: rgba(202, 120, 66, 0.4);
             }
 
             .order-item-subtotal {

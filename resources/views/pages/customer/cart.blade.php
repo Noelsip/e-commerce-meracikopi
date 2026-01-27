@@ -36,13 +36,43 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-wrapper" x-data="{ swiped: false, startX: 0, currentX: 0 }"
-                        @touchstart="startX = $event.touches[0].clientX; currentX = 0"
-                        @touchmove="currentX = $event.touches[0].clientX - startX"
-                        @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }">
-                        <div class="cart-item-row" :class="{ 'swiped': swiped }">
+                    <div class="cart-item-wrapper" 
+                        x-data="{
+                            startX: 0,
+                            offsetX: 0,
+                            isDragging: false,
+                            itemRow: null
+                        }"
+                        x-init="
+                            itemRow = $el.querySelector('.cart-item-row');
+                        "
+                        @touchstart="
+                            startX = $event.touches[0].clientX;
+                            isDragging = true;
+                            itemRow.style.transition = 'none';
+                        "
+                        @touchmove.prevent="
+                            if (!isDragging) return;
+                            let diff = $event.touches[0].clientX - startX;
+                            if (diff < 0) {
+                                offsetX = Math.max(-90, diff);
+                                itemRow.style.transform = 'translateX(' + offsetX + 'px)';
+                            }
+                        "
+                        @touchend="
+                            isDragging = false;
+                            itemRow.style.transition = 'transform 0.3s ease';
+                            if (offsetX < -45) {
+                                offsetX = -90;
+                                itemRow.style.transform = 'translateX(-90px)';
+                            } else {
+                                offsetX = 0;
+                                itemRow.style.transform = 'translateX(0px)';
+                            }
+                        ">
+                        <div class="cart-item-row">
                             <!-- Item Checkbox -->
-                            <div class="header-checkbox">
+                            <div class="header-checkbox" @touchstart.stop @touchmove.stop>
                                 <input type="checkbox" class="cart-checkbox item-checkbox" :checked="item.selected"
                                     @change="toggleItemSelection(item.id)">
                             </div>
@@ -50,7 +80,7 @@
                             <!-- Product Info -->
                             <div class="product-info">
                                 <template x-if="item.menu_image">
-                                    <img :src="item.menu_image" alt="Product" class="product-image">
+                                    <img :src="item.menu_image" alt="Product" class="product-image" draggable="false">
                                 </template>
                                 <template x-if="!item.menu_image">
                                     <div class="product-image-placeholder"></div>
@@ -62,7 +92,7 @@
                             <span class="product-price" x-text="formatRupiah(item.price)"></span>
 
                             <!-- Quantity -->
-                            <div class="quantity-controls">
+                            <div class="quantity-controls" @touchstart.stop @touchmove.stop @touchend.stop>
                                 <button type="button" class="quantity-btn quantity-btn-minus"
                                     @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
                                     −
@@ -82,7 +112,8 @@
                         </div>
 
                         <!-- Swipe Delete Button (Mobile only) -->
-                        <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
+                        <button class="swipe-delete-btn" 
+                            @click="removeItem(item.id); offsetX = 0; itemRow.style.transform = 'translateX(0px)'">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>

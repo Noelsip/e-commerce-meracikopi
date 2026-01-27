@@ -250,11 +250,20 @@
             position: relative;
             overflow: visible;
         }
+
+        /* Hide swipe delete button on desktop */
+        .swipe-delete-btn {
+            display: none;
+        }
         
         @media (max-width: 768px) {
             .cart-item-wrapper {
                 overflow: hidden;
                 margin-bottom: 8px;
+            }
+
+            .swipe-delete-btn {
+                display: flex;
             }
         }
 
@@ -434,9 +443,9 @@
             /* Cart item: horizontal layout like Shopee */
             .cart-item-row {
                 display: grid;
-                grid-template-columns: auto 80px 1fr;
+                grid-template-columns: auto 80px 1fr auto;
                 grid-template-rows: auto auto;
-                gap: 12px;
+                gap: 12px 8px;
                 border: 1px solid #D9D9D9;
                 border-radius: 8px;
                 padding: 12px 8px;
@@ -483,7 +492,7 @@
 
             /* Name - Column 3, Row 1 (di atas) */
             .product-name {
-                grid-column: 3;
+                grid-column: 3 / span 2;
                 grid-row: 1;
                 font-size: 13px;
                 font-weight: 400;
@@ -498,28 +507,33 @@
                 margin-bottom: 4px;
             }
 
-            /* Quantity controls - Column 3, Row 2 (bawah, kiri) */
+            /* Quantity controls dan price wrapper - Column 3, Row 2 */
+            .cart-item-row>.quantity-controls,
+            .cart-item-row>.product-price {
+                grid-row: 2;
+                align-self: center;
+            }
+
+            /* Quantity controls - kiri (Column 3) */
             .cart-item-row>.quantity-controls {
                 grid-column: 3;
-                grid-row: 2;
                 display: flex;
                 align-items: center;
                 justify-content: flex-start;
                 gap: 8px;
-                align-self: center;
             }
 
-            /* Price - Column 3, Row 2 (bawah, kanan - sejajar dengan plus/minus) */
+            /* Price - kanan (Column 4) */
             .cart-item-row>.product-price {
-                grid-column: 3;
-                grid-row: 2;
+                grid-column: 4;
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
                 text-align: right;
-                align-self: center;
-                justify-self: end;
+                white-space: nowrap;
+                min-width: max-content;
+                padding-left: 8px;
             }
 
             /* Hide standalone total price */
@@ -573,80 +587,63 @@
                 display: none !important;
             }
 
-            /* Swipe container - styles already defined above */
+            /* Swipe container */
+            .cart-item-wrapper {
+                position: relative;
+                overflow: hidden;
+                margin-bottom: 8px;
+                -webkit-user-select: none;
+                user-select: none;
+            }
 
             .cart-item-wrapper .cart-item-row {
-                transition: transform 0.3s ease;
+                position: relative;
+                transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
                 margin-bottom: 0;
                 background: #241813;
+                border-radius: 8px;
+                z-index: 2;
+                will-change: transform;
+            }
+            
+            .cart-item-wrapper .cart-item-row.swiping {
+                transition: none;
             }
 
             .cart-item-wrapper .cart-item-row.swiped {
-                transform: translateX(-80px);
+                transform: translateX(-90px);
             }
 
-            /* Swipe delete button - hidden by default */
+            /* Swipe delete button - Shopee style */
             .swipe-delete-btn {
                 position: absolute;
-                right: -80px;
-                top: 0;
-                bottom: 0;
-                width: 80px;
-                background: #e74c3c;
-                color: white;
-                border: none;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                opacity: 0;
-                transition: right 0.3s ease, opacity 0.3s ease;
-            }
-
-            /* Show delete button when swiped */
-            .cart-item-wrapper:has(.cart-item-row.swiped) .swipe-delete-btn {
                 right: 0;
-                opacity: 1;
-            }
-
-            /* Swipe container - styles already defined above */
-
-            .cart-item-wrapper .cart-item-row {
-                transition: transform 0.3s ease;
-                margin-bottom: 0;
-                background: #241813;
-            }
-
-            .cart-item-wrapper .cart-item-row.swiped {
-                transform: translateX(-80px);
-            }
-
-            /* Swipe delete button - hidden by default */
-            .swipe-delete-btn {
-                position: absolute;
-                right: -80px;
                 top: 0;
                 bottom: 0;
-                width: 80px;
-                background: #e74c3c;
+                width: 90px;
+                background: #ff4444;
                 color: white;
                 border: none;
+                border-radius: 0 8px 8px 0;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                opacity: 0;
-                transition: right 0.3s ease, opacity 0.3s ease;
                 gap: 4px;
-                font-size: 11px;
+                font-size: 12px;
                 font-weight: 500;
                 cursor: pointer;
+                box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+                z-index: 1;
             }
 
-            /* Show delete button when swiped */
-            .cart-item-wrapper:has(.cart-item-row.swiped) .swipe-delete-btn {
-                right: 0;
-                opacity: 1;
+            .swipe-delete-btn svg {
+                stroke: white;
+                stroke-width: 2.5;
+            }
+
+            .swipe-delete-btn:active {
+                background: #cc0000;
             }
 
             .swipe-delete-btn:hover {
