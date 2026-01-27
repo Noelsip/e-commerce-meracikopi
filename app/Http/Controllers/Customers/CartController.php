@@ -17,11 +17,12 @@ class CartController extends Controller
         // 1. Ambil guest token dari middleware
         $guestToken = $request->attributes->get('guest_token');
 
-        // 2. Cache cart data untuk mengurangi query database (TTL 60 detik)
+        // 2. Cache cart data (30 detik) untuk mengurangi load database
         $cacheKey = 'cart_' . $guestToken;
         
-        $cart = Cache::remember($cacheKey, 60, function () use ($guestToken) {
-            return Cart::with([
+        $result = Cache::remember($cacheKey, 30, function () use ($guestToken) {
+            // Query cart data directly (Eager Loading)
+            $cart = Cart::with([
                 'items' => function ($query) {
                     // Select only necessary columns from cart_items
                     $query->select('id', 'cart_id', 'menu_id', 'quantity');
@@ -34,46 +35,49 @@ class CartController extends Controller
                 ->select('id', 'guest_token')
                 ->where('guest_token', $guestToken)
                 ->first();
-        });
 
-        // 3. Jika cart belum ada
-        if (!$cart) {
-            return response()->json([
-                'data' => [
+            // Jika cart belum ada
+            if (!$cart) {
+                return [
                     'items' => [],
                     'total_price' => 0
-                ]
-            ]);
-        }
+                ];
+            }
 
-        // 4. Format item & hitung total
-        $items = [];
-        $totalPrice = 0;
+            // Format item & hitung total
+            $items = [];
+            $totalPrice = 0;
 
-        foreach ($cart->items as $item) {
-            // Check if menu still exists (soft delete handling)
-            if (!$item->menu)
-                continue;
+            foreach ($cart->items as $item) {
+                // Check if menu still exists (soft delete handling)
+                if (!$item->menu)
+                    continue;
 
-            $subtotal = $item->menu->price * $item->quantity;
-            $totalPrice += $subtotal;
+                $subtotal = $item->menu->price * $item->quantity;
+                $totalPrice += $subtotal;
 
-            $items[] = [
-                'id' => $item->id,
-                'menu_id' => $item->menu_id,
-                'menu_name' => $item->menu->name,
-                'menu_image' => $item->menu->image_path ? asset($item->menu->image_path) : null,
-                'price' => $item->menu->price,
-                'quantity' => $item->quantity,
-                'subtotal' => $subtotal
+                $items[] = [
+                    'id' => $item->id,
+                    'menu_id' => $item->menu_id,
+                    'menu_name' => $item->menu->name,
+                    'menu_image' => $item->menu->image_path ? asset($item->menu->image_path) : null,
+                    'price' => $item->menu->price,
+                    'quantity' => $item->quantity,
+                    'subtotal' => $subtotal
+                ];
+            }
+
+            return [
+                'items' => $items,
+                'total_price' => $totalPrice
             ];
-        }
+        });
 
         return response()->json([
             'data' => [
-                'items' => $items,
-                'total' => $totalPrice, // Legacy support
-                'total_price' => $totalPrice
+                'items' => $result['items'],
+                'total' => $result['total_price'], // Legacy support
+                'total_price' => $result['total_price']
             ]
         ]);
     }

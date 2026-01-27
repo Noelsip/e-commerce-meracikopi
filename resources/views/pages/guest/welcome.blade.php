@@ -24,8 +24,11 @@
         .category-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
             border-radius: 24px;
-            overflow: hidden;
             box-shadow: none !important;
+<<<<<<< HEAD
+            -webkit-tap-highlight-color: transparent;
+            text-decoration: none;
+=======
             display: flex !important;
             flex-direction: column;
             align-items: stretch;
@@ -34,20 +37,29 @@
             /* Fix for potential sub-pixel rendering gaps */
             width: 100%;
             /* Fill grid column */
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
 
         .category-card:hover {
-            transform: scale(1.03) !important;
-            /* Only colored glow, no black shadow */
-            box-shadow: 0 25px 60px rgba(202, 120, 66, 0.3) !important;
+            transform: scale(1.05) !important;
+            z-index: 10;
         }
 
         .category-card:hover .category-card-inner {
-            /* No border on hover */
+            border: 2px solid #CA7842 !important; /* Border emas menempel langsung di kotak cokelat */
+            box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
         }
 
         .category-card-inner {
             box-shadow: none !important;
+<<<<<<< HEAD
+            transition: all 0.4s ease;
+            height: 100%;
+            border-radius: 24px !important; 
+            overflow: hidden;
+            border: 2px solid transparent !important;
+            box-sizing: border-box;
+=======
             flex: 1;
             /* Ensure inner fills outer */
             width: 100%;
@@ -60,6 +72,7 @@
                 box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
                 transform: scale(1.01) !important;
             }
+>>>>>>> cbb216c8f40bb1d5a2e06d1afce9ae11941d9f3d
         }
     </style>
 

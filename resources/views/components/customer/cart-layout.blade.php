@@ -245,10 +245,17 @@
             color: #e74c3c;
         }
 
-        /* Cart Item Wrapper - Desktop */
+        /* Cart Item Wrapper */
         .cart-item-wrapper {
             position: relative;
             overflow: visible;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-item-wrapper {
+                overflow: hidden;
+                margin-bottom: 8px;
+            }
         }
 
         /* Hide swipe delete button on desktop */
@@ -294,7 +301,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-left: 16px;
+            padding-left: 1px;
         }
 
         .cart-summary-right {
@@ -330,6 +337,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .cart-table-header .header-checkbox,
+        .cart-item-row > .header-checkbox {
+            justify-content: center;
+            align-items: center;
+            align-self: center;
         }
 
         .select-all-checkbox {
@@ -420,13 +434,15 @@
             /* Cart item: horizontal layout like Shopee */
             .cart-item-row {
                 display: grid;
-                grid-template-columns: auto auto 1fr;
+                grid-template-columns: auto 80px 1fr;
+                grid-template-rows: auto auto;
                 gap: 12px;
                 border: 1px solid #D9D9D9;
                 border-radius: 8px;
                 padding: 12px 8px;
                 margin-bottom: 8px;
                 background: #241813;
+                align-items: start;
                 position: relative;
             }
 
@@ -434,14 +450,14 @@
                 background: rgba(255, 255, 255, 0.02);
             }
 
-            /* Checkbox column - Grid Column 1 */
+            /* Checkbox - Column 1, Row 1-2 span */
             .cart-item-row>div:first-child {
                 display: flex;
-                align-items: flex-start;
-                padding-top: 4px;
+                align-items: center;
+                justify-content: center;
                 grid-column: 1;
                 grid-row: 1 / span 2;
-                align-self: start;
+                align-self: center;
             }
 
             .cart-checkbox {
@@ -454,7 +470,7 @@
                 display: contents;
             }
 
-            /* Image - Grid Column 2 */
+            /* Image - Column 2, Row 1-2 span */
             .product-image,
             .product-image-placeholder {
                 grid-column: 2;
@@ -465,7 +481,7 @@
                 border-radius: 4px;
             }
 
-            /* Name - Grid Column 3, Row 1 */
+            /* Name - Column 3, Row 1 (di atas) */
             .product-name {
                 grid-column: 3;
                 grid-row: 1;
@@ -479,9 +495,10 @@
                 overflow: hidden;
                 width: 100%;
                 align-self: start;
+                margin-bottom: 4px;
             }
 
-            /* Quantity controls - Grid Column 3, Row 2 (Left side) */
+            /* Quantity controls - Column 3, Row 2 (bawah, kiri) */
             .cart-item-row>.quantity-controls {
                 grid-column: 3;
                 grid-row: 2;
@@ -489,26 +506,20 @@
                 align-items: center;
                 justify-content: flex-start;
                 gap: 8px;
-                margin-top: auto;
-                /* Push to bottom */
-                align-self: end;
-                width: fit-content;
+                align-self: center;
             }
 
-            /* Price - Grid Column 3, Row 2 (Right side) */
+            /* Price - Column 3, Row 2 (bawah, kanan - sejajar dengan plus/minus) */
             .cart-item-row>.product-price {
+                grid-column: 3;
+                grid-row: 2;
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
                 text-align: right;
-                grid-column: 3;
-                grid-row: 2;
+                align-self: center;
                 justify-self: end;
-                align-self: end;
-                /* Align with Qty */
-                padding-left: 0;
-                width: auto;
             }
 
             /* Hide standalone total price */
@@ -516,6 +527,7 @@
                 display: none;
             }
 
+            /* Button Styling */
             .quantity-btn {
                 width: 24px;
                 height: 24px;
@@ -561,12 +573,7 @@
                 display: none !important;
             }
 
-            /* Swipe container */
-            .cart-item-wrapper {
-                position: relative;
-                overflow: hidden;
-                margin-bottom: 8px;
-            }
+            /* Swipe container - styles already defined above */
 
             .cart-item-wrapper .cart-item-row {
                 transition: transform 0.3s ease;
@@ -602,12 +609,44 @@
                 opacity: 1;
             }
 
+            /* Swipe container - styles already defined above */
+
+            .cart-item-wrapper .cart-item-row {
+                transition: transform 0.3s ease;
+                margin-bottom: 0;
+                background: #241813;
+            }
+
+            .cart-item-wrapper .cart-item-row.swiped {
+                transform: translateX(-80px);
+            }
+
+            /* Swipe delete button - hidden by default */
             .swipe-delete-btn {
+                position: absolute;
+                right: -80px;
+                top: 0;
+                bottom: 0;
+                width: 80px;
+                background: #e74c3c;
+                color: white;
+                border: none;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                transition: right 0.3s ease, opacity 0.3s ease;
                 gap: 4px;
                 font-size: 11px;
                 font-weight: 500;
                 cursor: pointer;
-                transition: background 0.2s ease;
+            }
+
+            /* Show delete button when swiped */
+            .cart-item-wrapper:has(.cart-item-row.swiped) .swipe-delete-btn {
+                right: 0;
+                opacity: 1;
             }
 
             .swipe-delete-btn:hover {
@@ -632,9 +671,7 @@
                 right: 0;
                 width: 100%;
                 background: #2A1B14;
-                padding: 0 17px;
-                /* 8px container + 1px border + 8px card padding = 17px */
-                /* Reduced vertical padding since flex aligns it */
+                padding: 8px 8px;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
                 z-index: 1000;
@@ -642,17 +679,6 @@
                 -webkit-transform: translateZ(0);
                 -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
-                /* Center content vertically */
-                display: flex !important;
-                align-items: center !important;
-                justify-content: center !important;
-            }
-
-            .cart-summary-container {
-                width: 100%;
-                max-width: 100%;
-                padding: 0;
-                /* Reset desktop padding */
             }
 
             .cart-summary {
@@ -664,15 +690,13 @@
                 padding: 0;
                 border: none;
                 background: transparent;
-                width: 100%;
             }
-
-            /* Footer checkbox now inherits standard .cart-checkbox styles */
 
             .cart-summary-left {
                 display: flex;
                 align-items: center;
                 gap: 8px;
+                padding-left: 0;
             }
 
             .select-all-text {
@@ -733,8 +757,7 @@
             }
 
             .cart-summary-wrapper {
-                padding: 0 15px !important;
-                /* 6px container + 1px border + 8px card padding = 15px */
+                padding: 8px 6px !important;
             }
 
             .product-image,
