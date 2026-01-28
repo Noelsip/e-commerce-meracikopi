@@ -26,6 +26,10 @@ class Orders extends Model
         'total_price',
         'notes',
         'delivery_fee',
+        'service_fee',
+        'delivery_provider',
+        'delivery_service',
+        'delivery_meta',
         'discount_amount',
         'final_price',
     ];
@@ -35,20 +39,22 @@ class Orders extends Model
         'status' => OrderStatus::class,
         'total_price' => 'decimal:2',
         'delivery_fee' => 'decimal:2',
+        'service_fee' => 'decimal:2',
         'discount_amount' => 'decimal:2',
         'final_price' => 'decimal:2',
+        'delivery_meta' => 'array',
     ];
 
     /**
      * Menghitung dan update final_price
      * 
-     * Formula: final_price = total_price + delivery_fee - discount_amount
+     * Formula: final_price = total_price + delivery_fee + service_fee - discount_amount
      * 
      * @return void
      */
     public function calculateFinalPrice()
     {
-        $this->final_price = $this->total_price + $this->delivery_fee - $this->discount_amount;
+        $this->final_price = $this->total_price + $this->delivery_fee + $this->service_fee - $this->discount_amount;
         $this->final_price = max(0, $this->final_price); // Tidak boleh negatif
     }
 
@@ -64,26 +70,26 @@ class Orders extends Model
 
     public function order_items()
     {
-        return $this->hasMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class, 'order_id');
     }
 
     public function order_logs()
     {
-        return $this->hasMany(OrderLogs::class);
+        return $this->hasMany(OrderLogs::class, 'order_id');
     }
 
     public function order_addresses()
     {
-        return $this->hasMany(OrderAddresses::class);
+        return $this->hasMany(OrderAddresses::class, 'order_id');
     }
 
     public function payments()
     {
-        return $this->hasMany(Payments::class);
+        return $this->hasMany(Payments::class, 'order_id');
     }
 
     public function deliveries()
     {
-        return $this->hasMany(Deliveries::class);
+        return $this->hasMany(Deliveries::class, 'order_id');
     }
 }

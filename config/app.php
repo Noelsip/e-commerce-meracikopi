@@ -105,6 +105,12 @@ return [
         ),
     ],
 
+    'restaurant_latitude' => env('RESTAURANT_LATITUDE', -1.2248893),
+
+    'restaurant_longitude' => env('RESTAURANT_LONGITUDE', 116.8658594),
+
+    'restaurant_address' => env('RESTAURANT_ADDRESS', 'Meracikopi, Balikpapan, Kalimantan Timur'),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

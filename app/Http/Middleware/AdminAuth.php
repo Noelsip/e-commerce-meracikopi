@@ -28,7 +28,7 @@ class AdminAuth
             }
             
             // Set authenticated user
-            Auth::setUser($user);
+            // Auth::setUser($user);
             return $next($request);
         }
 

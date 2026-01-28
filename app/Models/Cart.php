@@ -8,7 +8,7 @@ use App\Models\User;
 
 class Cart extends Model
 {
-    protected $fillable = ['guest_token'];
+    protected $fillable = ['guest_token', 'status'];
 
     public function items()
     {
@@ -20,3 +20,4 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 }
+    

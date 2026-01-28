@@ -347,22 +347,35 @@
             }
         }
 
-        /* Order Detail Modal */
-        .order-modal-overlay {
+        /* Order Detail Modal - Popup Style */
+        #orderModalRoot {
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
+            width: 0;
+            height: 0;
+            z-index: 99999;
+        }
+
+        .order-modal-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 99999 !important;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
             padding: 20px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
         }
 
         .order-modal-overlay.show {
@@ -371,19 +384,23 @@
         }
 
         .order-modal {
-            background: #1e1815;
-            border: 1px solid #3e302b;
-            border-radius: 16px;
+            position: relative !important;
+            background: linear-gradient(145deg, #2A1B14, #1e1510);
+            border: 1px solid rgba(202, 120, 66, 0.3);
+            border-radius: 20px;
             max-width: 420px;
-            width: 100%;
-            max-height: 90vh;
+            width: 90%;
+            max-height: 80vh;
             overflow-y: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s ease;
+            transform: scale(0.8) translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
 
         .order-modal-overlay.show .order-modal {
-            transform: scale(1);
+            transform: scale(1) translateY(0);
+            opacity: 1;
         }
 
         .order-modal-header {
@@ -630,19 +647,25 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Modal Responsive */
+        /* Modal Responsive - Keep as centered popup */
         @media (max-width: 768px) {
             .order-modal-overlay {
-                padding: 0;
-                align-items: flex-end;
+                padding: 16px !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
             }
 
             .order-modal {
-                border-radius: 20px 20px 0 0;
-                max-height: 90vh;
-                max-width: 100%;
-                width: 100%;
-                margin: 0;
+                position: relative !important;
+                border-radius: 20px;
+                max-height: 85vh;
+                max-width: 95%;
+                width: 95%;
             }
 
             .order-modal-header {
@@ -776,6 +799,93 @@
     <!-- Navbar -->
     @include('components.customer.navbar')
 
+    <!-- Order Detail Modal - OUTSIDE CONTAINER for proper fixed positioning -->
+    <div id="orderModalRoot" x-data="orderModal()" @open-order-detail.window="openOrderDetail($event.detail)">
+        <div class="order-modal-overlay" :class="{ 'show': showModal }" @click.self="closeOrderDetail()">
+            <div class="order-modal" x-show="selectedOrder">
+                <!-- Modal Header -->
+                <div class="order-modal-header">
+                    <button class="order-modal-close" @click="closeOrderDetail()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <!-- Receipt Icon -->
+                    <svg class="order-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+                    </svg>
+
+                    <span class="order-modal-label">Nomor Order</span>
+                    <span class="order-modal-code" x-text="selectedOrder?.order_code"></span>
+                    <span class="order-modal-date" x-text="formatDate(selectedOrder?.created_at)"></span>
+                    <span class="status-badge" 
+                        :class="'status-' + selectedOrder?.status"
+                        x-text="getStatusLabel(selectedOrder?.status)"></span>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="order-modal-body">
+                    <!-- Order Type & Payment Method Box -->
+                    <div class="order-info-box">
+                        <div class="order-info-item">
+                            <span class="order-info-label">Order Type</span>
+                            <span class="order-info-value" x-text="getOrderTypeLabel(selectedOrder?.order_type)"></span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">Payment Method</span>
+                            <div class="order-info-value-with-icon">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                </svg>
+                                <span x-text="selectedOrder?.payment_method || 'Credit Card'"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <h3 class="order-modal-section-title">Order Items</h3>
+                    <div class="order-modal-items">
+                        <template x-if="!selectedOrder?.items || selectedOrder?.items.length === 0">
+                            <div class="order-modal-item" style="justify-content: center; color: rgba(255,255,255,0.5);">
+                                <span>Tidak ada item</span>
+                            </div>
+                        </template>
+                        <template x-for="item in selectedOrder?.items" :key="item.id">
+                            <div class="order-modal-item">
+                                <div class="order-modal-item-left">
+                                    <span class="order-modal-item-name" x-text="item.menu_name"></span>
+                                    <span class="order-modal-item-variant" x-text="'Qty: ' + item.quantity"></span>
+                                </div>
+                                <span class="order-modal-item-price" x-text="'RP ' + formatPrice(item.price * item.quantity)"></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="order-modal-summary">
+                        <div class="order-modal-summary-row">
+                            <span class="order-modal-summary-label">Total</span>
+                            <span class="order-modal-summary-value" x-text="'RP ' + formatPrice(selectedOrder?.final_price || selectedOrder?.total_price)"></span>
+                        </div>
+                    </div>
+
+                    <!-- Note for Barista -->
+                    <div class="order-modal-note" x-show="selectedOrder?.notes">
+                        <div class="order-modal-note-title">Note For Barista</div>
+                        <div class="order-modal-note-text" x-text="selectedOrder?.notes || '-'"></div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="order-modal-buttons">
+                        <a :href="'{{ route('catalogs.index') }}'" class="order-modal-btn order-modal-btn-primary">Order Again</a>
+                        <button class="order-modal-btn order-modal-btn-secondary" @click="closeOrderDetail()">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content -->
     <main>
         <div class="order-history-container" x-data="orderHistory()" x-init="loadOrders()">
@@ -837,86 +947,6 @@
                     </div>
                 </template>
             </div>
-
-            <!-- Order Detail Modal -->
-            <div class="order-modal-overlay" :class="{ 'show': showModal }" @click.self="closeOrderDetail()">
-                <div class="order-modal" x-show="selectedOrder">
-                    <!-- Modal Header -->
-                    <div class="order-modal-header">
-                        <button class="order-modal-close" @click="closeOrderDetail()">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-
-                        <!-- Receipt Icon -->
-                        <svg class="order-modal-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-                        </svg>
-
-                        <span class="order-modal-label">Nomor Order</span>
-                        <span class="order-modal-code" x-text="selectedOrder?.order_code"></span>
-                        <span class="order-modal-date" x-text="formatDate(selectedOrder?.created_at)"></span>
-                        <span class="status-badge" 
-                            :class="'status-' + selectedOrder?.status"
-                            x-text="getStatusLabel(selectedOrder?.status)"></span>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="order-modal-body">
-                        <!-- Order Type & Payment Method Box -->
-                        <div class="order-info-box">
-                            <div class="order-info-item">
-                                <span class="order-info-label">Order Type</span>
-                                <span class="order-info-value" x-text="getOrderTypeLabel(selectedOrder?.order_type)"></span>
-                            </div>
-                            <div class="order-info-item">
-                                <span class="order-info-label">Payment Method</span>
-                                <div class="order-info-value-with-icon">
-                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                                    </svg>
-                                    <span x-text="selectedOrder?.payment_method || 'Credit Card'"></span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Order Items -->
-                        <h3 class="order-modal-section-title">Order Items</h3>
-                        <div class="order-modal-items">
-                            <template x-for="item in selectedOrder?.items" :key="item.id">
-                                <div class="order-modal-item">
-                                    <div class="order-modal-item-left">
-                                        <span class="order-modal-item-name" x-text="item.menu_name"></span>
-                                        <span class="order-modal-item-variant" x-text="(item.variant || 'Hot') + ' | Qty: ' + item.quantity"></span>
-                                    </div>
-                                    <span class="order-modal-item-price" x-text="'RP ' + formatPrice(item.price * item.quantity)"></span>
-                                </div>
-                            </template>
-                        </div>
-
-                        <!-- Total -->
-                        <div class="order-modal-summary">
-                            <div class="order-modal-summary-row">
-                                <span class="order-modal-summary-label">Total</span>
-                                <span class="order-modal-summary-value" x-text="'RP ' + formatPrice(selectedOrder?.final_price || selectedOrder?.total_price)"></span>
-                            </div>
-                        </div>
-
-                        <!-- Note for Barista -->
-                        <div class="order-modal-note" x-show="selectedOrder?.notes">
-                            <div class="order-modal-note-title">Note For Barista</div>
-                            <div class="order-modal-note-text" x-text="selectedOrder?.notes || '-'"></div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="order-modal-buttons">
-                            <a :href="'{{ route('catalogs.index') }}'" class="order-modal-btn order-modal-btn-primary">Order Again</a>
-                            <button class="order-modal-btn order-modal-btn-secondary" @click="closeOrderDetail()">Tutup</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 
@@ -924,93 +954,85 @@
     @include('components.customer.footer')
 
     <script>
-        function orderHistory() {
+        // Order Modal Component - separate from orderHistory for proper fixed positioning
+        function orderModal() {
             return {
-                orders: [],
-                loading: true,
                 showModal: false,
                 selectedOrder: null,
 
-                // Open order detail modal
                 openOrderDetail(order) {
                     this.selectedOrder = order;
                     this.showModal = true;
                     document.body.style.overflow = 'hidden';
                 },
 
-                // Close order detail modal
                 closeOrderDetail() {
                     this.showModal = false;
                     this.selectedOrder = null;
                     document.body.style.overflow = '';
                 },
 
-                // Dummy data for demonstration
-                getDummyOrders() {
-                    return [
-                        {
-                            id: 1,
-                            order_code: 'MRK-20260110-001',
-                            status: 'completed',
-                            order_type: 'dine_in',
-                            payment_method: 'Credit Card',
-                            created_at: '2026-01-12T05:05:00',
-                            total_price: 40000,
-                            final_price: 40000,
-                            discount_amount: 0,
-                            delivery_fee: 0,
-                            notes: 'No sugar ya mas',
-                            items: [
-                                { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
-                                { id: 2, menu_name: 'Americano', variant: 'Hot', quantity: 1, price: 20000 }
-                            ]
-                        },
-                        {
-                            id: 2,
-                            order_code: 'MRK-20260110-001',
-                            status: 'cancelled',
-                            order_type: 'dine_in',
-                            payment_method: 'DANA',
-                            created_at: '2026-01-12T05:05:00',
-                            total_price: 40000,
-                            final_price: 40000,
-                            discount_amount: 0,
-                            delivery_fee: 0,
-                            notes: '',
-                            items: [
-                                { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
-                                { id: 2, menu_name: 'Americano', variant: 'Hot', quantity: 1, price: 20000 }
-                            ]
-                        },
-                        {
-                            id: 3,
-                            order_code: 'MRK-20260110-001',
-                            status: 'pending_payment',
-                            order_type: 'dine_in',
-                            payment_method: 'QRIS',
-                            created_at: '2026-01-12T05:05:00',
-                            total_price: 40000,
-                            final_price: 40000,
-                            discount_amount: 0,
-                            delivery_fee: 0,
-                            notes: 'Less ice please',
-                            items: [
-                                { id: 1, menu_name: 'Americano', variant: 'Iced', quantity: 1, price: 20000 },
-                                { id: 2, menu_name: 'Americano', variant: 'Hot', quantity: 1, price: 20000 }
-                            ]
-                        }
-                    ];
+                getStatusLabel(status) {
+                    const labels = {
+                        'created': 'Created',
+                        'pending_payment': 'Waiting',
+                        'paid': 'Paid',
+                        'processing': 'Processing',
+                        'ready': 'Ready',
+                        'on_delivery': 'On Delivery',
+                        'completed': 'Completed',
+                        'cancelled': 'Cancelled'
+                    };
+                    return labels[status] || status;
+                },
+
+                getOrderTypeLabel(type) {
+                    const labels = {
+                        'dine_in': 'Dine In',
+                        'delivery': 'Delivery',
+                        'takeaway': 'Takeaway'
+                    };
+                    return labels[type] || type;
+                },
+
+                formatDate(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    const options = { 
+                        day: 'numeric', 
+                        month: 'long', 
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    };
+                    return date.toLocaleDateString('id-ID', options).replace(',', ' pukul');
+                },
+
+                formatPrice(price) {
+                    return new Intl.NumberFormat('id-ID').format(price);
+                }
+            }
+        }
+
+        // Order History Component
+        function orderHistory() {
+            return {
+                orders: [],
+                loading: true,
+
+                // Open order detail modal - dispatch event to modal component
+                openOrderDetail(order) {
+                    window.dispatchEvent(new CustomEvent('open-order-detail', { detail: order }));
                 },
 
                 loadOrders() {
                     // Get guest token
                     const guestToken = localStorage.getItem('guest_token');
                     
-                    // Load dummy data first for demonstration
-                    this.orders = this.getDummyOrders();
-                    this.loading = false;
+                    this.loading = true;
+                    this.orders = [];
 
-                    // If guest token exists, also try to load real orders
+                    // If guest token exists, load real orders from API
                     if (guestToken) {
                         fetch('/api/customer/orders', {
                             method: 'GET',
@@ -1021,23 +1043,36 @@
                         })
                         .then(response => response.json())
                         .then(data => {
+                            console.log('Orders API response:', data);
                             if (data.data && data.data.length > 0) {
-                                const realOrders = data.data.map(order => ({
-                                    ...order,
-                                    order_code: this.generateOrderCode(order),
-                                    items: (order.order_items || []).map(item => ({
-                                        ...item,
-                                        variant: item.variant || item.notes || 'Hot'
-                                    })),
-                                    payment_method: order.payments?.[0]?.payment_method || 'Credit Card'
-                                }));
-                                // Combine real orders with dummy orders
-                                this.orders = [...realOrders, ...this.getDummyOrders()];
+                                this.orders = data.data.map(order => {
+                                    // Items sudah di-return dari API sebagai 'items', bukan 'order_items'
+                                    const items = (order.items || order.order_items || []).map(item => ({
+                                        id: item.menu_id || item.id,
+                                        menu_name: item.menu_name || item.name || 'Unknown Item',
+                                        quantity: item.quantity || 1,
+                                        price: item.price || 0,
+                                        variant: item.variant || item.notes || ''
+                                    }));
+                                    
+                                    console.log('Order items for', order.id, ':', items);
+                                    
+                                    return {
+                                        ...order,
+                                        order_code: this.generateOrderCode(order),
+                                        items: items,
+                                        payment_method: this.formatPaymentMethod(order.payments?.[0]?.payment_method)
+                                    };
+                                });
                             }
+                            this.loading = false;
                         })
                         .catch(error => {
                             console.error('Error loading orders:', error);
+                            this.loading = false;
                         });
+                    } else {
+                        this.loading = false;
                     }
                 },
 
@@ -1064,15 +1099,6 @@
                     return labels[status] || status;
                 },
 
-                getOrderTypeLabel(type) {
-                    const labels = {
-                        'dine_in': 'Dine In',
-                        'delivery': 'Delivery',
-                        'takeaway': 'Takeaway'
-                    };
-                    return labels[type] || type;
-                },
-
                 getItemsPreview(items) {
                     if (!items || items.length === 0) return '';
                     const names = items.slice(0, 2).map(item => item.menu_name);
@@ -1096,6 +1122,22 @@
 
                 formatPrice(price) {
                     return new Intl.NumberFormat('id-ID').format(price);
+                },
+
+                formatPaymentMethod(method) {
+                    const paymentMethods = {
+                        'dana': 'Dana',
+                        'gopay': 'GoPay',
+                        'shopeepay': 'ShopeePay',
+                        'qris': 'QRIS',
+                        'transfer_bank': 'Transfer Bank',
+                        'cod': 'Bayar di Tempat (COD)',
+                        'credit_card': 'Credit Card',
+                        'debit_card': 'Debit Card',
+                        'ovo': 'OVO',
+                        'linkaja': 'LinkAja'
+                    };
+                    return paymentMethods[method] || method || 'Belum dipilih';
                 }
             }
         }

@@ -19,18 +19,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest.token' => \App\Http\Middleware\GuestTokenMiddleware::class,
         ]);
 
+        // Exclude API routes and admin routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'api/*',
             'admin/login',
             'admin/logout',
         ]);
-
-        // Exclude route dari CSRF verification untuk testing Postman
-        $middleware->validateCsrfTokens(except: [
-            'admin/login',
-            'admin/logout',
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Ensure API routes always return JSON responses
+        $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $e) {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();

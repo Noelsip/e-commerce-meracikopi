@@ -281,7 +281,7 @@
             width: 100%;
             background-color: #2A1B14;
             padding: 16px 0;
-            z-index: 1000;
+            z-index: 9999;
             box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
@@ -526,11 +526,14 @@
             /* Price - kanan (Column 4) */
             .cart-item-row>.product-price {
                 grid-column: 4;
+                grid-row: 2;
                 display: block !important;
                 font-size: 15px;
                 font-weight: 600;
                 color: #ca7842;
                 text-align: right;
+                justify-self: end;
+                align-self: center;
                 white-space: nowrap;
                 min-width: max-content;
                 padding-left: 8px;
@@ -640,6 +643,8 @@
             .swipe-delete-btn svg {
                 stroke: white;
                 stroke-width: 2.5;
+                width: 20px;
+                height: 20px;
             }
 
             .swipe-delete-btn:active {
@@ -648,11 +653,6 @@
 
             .swipe-delete-btn:hover {
                 background: #c0392b;
-            }
-
-            .swipe-delete-btn svg {
-                width: 20px;
-                height: 20px;
             }
 
             /* Remove ::after subtotal */
@@ -668,14 +668,23 @@
                 right: 0;
                 width: 100%;
                 background: #2A1B14;
-                padding: 8px 8px;
+                padding: 8px 12px;
                 box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
                 border-top: 1px solid rgba(255, 255, 255, 0.1);
-                z-index: 1000;
+                z-index: 9999;
                 transform: translateZ(0);
                 -webkit-transform: translateZ(0);
                 -webkit-backface-visibility: hidden;
                 backface-visibility: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .cart-summary-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0;
             }
 
             .cart-summary {
@@ -687,6 +696,7 @@
                 padding: 0;
                 border: none;
                 background: transparent;
+                width: 100%;
             }
 
             .cart-summary-left {
