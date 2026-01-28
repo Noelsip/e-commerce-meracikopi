@@ -16,8 +16,12 @@ class OrderAddresses extends Model
         'phone',
         'full_address',
         'city',
+        'province',
         'postal_code',
-        'notes'
+        'latitude',
+        'longitude',
+        'rajaongkir_destination_id',
+        'notes',
     ];
 
     public function order()

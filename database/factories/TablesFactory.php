@@ -14,7 +14,7 @@ class TablesFactory extends Factory
         return [
             'table_number' => $this->faker->unique()->numberBetween(1, 50),
             'capacity' => $this->faker->numberBetween(2, 8),
-            'is_available' => true,
+            'status' => 'available',
         ];
     }
 }

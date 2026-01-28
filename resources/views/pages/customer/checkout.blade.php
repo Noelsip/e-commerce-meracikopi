@@ -693,18 +693,16 @@
             <div class="address-card">
                 <div class="address-info">
                     <div class="address-name-phone">
-                        <span class="recipient-name">Adwin Ahmad</span>
+                        <span class="recipient-name" id="deliveryRecipientName">-</span>
                         <span class="recipient-divider">|</span>
-                        <span class="recipient-phone">(+62) 822 54554411</span>
+                        <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan,
-                        Kalimantan Timur 76614</p>
+                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>
         </div>
 
-        <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
         <!-- Customer Info Section (Shown for Dine In and Takeaway) -->
         <div class="customer-info-section" id="customerInfoSection" style="margin-top: 24px; margin-bottom: 20px;">
             <div class="address-header" style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
@@ -804,12 +802,6 @@
                 <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
                     <p class="section-title">Metode Pembayaran</p>
 
-                    <!-- COD - Only shown for Delivery -->
-                    <label class="payment-method-card" id="codPaymentOption" style="display: none;" onclick="toggleRadio(event, 'payment_method', 'cod')">
-                        <input type="radio" name="payment_method" value="cod" class="payment-radio">
-                        <span class="payment-method-name">Cash On Delivery (COD)</span>
-                    </label>
-
                     <!-- DANA -->
                     <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
                         <input type="radio" name="payment_method" value="dana" class="payment-radio">
@@ -851,7 +843,6 @@
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
                     </div>
-
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
                         <span class="summary-total-label">Total</span>
@@ -1059,29 +1050,14 @@
                 showErrorModal('Pesanan Belum Dipilih', 'Silahkan pilih minimal satu pesanan untuk checkout');
                 return;
             }
-            
-            const selectedItemIds = Array.from(selectedCheckbox).map(cb => {
-                const card = cb.closest('.order-item-card');
-                const itemId = cb.getAttribute('data-item-id');
-                console.log('Selected item checkbox:', { card, itemId });
-                return itemId;
-            });
+            const selectedItemIds = Array.from(selectedCheckbox)
+                .map(cb => {
+                    const itemId = cb.dataset.itemId || cb.getAttribute('data-item-id');
+                    return itemId ? parseInt(itemId, 10) : null;
+                })
+                .filter(id => id !== null && !isNaN(id));
             
             console.log('📋 Selected item IDs:', selectedItemIds);
-
-            // 1.5. Validate Table Selection for Dine In
-            let tableId = null;
-            if (orderType === 'dine_in') {
-                tableId = localStorage.getItem('selected_table_id');
-                const tableNumber = localStorage.getItem('selected_table_number');
-
-                if (!tableId || !tableNumber) {
-                    showErrorModal('Meja Belum Dipilih', 'Silahkan pilih meja terlebih dahulu untuk Dine In');
-                    return;
-                }
-
-                console.log('✓ Table selected:', { id: tableId, number: tableNumber });
-            }
 
             // 2. Validate Payment/Delivery Method
             let paymentMethod = null;
@@ -1096,22 +1072,14 @@
             const backendOrderType = orderTypeMap[orderType] || 'take_away';
 
             if (orderType === 'delivery') {
-                // Validate delivery method
                 const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
                 if (!selectedDelivery) {
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
                 deliveryMethod = selectedDelivery.value;
-
-                // Validate payment method for delivery
-                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-                if (!selectedPayment) {
-                    showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
-                    return;
-                }
-                paymentMethod = selectedPayment.value;
             } else {
+                // Payment method is required - will be passed to Midtrans
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
@@ -1145,28 +1113,29 @@
                 }
             }
 
-            // Use tableId from validation above, or fallback
-            if (!tableId) {
-                tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
-            }
+            const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
 
             const payload = {
                 order_type: backendOrderType,
                 customer_name: customerName,
-                customer_phone: customerPhone,
-                notes: document.getElementById('receiptNote')?.textContent || '', // Assuming note is somewhere or empty
+                customer_phone: customerPhone || null,
+                notes: '', // Notes field - can be enhanced with a notes input later
                 selected_item_ids: selectedItemIds,
-                payment_method: paymentMethod, // Tambahkan payment method
-                // Delivery specific fields
-                address: orderType === 'delivery' ? {
-                    receiver_name: customerName,
-                    phone: customerPhone,
-                    full_address: document.getElementById('fullAddress').value,
-                    city: document.getElementById('city').value,
-                    postal_code: document.getElementById('postalCode').value,
-                    notes: document.getElementById('addressDetail').value
-                } : null,
-                table_id: orderType === 'dine_in' ? tableId : null
+                // Delivery specific fields (only for delivery order type)
+                ...(orderType === 'delivery' ? {
+                    address: {
+                        receiver_name: customerName,
+                        phone: customerPhone,
+                        full_address: document.getElementById('fullAddress').value,
+                        city: document.getElementById('city').value,
+                        postal_code: document.getElementById('postalCode').value,
+                        notes: document.getElementById('addressDetail').value || ''
+                    },
+                    shipping_quote_id: localStorage.getItem('shipping_quote_id') || '',
+                    shipping_option_id: localStorage.getItem('shipping_option_id') || ''
+                } : {}),
+                // Table ID only for dine_in
+                ...(orderType === 'dine_in' && tableId ? { table_id: tableId } : {})
             };
 
             // 4. Submit Order
@@ -1182,38 +1151,94 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json',
                         'X-GUEST-TOKEN': token,
                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
                     },
                     body: JSON.stringify(payload)
                 });
 
-                // Check content type before parsing
-                const contentType = response.headers.get('content-type');
-                
-                if (!contentType || !contentType.includes('application/json')) {
-                    // Server returned HTML instead of JSON (likely an error page)
-                    const text = await response.text();
-                    console.error('Server returned non-JSON response:', text);
-                    throw new Error('Server error. Silahkan coba lagi atau hubungi admin.');
-                }
-
                 const data = await response.json();
 
                 if (!response.ok) {
+                    // Handle validation errors
+                    if (data.errors) {
+                        const firstError = Object.values(data.errors)[0];
+                        throw new Error(Array.isArray(firstError) ? firstError[0] : firstError);
+                    }
                     throw new Error(data.message || 'Gagal memproses pesanan');
                 }
 
-                // Success! Show modal with real data
-                // Map backend order type back to display text if needed
-                showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), paymentMethod || deliveryMethod);
+                console.log('✅ Order created successfully:', data);
+                const orderId = data.data.id;
 
-                // Clear selected items from cart or refresh page logic could go here
+                // Step 2: Call payment API to get snap_token
+                checkoutBtn.innerText = 'Memproses Pembayaran...';
+                
+                const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-GUEST-TOKEN': token,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify({
+                        payment_method: paymentMethod // Pass selected payment method
+                    })
+                });
+
+                const paymentData = await paymentResponse.json();
+
+                if (!paymentResponse.ok) {
+                    throw new Error(paymentData.message || 'Gagal memproses pembayaran');
+                }
+
+                console.log('✅ Payment initiated:', paymentData);
+                const snapToken = paymentData.data.snap_token;
+
+                // Step 3: Open Midtrans Snap popup
+                checkoutBtn.innerText = originalText;
+                checkoutBtn.disabled = false;
+
+                // Check if Midtrans Snap is loaded
+                if (typeof window.snap === 'undefined') {
+                    throw new Error('Payment gateway belum siap. Silahkan refresh halaman dan coba lagi.');
+                }
+
+                window.snap.pay(snapToken, {
+                    onSuccess: function(result) {
+                        console.log('✅ Payment success:', result);
+                        // Clear cart selection
+                        localStorage.removeItem('selected_cart_items');
+                        // Show success modal
+                        showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
+                    },
+                    onPending: function(result) {
+                        console.log('⏳ Payment pending:', result);
+                        // Clear cart selection
+                        localStorage.removeItem('selected_cart_items');
+                        // Show pending message
+                        showErrorModal('Pembayaran Pending', 'Silahkan selesaikan pembayaran Anda. Status akan diupdate otomatis.');
+                        // Redirect to order history after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/customer/order-history';
+                        }, 2000);
+                    },
+                    onError: function(result) {
+                        console.error('❌ Payment error:', result);
+                        showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
+                    },
+                    onClose: function() {
+                        console.log('ℹ️ Payment popup closed');
+                        // User closed the popup without completing payment
+                        showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
+                    }
+                });
 
             } catch (error) {
                 console.error('Checkout error:', error);
                 showErrorModal('Gagal Checkout', error.message || 'Terjadi kesalahan. Silahkan coba lagi.');
-            } finally {
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
             }
@@ -1345,21 +1370,18 @@
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
             const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
-            const codPaymentOption = document.getElementById('codPaymentOption');
 
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
                 deliveryAddressSection.style.display = 'block';
                 deliveryMethodsSection.style.display = 'block';
-                paymentMethodsSection.style.display = 'block';
-                if (codPaymentOption) codPaymentOption.style.display = 'flex'; // Show COD for delivery
+                paymentMethodsSection.style.display = 'none';
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
                 deliveryAddressSection.style.display = 'none';
                 deliveryMethodsSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
-                if (codPaymentOption) codPaymentOption.style.display = 'none'; // Hide COD for non-delivery
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }
@@ -1613,16 +1635,47 @@
             }
         }
 
+        // Global variable for service fee from backend
+        let checkoutServiceFee = 0;
+
+        // Fetch checkout settings from backend (service fee, etc.)
+        async function loadCheckoutSettings() {
+            try {
+                const response = await fetch('/api/customer/checkout/settings', {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    checkoutServiceFee = result.data.service_fee || 0;
+
+                    // Show/hide service fee row based on value
+                    const serviceFeeRow = document.getElementById('serviceFeeRow');
+                    if (serviceFeeRow) {
+                        serviceFeeRow.style.display = checkoutServiceFee > 0 ? 'flex' : 'none';
+                    }
+
+                    // Update totals with new service fee
+                    updateOrderTotal();
+                }
+            } catch (error) {
+                console.error('Error loading checkout settings:', error);
+                // Keep service fee as 0 if failed to load
+                checkoutServiceFee = 0;
+            }
+        }
+
         // Calculate and update order total
         function updateOrderTotal() {
             let subtotal = 0;
             let totalQty = 0;
+
             document.querySelectorAll('.order-item-checkbox:checked').forEach(checkbox => {
                 subtotal += parseFloat(checkbox.getAttribute('data-subtotal') || 0);
                 totalQty += parseInt(checkbox.getAttribute('data-quantity') || 0);
             });
-
-            const grandTotal = subtotal;
 
             // Update labels
             const subtotalLabel = document.getElementById('summarySubtotalLabel');
@@ -1633,7 +1686,7 @@
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
 
             if (totalElement) {
-                totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
+                totalElement.textContent = 'Rp ' + formatRupiah(subtotal);
             }
         }
 
@@ -1692,7 +1745,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function () {
-            // Load cart items for checkout immediately (no loading spinner)
+            // Load cart items for checkout
             loadCheckoutItems();
 
             // Setup mobile input handlers

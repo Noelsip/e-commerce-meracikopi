@@ -43,6 +43,12 @@ test('customer can create take away order', function () {
         'order_type' => 'take_away',
         'customer_name' => 'John Doe',
     ]);
+
+    // Verify cart status changed to checked_out
+    $this->assertDatabaseHas('carts', [
+        'guest_token' => $this->guestToken,
+        'status' => 'checked_out'
+    ]);
 });
 
 test('customer can create dine in order', function () {
@@ -94,11 +100,26 @@ test('customer can create delivery order', function () {
         'quantity' => 2,
     ]);
 
+    $quoteResponse = $this->postJson('/api/customer/delivery/calculate-fee', [
+        'destination' => [
+            'latitude' => -1.2248893,
+            'longitude' => 116.8658594,
+            'address' => 'Meracikopi, Balikpapan',
+        ],
+    ]);
+
+    $quoteResponse->assertStatus(200);
+
+    $quoteId = $quoteResponse->json('data.quote_id');
+    $optionId = $quoteResponse->json('data.options.0.id');
+
     $response = $this->withHeaders(['X-GUEST-TOKEN' => $this->guestToken])
         ->postJson('/api/customer/orders', [
             'customer_name' => 'John Doe',
             'customer_phone' => '08123456789',
             'order_type' => 'delivery',
+            'shipping_quote_id' => $quoteId,
+            'shipping_option_id' => $optionId,
             'address' => [
                 'receiver_name' => 'John Doe',
                 'phone' => '08123456789',
@@ -180,7 +201,7 @@ test('customer can get order by id', function () {
 
     $response->assertStatus(200)
         ->assertJsonStructure([
-            'data' => ['id', 'order_type', 'status', 'total_price', 'items']
+            'data' => ['id', 'order_type', 'status', 'items']
         ]);
 });
 

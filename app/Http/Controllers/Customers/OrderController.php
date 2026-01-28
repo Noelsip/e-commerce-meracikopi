@@ -10,13 +10,25 @@ use App\Models\Orders;
 use App\Models\OrderItems;
 use App\Models\OrderAddresses;
 use App\Models\OrderLogs;
-use App\Models\Payments;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
-use App\Enums\StatusPayments;
+use App\Services\Shipping\ShippingQuoteService;
 
 class OrderController extends Controller
 {
+    /**
+     * Get checkout settings (service fee, etc.)
+     * This endpoint is used by frontend to display fees from backend/third-party services
+     */
+    public function getCheckoutSettings()
+    {
+        return response()->json([
+            'data' => [
+                'service_fee' => (int) config('order.service_fee', 0),
+            ]
+        ]);
+    }
+
     public function index(Request $request)
     {
         $guestToken = $request->attributes->get('guest_token');
@@ -30,41 +42,55 @@ class OrderController extends Controller
             $query->where('guest_token', $guestToken);
         }
 
+        // Filter by status
         if ($request->has('status')) {
             $query->where('status', $request->status);
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->get();
+        // Filter by date range
+        if ($request->has('from_date')) {
+            $query->whereDate('created_at', '>=', $request->from_date);
+        }
+        if ($request->has('to_date')) {
+            $query->whereDate('created_at', '<=', $request->to_date);
+        }
+
+        // Pagination
+        $perPage = $request->input('per_page', 10);
+        $orders = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
         return response()->json([
             'data' => $orders->map(fn($order) => [
                 'id' => $order->id,
                 'order_type' => $order->order_type,
                 'status' => $order->status,
+                'customer_name' => $order->customer_name,
                 'total_price' => (int) $order->total_price,
                 'delivery_fee' => (int) $order->delivery_fee,
                 'discount_amount' => (int) $order->discount_amount,
                 'final_price' => (int) $order->final_price,
+                'items_count' => $order->order_items->count(),
+                'items_summary' => $order->order_items->take(3)->map(fn($item) => $item->menu?->name)->filter()->implode(', '),
+                'payment' => $order->payments->first() ? [
+                    'status' => $order->payments->first()->status,
+                    'method' => $order->payments->first()->payment_method,
+                    'paid_at' => $order->payments->first()->paid_at?->toIso8601String(),
+                ] : null,
                 'created_at' => $order->created_at->toIso8601String(),
-                'payments' => $order->payments->map(fn($payment) => [
-                    'payment_method' => $payment->payment_method,
-                    'payment_gateway' => $payment->payment_gateway,
-                    'status' => $payment->status,
-                ]),
-                'items' => $order->order_items->map(fn($item) => [
-                    'menu_id' => $item->menu_id,
-                    'menu_name' => $item->menu->name ?? null,
-                    'quantity' => $item->quantity,
-                    'price' => (int) $item->price,
-                ]),
-            ])
+            ]),
+            'meta' => [
+                'current_page' => $orders->currentPage(),
+                'last_page' => $orders->lastPage(),
+                'per_page' => $orders->perPage(),
+                'total' => $orders->total(),
+            ]
         ], 200);
     }
 
     /**
      * Checkout dari cart (rename dari checkout ke store)
      */
-    public function store(Request $request)
+    public function store(Request $request, ShippingQuoteService $shipping)
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -77,14 +103,19 @@ class OrderController extends Controller
             'address.full_address' => 'required_if:order_type,delivery|string',
             'address.city' => 'required_if:order_type,delivery|string',
             'address.postal_code' => 'required_if:order_type,delivery|string',
+            'address.province' => 'nullable|string',
+            'address.latitude' => 'nullable|numeric',
+            'address.longitude' => 'nullable|numeric',
+            'address.rajaongkir_destination_id' => 'nullable|integer',
             'address.notes' => 'nullable|string',
+            'shipping_quote_id' => 'required_if:order_type,delivery|string',
+            'shipping_option_id' => 'required_if:order_type,delivery|string',
             'notes' => 'nullable|string',
             'selected_item_ids' => 'required|array|min:1', // Add validation for selected items
-            'selected_item_ids.*' => 'integer|exists:cart_items,id', // Each item must be valid cart_item ID
-            'payment_method' => 'required|string|in:dana,gopay,shopeepay,qris,transfer_bank,cod,credit_card,ovo,linkaja',
+            'selected_item_ids.*' => 'integer', // Ownership validation is done in transaction
         ]);
 
-        return DB::transaction(function () use ($request) {
+        return DB::transaction(function () use ($request, $shipping) {
             $guestToken = $request->attributes->get('guest_token');
 
 
@@ -129,14 +160,42 @@ class OrderController extends Controller
 
             // Hitung delivery fee (jika order type = delivery)
             $deliveryFee = 0;
+            $deliveryProvider = null;
+            $deliveryService = null;
+            $deliveryMeta = null;
             if ($request->order_type === 'delivery') {
-                // TODO: Integrate dengan third party delivery service
-                // Untuk sementara set default atau dari request
-                $deliveryFee = $request->input('delivery_fee', 0);
+                $quoteId = (string) $request->input('shipping_quote_id');
+                $optionId = (string) $request->input('shipping_option_id');
+
+                $quote = $shipping->getQuote($quoteId);
+                if (!$quote) {
+                    abort(422, 'Invalid shipping_quote_id');
+                }
+
+                $option = $shipping->getOptionFromQuote($quoteId, $optionId);
+                if (!$option || !is_numeric($option['price'] ?? null)) {
+                    abort(422, 'Invalid shipping_option_id');
+                }
+
+                $deliveryFee = (int) $option['price'];
+                $deliveryProvider = $option['provider'] ?? null;
+                $deliveryService = $option['service'] ?? null;
+                $deliveryMeta = [
+                    'quote_id' => $quoteId,
+                    'option_id' => $optionId,
+                    'channel' => $quote['channel'] ?? null,
+                    'origin' => $quote['origin'] ?? null,
+                    'destination' => $quote['destination'] ?? null,
+                    'selected_option' => $option,
+                    'meta' => $quote['meta'] ?? null,
+                ];
             }
 
-            // Hitung final price
-            $finalPrice = $totalPrice + $deliveryFee;
+            // Get service fee from config (can be from third-party payment gateway)
+            $serviceFee = (int) config('order.service_fee', 0);
+
+            // Hitung final price (including service fee)
+            $finalPrice = $totalPrice + $deliveryFee + $serviceFee - $totalDiscountAmount;
 
             // Membuat order
             $order = Orders::create([
@@ -148,6 +207,10 @@ class OrderController extends Controller
                 'table_id' => $request->table_id,
                 'total_price' => $totalPrice,
                 'delivery_fee' => $deliveryFee,
+                'service_fee' => $serviceFee,
+                'delivery_provider' => $deliveryProvider,
+                'delivery_service' => $deliveryService,
+                'delivery_meta' => $deliveryMeta,
                 'discount_amount' => $totalDiscountAmount,
                 'final_price' => $finalPrice,
                 'status' => OrderStatus::PENDING_PAYMENT,
@@ -172,8 +235,12 @@ class OrderController extends Controller
                     'phone' => $request->address['phone'],
                     'full_address' => $request->address['full_address'],
                     'city' => $request->address['city'],
+                    'province' => $request->address['province'] ?? null,
                     'postal_code' => $request->address['postal_code'],
-                    'notes' => $request->address['notes'] ?? null,
+                    'latitude' => $request->address['latitude'] ?? null,
+                    'longitude' => $request->address['longitude'] ?? null,
+                    'rajaongkir_destination_id' => $request->address['rajaongkir_destination_id'] ?? null,
+                    'notes' => $request->address['notes'] ?? '',
                 ]);
             }
 
@@ -182,18 +249,6 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'status' => OrderStatus::PENDING_PAYMENT,
                 'note' => 'Order created',
-            ]);
-
-            // Membuat payment record dengan payment method yang dipilih user
-            $transactionId = 'MERACIKOPI-' . $order->id . '-' . time();
-            Payments::create([
-                'order_id' => $order->id,
-                'payment_gateway' => 'midtrans',
-                'payment_method' => $request->payment_method,
-                'transaction_id' => $transactionId,
-                'amount' => $finalPrice,
-                'status' => StatusPayments::PENDING,
-                'payload' => [],
             ]);
 
             // Empty the cart
@@ -207,6 +262,7 @@ class OrderController extends Controller
                     'status' => $order->status,
                     'total_price' => (int) $order->total_price,
                     'delivery_fee' => (int) $order->delivery_fee,
+                    'service_fee' => (int) $order->service_fee,
                     'discount_amount' => (int) $order->discount_amount,
                     'final_price' => (int) $order->final_price,
                 ]
@@ -280,8 +336,6 @@ class OrderController extends Controller
                 'payments' => $order->payments->map(fn($payment) => [
                     'amount' => (int) $payment->amount,
                     'status' => $payment->status,
-                    'payment_method' => $payment->payment_method,
-                    'payment_gateway' => $payment->payment_gateway,
                     'paid_at' => $payment->paid_at?->toIso8601String(),
                 ]),
                 'logs' => $order->order_logs->map(fn($log) => [
