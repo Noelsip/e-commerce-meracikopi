@@ -279,9 +279,14 @@
 
         /* Empty State */
         .empty-orders {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             text-align: center;
             padding: 60px 20px;
             color: rgba(255, 255, 255, 0.6);
+            min-height: 300px;
         }
 
         .empty-orders svg {
