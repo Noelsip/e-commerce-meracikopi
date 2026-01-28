@@ -40,14 +40,21 @@ class PaymentController extends Controller
                 abort(422, 'Order already paid');
             }
 
-            // Membuat record pembayaran
-            $payment = Payments::create([
-                'order_id' => $order->id,
-                'payment_gateway' => 'midtrans',
-                'payment_method' => 'snap',
-                'amount' => $order->total_price,
-                'status' => StatusPayments::PENDING,
-            ]);
+            // Mengambil payment record yang sudah dibuat saat checkout atau buat baru jika tidak ada
+            $payment = Payments::where('order_id', $order->id)
+                ->where('status', StatusPayments::PENDING)
+                ->first();
+
+            if (!$payment) {
+                // Fallback: buat payment record baru jika tidak ada
+                $payment = Payments::create([
+                    'order_id' => $order->id,
+                    'payment_gateway' => 'midtrans',
+                    'payment_method' => 'snap',
+                    'amount' => $order->final_price,
+                    'status' => StatusPayments::PENDING,
+                ]);
+            }
 
             $transactionId = 'MERACIKOPI-' . $order->id;
             $payment->update([

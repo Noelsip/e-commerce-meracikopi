@@ -1061,7 +1061,7 @@
                                         ...order,
                                         order_code: this.generateOrderCode(order),
                                         items: items,
-                                        payment_method: order.payments?.[0]?.payment_method || 'Credit Card'
+                                        payment_method: this.formatPaymentMethod(order.payments?.[0]?.payment_method)
                                     };
                                 });
                             }
@@ -1122,6 +1122,22 @@
 
                 formatPrice(price) {
                     return new Intl.NumberFormat('id-ID').format(price);
+                },
+
+                formatPaymentMethod(method) {
+                    const paymentMethods = {
+                        'dana': 'Dana',
+                        'gopay': 'GoPay',
+                        'shopeepay': 'ShopeePay',
+                        'qris': 'QRIS',
+                        'transfer_bank': 'Transfer Bank',
+                        'cod': 'Bayar di Tempat (COD)',
+                        'credit_card': 'Credit Card',
+                        'debit_card': 'Debit Card',
+                        'ovo': 'OVO',
+                        'linkaja': 'LinkAja'
+                    };
+                    return paymentMethods[method] || method || 'Belum dipilih';
                 }
             }
         }

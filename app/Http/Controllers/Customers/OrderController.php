@@ -10,8 +10,10 @@ use App\Models\Orders;
 use App\Models\OrderItems;
 use App\Models\OrderAddresses;
 use App\Models\OrderLogs;
+use App\Models\Payments;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Enums\StatusPayments;
 
 class OrderController extends Controller
 {
@@ -19,7 +21,7 @@ class OrderController extends Controller
     {
         $guestToken = $request->attributes->get('guest_token');
 
-        $query = Orders::query();
+        $query = Orders::with(['payments', 'order_items.menu']);
 
         // Filter by guest token or user_id
         if (auth()->check()) {
@@ -44,6 +46,17 @@ class OrderController extends Controller
                 'discount_amount' => (int) $order->discount_amount,
                 'final_price' => (int) $order->final_price,
                 'created_at' => $order->created_at->toIso8601String(),
+                'payments' => $order->payments->map(fn($payment) => [
+                    'payment_method' => $payment->payment_method,
+                    'payment_gateway' => $payment->payment_gateway,
+                    'status' => $payment->status,
+                ]),
+                'items' => $order->order_items->map(fn($item) => [
+                    'menu_id' => $item->menu_id,
+                    'menu_name' => $item->menu->name ?? null,
+                    'quantity' => $item->quantity,
+                    'price' => (int) $item->price,
+                ]),
             ])
         ], 200);
     }
@@ -68,6 +81,7 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
             'selected_item_ids' => 'required|array|min:1', // Add validation for selected items
             'selected_item_ids.*' => 'integer|exists:cart_items,id', // Each item must be valid cart_item ID
+            'payment_method' => 'required|string|in:dana,gopay,shopeepay,qris,transfer_bank,cod,credit_card,ovo,linkaja',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -168,6 +182,18 @@ class OrderController extends Controller
                 'order_id' => $order->id,
                 'status' => OrderStatus::PENDING_PAYMENT,
                 'note' => 'Order created',
+            ]);
+
+            // Membuat payment record dengan payment method yang dipilih user
+            $transactionId = 'MERACIKOPI-' . $order->id . '-' . time();
+            Payments::create([
+                'order_id' => $order->id,
+                'payment_gateway' => 'midtrans',
+                'payment_method' => $request->payment_method,
+                'transaction_id' => $transactionId,
+                'amount' => $finalPrice,
+                'status' => StatusPayments::PENDING,
+                'payload' => [],
             ]);
 
             // Empty the cart

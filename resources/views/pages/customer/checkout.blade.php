@@ -1156,6 +1156,7 @@
                 customer_phone: customerPhone,
                 notes: document.getElementById('receiptNote')?.textContent || '', // Assuming note is somewhere or empty
                 selected_item_ids: selectedItemIds,
+                payment_method: paymentMethod, // Tambahkan payment method
                 // Delivery specific fields
                 address: orderType === 'delivery' ? {
                     receiver_name: customerName,

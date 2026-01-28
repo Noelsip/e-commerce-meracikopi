@@ -64,26 +64,26 @@ class Orders extends Model
 
     public function order_items()
     {
-        return $this->hasMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class, 'order_id');
     }
 
     public function order_logs()
     {
-        return $this->hasMany(OrderLogs::class);
+        return $this->hasMany(OrderLogs::class, 'order_id');
     }
 
     public function order_addresses()
     {
-        return $this->hasMany(OrderAddresses::class);
+        return $this->hasMany(OrderAddresses::class, 'order_id');
     }
 
     public function payments()
     {
-        return $this->hasMany(Payments::class);
+        return $this->hasMany(Payments::class, 'order_id');
     }
 
     public function deliveries()
     {
-        return $this->hasMany(Deliveries::class);
+        return $this->hasMany(Deliveries::class, 'order_id');
     }
 }
