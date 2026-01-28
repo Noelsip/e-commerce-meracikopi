@@ -730,6 +730,7 @@
             margin: 0; 
             letter-spacing: 0.1em;
             font-weight: 500;
+            white-space: nowrap;
         ">
             Nikmati kopi pilihan hari ini &nbsp;<span style="opacity: 0.6;">|</span>&nbsp; Dine In & Delivery tersedia
         </p>

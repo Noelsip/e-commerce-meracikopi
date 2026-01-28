@@ -2,14 +2,8 @@
     <!-- Alpine Data Scope -->
     <div x-data="cartManager" class="cart-page-container">
 
-
-        <!-- Loading State -->
-        <div x-show="loading" class="flex justify-center items-center py-20">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#CA7842]"></div>
-        </div>
-
         <!-- Empty State -->
-        <div x-show="!loading && items.length === 0" class="empty-cart-container" style="display: none;">
+        <div x-show="items.length === 0" class="empty-cart-container" style="display: none;">
             <svg class="empty-cart-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z">
@@ -23,7 +17,7 @@
         </div>
 
         <!-- Cart Content -->
-        <div x-show="!loading && items.length > 0" style="display: none;">
+        <div x-show="items.length > 0" style="display: none;">
 
             <!-- Cart Table Header -->
             <div class="cart-table-header">
@@ -42,13 +36,43 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-wrapper" x-data="{ swiped: false, startX: 0, currentX: 0 }"
-                        @touchstart="startX = $event.touches[0].clientX; currentX = 0"
-                        @touchmove="currentX = $event.touches[0].clientX - startX"
-                        @touchend="if(currentX < -50) { swiped = true } else if(currentX > 50) { swiped = false }">
-                        <div class="cart-item-row" :class="{ 'swiped': swiped }">
+                    <div class="cart-item-wrapper" 
+                        x-data="{
+                            startX: 0,
+                            offsetX: 0,
+                            isDragging: false,
+                            itemRow: null
+                        }"
+                        x-init="
+                            itemRow = $el.querySelector('.cart-item-row');
+                        "
+                        @touchstart="
+                            startX = $event.touches[0].clientX;
+                            isDragging = true;
+                            itemRow.style.transition = 'none';
+                        "
+                        @touchmove.prevent="
+                            if (!isDragging) return;
+                            let diff = $event.touches[0].clientX - startX;
+                            if (diff < 0) {
+                                offsetX = Math.max(-90, diff);
+                                itemRow.style.transform = 'translateX(' + offsetX + 'px)';
+                            }
+                        "
+                        @touchend="
+                            isDragging = false;
+                            itemRow.style.transition = 'transform 0.3s ease';
+                            if (offsetX < -45) {
+                                offsetX = -90;
+                                itemRow.style.transform = 'translateX(-90px)';
+                            } else {
+                                offsetX = 0;
+                                itemRow.style.transform = 'translateX(0px)';
+                            }
+                        ">
+                        <div class="cart-item-row">
                             <!-- Item Checkbox -->
-                            <div class="header-checkbox">
+                            <div class="header-checkbox" @touchstart.stop @touchmove.stop>
                                 <input type="checkbox" class="cart-checkbox item-checkbox" :checked="item.selected"
                                     @change="toggleItemSelection(item.id)">
                             </div>
@@ -56,7 +80,7 @@
                             <!-- Product Info -->
                             <div class="product-info">
                                 <template x-if="item.menu_image">
-                                    <img :src="item.menu_image" alt="Product" class="product-image">
+                                    <img :src="item.menu_image" alt="Product" class="product-image" draggable="false">
                                 </template>
                                 <template x-if="!item.menu_image">
                                     <div class="product-image-placeholder"></div>
@@ -68,7 +92,7 @@
                             <span class="product-price" x-text="formatRupiah(item.price)"></span>
 
                             <!-- Quantity -->
-                            <div class="quantity-controls">
+                            <div class="quantity-controls" @touchstart.stop @touchmove.stop @touchend.stop>
                                 <button type="button" class="quantity-btn quantity-btn-minus"
                                     @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.updating">
                                     −
@@ -88,7 +112,8 @@
                         </div>
 
                         <!-- Swipe Delete Button (Mobile only) -->
-                        <button class="swipe-delete-btn" @click="removeItem(item.id); swiped = false">
+                        <button class="swipe-delete-btn" 
+                            @click="removeItem(item.id); offsetX = 0; itemRow.style.transform = 'translateX(0px)'">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
                                 <polyline points="3 6 5 6 21 6"></polyline>
@@ -166,11 +191,24 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('cartManager', () => ({
                 items: [],
-                loading: true,
+                loading: false,
                 totalPrice: 0,
                 token: localStorage.getItem('guest_token') || '',
 
                 init() {
+                    // Load dari localStorage cache dulu untuk instant display
+                    const cachedCart = localStorage.getItem('cart_data');
+                    if (cachedCart) {
+                        try {
+                            const cached = JSON.parse(cachedCart);
+                            this.items = cached.items || [];
+                            this.totalPrice = cached.total_price || 0;
+                        } catch (e) {
+                            console.error('Error parsing cached cart:', e);
+                        }
+                    }
+                    
+                    // Fetch data terbaru di background
                     this.fetchCart();
                 },
 
@@ -212,8 +250,7 @@
                     return 'Rp. ' + new Intl.NumberFormat('id-ID').format(amount);
                 },
 
-                async fetchCart(showLoading = true) {
-                    if (showLoading) this.loading = true;
+                async fetchCart(showLoading = false) {
                     try {
                         const response = await fetch('/api/customer/cart', {
                             headers: {
@@ -240,10 +277,14 @@
 
                         this.totalPrice = result.data.total_price || 0;
                         this.itemToDelete = null; // Reset delete state
+                        
+                        // Simpan ke localStorage untuk instant load next time
+                        localStorage.setItem('cart_data', JSON.stringify({
+                            items: this.items,
+                            total_price: this.totalPrice
+                        }));
                     } catch (error) {
                         console.error('Error fetching cart:', error);
-                    } finally {
-                        if (showLoading) this.loading = false;
                     }
                 },
 
@@ -313,8 +354,13 @@
                 },
 
                 proceedToCheckout() {
+                    console.log('🛒 Proceed to checkout clicked');
+                    console.log('📦 Current items:', this.items);
+                    console.log('✓ Selected count:', this.selectedCount);
+                    
                     // Check if any item is selected
                     if (this.selectedCount === 0) {
+                        console.warn('⚠️ No items selected');
                         // Show error modal
                         const modal = document.getElementById('errorModal');
                         if (modal) {
@@ -327,7 +373,13 @@
                     const selectedIds = this.items
                         .filter(item => item.selected)
                         .map(item => item.id);
+                    
+                    console.log('💾 Saving selected IDs to localStorage:', selectedIds);
                     localStorage.setItem('selected_cart_items', JSON.stringify(selectedIds));
+                    
+                    // Verify saved data
+                    const saved = localStorage.getItem('selected_cart_items');
+                    console.log('✓ Verified saved data:', saved);
 
                     window.location.href = '/customer/checkout';
                 }

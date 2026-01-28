@@ -262,6 +262,24 @@
     // Load available tables on page load
     document.addEventListener('DOMContentLoaded', function() {
         loadAvailableTables();
+        
+        // Initialize order type dari localStorage atau default ke takeaway
+        const savedOrderType = localStorage.getItem('selected_order_type') || 'takeaway';
+        const orderTypeNavbar = document.getElementById('orderTypeNavbar');
+        
+        if (orderTypeNavbar) {
+            orderTypeNavbar.value = savedOrderType;
+            // Trigger sync untuk update tampilan checkout
+            syncOrderType(savedOrderType);
+            
+            // Show/hide table selector based on saved order type
+            if (savedOrderType === 'dine_in') {
+                const tableSelector = document.getElementById('tableSelector');
+                if (tableSelector) {
+                    tableSelector.style.display = 'block';
+                }
+            }
+        }
     });
 
     // Fetch available tables from backend
@@ -342,6 +360,9 @@
         const tableSelector = document.getElementById('tableSelector');
         const tableSelect = document.getElementById('tableSelect');
         const tableWarning = document.getElementById('tableWarning');
+        
+        // Simpan pilihan order type ke localStorage
+        localStorage.setItem('selected_order_type', value);
         
         // Show/hide table selector based on order type
         if (value === 'dine_in') {
