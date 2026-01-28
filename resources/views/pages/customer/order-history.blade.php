@@ -831,6 +831,18 @@
 
                 <!-- Modal Body -->
                 <div class="order-modal-body">
+                    <!-- Customer Info Box -->
+                    <div class="order-info-box" style="margin-bottom: 16px;">
+                        <div class="order-info-item">
+                            <span class="order-info-label">Nama Pelanggan</span>
+                            <span class="order-info-value" x-text="selectedOrder?.customer_name || '-'"></span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">No. Telepon</span>
+                            <span class="order-info-value" x-text="selectedOrder?.customer_phone || '-'"></span>
+                        </div>
+                    </div>
+
                     <!-- Order Type & Payment Method Box -->
                     <div class="order-info-box">
                         <div class="order-info-item">
@@ -1061,12 +1073,13 @@
                                     }));
                                     
                                     console.log('Order items for', order.id, ':', items);
+                                    console.log('Payment method for', order.id, ':', order.payment?.method);
                                     
                                     return {
                                         ...order,
                                         order_code: this.generateOrderCode(order),
                                         items: items,
-                                        payment_method: this.formatPaymentMethod(order.payments?.[0]?.payment_method)
+                                        payment_method: this.formatPaymentMethod(order.payment?.method)
                                     };
                                 });
                             }
@@ -1140,7 +1153,8 @@
                         'credit_card': 'Credit Card',
                         'debit_card': 'Debit Card',
                         'ovo': 'OVO',
-                        'linkaja': 'LinkAja'
+                        'linkaja': 'LinkAja',
+                        'snap': 'Midtrans Snap'
                     };
                     return paymentMethods[method] || method || 'Belum dipilih';
                 }
