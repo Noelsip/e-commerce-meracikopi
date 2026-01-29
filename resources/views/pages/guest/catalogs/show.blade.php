@@ -56,8 +56,8 @@
                     background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
                 }
 
-                .product-box > div:first-child,
-                .product-box > div:nth-child(2) {
+                .product-box>div:first-child,
+                .product-box>div:nth-child(2) {
                     background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.6) 0%, transparent 60%) !important;
                 }
 
@@ -92,12 +92,12 @@
                     margin-bottom: 2px !important;
                 }
 
-                .product-details > div:nth-child(2) {
+                .product-details>div:nth-child(2) {
                     font-size: 14px !important;
                     margin-bottom: 0px !important;
                 }
 
-                .product-details > div:nth-child(3) {
+                .product-details>div:nth-child(3) {
                     font-size: 10px !important;
                     margin-bottom: 14px !important;
                 }
@@ -187,7 +187,7 @@
                     font-size: 22px !important;
                 }
 
-                .product-details > div:nth-child(2) {
+                .product-details>div:nth-child(2) {
                     font-size: 16px !important;
                 }
 
@@ -219,42 +219,7 @@
         </div>
 
         <!-- Combined Container for Background Box & Content -->
-        <div class="product-box" style="
-            position: relative; 
-            width: 100%;
-            max-width: 1440px; 
-            height: 350px; 
-            margin: 0 auto;
-        ">
-            <!-- Background Layer -->
-            <div style="
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
-                z-index: 1;
-                pointer-events: none;
-            "></div>
-
-            <!-- Background Layer -->
-            <div style="
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
-                z-index: 1;
-                pointer-events: none;
-            "></div>
-
-            <!-- Content Layer -->
-            <div class="product-content" style="
-                position: relative;
-                z-index: 2;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 60px;
-            " x-data="{
+        <div class="product-box" x-data="{
                 quantity: 1,
                 note: '',
                 loading: false,
@@ -305,7 +270,42 @@
                         this.loading = false;
                     });
                 }
-            }">
+            }" style="
+            position: relative; 
+            width: 100%;
+            max-width: 1440px; 
+            height: 350px; 
+            margin: 0 auto;
+        ">
+            <!-- Background Layer -->
+            <div style="
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
+                z-index: 1;
+                pointer-events: none;
+            "></div>
+
+            <!-- Background Layer -->
+            <div style="
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
+                z-index: 1;
+                pointer-events: none;
+            "></div>
+
+            <!-- Content Layer -->
+            <div class="product-content" style="
+                position: relative;
+                z-index: 2;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 60px;
+            ">
 
                 <script>
                     window.showCustomerToast = function (message, type = 'success') {
@@ -443,38 +443,41 @@
                     </button>
                 </div>
             </div>
-        </div>
+            <!-- product-content closes here -->
 
-        <!-- Description and Notes Section -->
-        <div class="description-section"
-            style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
-            <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
-                <!-- Description -->
-                <div>
-                    <h3
-                        style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
-                        Deskripsi Produk
-                    </h3>
-                    <p style="color: #aaa; font-size: 14px; line-height: 1.6;">
-                        {{ $menu->description ?? 'Deskripsi produk belum tersedia.' }}
-                    </p>
-                </div>
+            <!-- Description and Notes Section - inside product-box for Alpine.js scope -->
+            <div class="description-section"
+                style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
+                <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
+                    <!-- Description -->
+                    <div>
+                        <h3
+                            style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+                            Deskripsi Produk
+                        </h3>
+                        <p style="color: #aaa; font-size: 14px; line-height: 1.6;">
+                            {{ $menu->description ?? 'Deskripsi produk belum tersedia.' }}
+                        </p>
+                    </div>
 
-                <!-- Notes -->
-                <div>
-                    <h3
-                        style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
-                        Catatan
-                    </h3>
-                    <div class="note-wrapper"
-                        style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;">
-                        <textarea x-model="note" placeholder="Catatan opsional..."
-                            style="width: 100%; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; resize: none; font-family: 'Inter', sans-serif;"
-                            rows="6"></textarea>
+                    <!-- Notes -->
+                    <div>
+                        <h3
+                            style="font-size: 18px; color: #fff; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px;">
+                            Catatan
+                        </h3>
+                        <div class="note-wrapper"
+                            style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px;">
+                            <textarea x-model="note" placeholder="Catatan opsional..."
+                                style="width: 100%; background: transparent; border: none; color: #fff; font-size: 14px; outline: none; resize: none; font-family: 'Inter', sans-serif;"
+                                rows="6"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
+            <!-- description-section closes here -->
         </div>
+        <!-- product-box with x-data closes here -->
 
         <!-- Related Menus Section -->
         @if(isset($relatedMenus) && $relatedMenus->count() > 0)
