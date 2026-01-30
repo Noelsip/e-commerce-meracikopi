@@ -27,7 +27,16 @@ class CatalogController extends Controller
 
         $menus = $query->orderBy('name')->get();
 
-        return view('pages.guest.catalogs.index', compact('menus'));
+        // Get table info from session
+        $tableInfo = null;
+        if (session()->has('table_id')) {
+            $tableInfo = [
+                'id' => session('table_id'),
+                'number' => session('table_number'),
+            ];
+        }
+
+        return view('pages.guest.catalogs.index', compact('menus', 'tableInfo'));
     }
 
     /**

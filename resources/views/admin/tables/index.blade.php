@@ -73,30 +73,39 @@
                     {{ $table->status === 'available' ? 'Tersedia' : ($table->status === 'occupied' ? 'Terisi' : 'Reserved') }} · {{ $table->capacity }} Kursi
                 </p>
 
-                <div class="flex gap-2 mt-4 pt-4" style="border-top: 1px solid #3e302b;">
-                    <select onchange="updateStatus({{ $table->id }}, this.value)"
-                        class="flex-1 px-3 py-2 text-xs cursor-pointer rounded-lg"
-                        style="background-color: #3e302b; color: #f0f2bd; border: none;">
-                        <option value="available" {{ $table->status === 'available' ? 'selected' : '' }}>Tersedia</option>
-                        <option value="occupied" {{ $table->status === 'occupied' ? 'selected' : '' }}>Terisi</option>
-                        <option value="reserved" {{ $table->status === 'reserved' ? 'selected' : '' }}>Reserved</option>
-                    </select>
-                    
-                    <a href="{{ route('admin.tables.edit', $table->id) }}"
-                        class="px-3 py-2 text-xs rounded-lg"
-                        style="background-color: #3e302b; color: #f0f2bd;">
-                        Edit
-                    </a>
-                    
-                    <form action="{{ route('admin.tables.destroy', $table->id) }}" method="POST"
-                        onsubmit="return confirm('Hapus meja ini?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="px-3 py-2 text-xs rounded-lg"
-                            style="background-color: #3e302b; color: #ef4444;">
-                            Hapus
-                        </button>
-                    </form>
+                    <div class="flex flex-col gap-2 flex-1">
+                        <select onchange="updateStatus({{ $table->id }}, this.value)"
+                            class="px-3 py-2 text-xs cursor-pointer rounded-lg"
+                            style="background-color: #3e302b; color: #f0f2bd; border: none;">
+                            <option value="available" {{ $table->status === 'available' ? 'selected' : '' }}>Tersedia</option>
+                            <option value="occupied" {{ $table->status === 'occupied' ? 'selected' : '' }}>Terisi</option>
+                            <option value="reserved" {{ $table->status === 'reserved' ? 'selected' : '' }}>Reserved</option>
+                        </select>
+                        
+                        <div class="flex gap-2">
+                            <button onclick="showQRCode({{ $table->id }}, '{{ $table->table_number }}', '{{ $table->qr_code_path ? asset('storage/' . $table->qr_code_path) : '' }}')"
+                                    class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
+                                    style="background-color: #3e302b; color: #D4A574; border: 1px solid #D4A574;">
+                                QR Code
+                            </button>
+                            
+                            <a href="{{ route('admin.tables.edit', $table->id) }}"
+                                class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
+                                style="background-color: #3e302b; color: #f0f2bd;">
+                                Edit
+                            </a>
+                            
+                            <form action="{{ route('admin.tables.destroy', $table->id) }}" method="POST"
+                                onsubmit="return confirm('Hapus meja ini?');" class="flex-1">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-full px-3 py-2 text-xs rounded-lg"
+                                    style="background-color: #3e302b; color: #ef4444;">
+                                    Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         @empty
@@ -174,3 +183,124 @@
         }
     </script>
 </x-layouts.admin>
+
+<!-- QR Code Modal -->
+<div id="qrModal" class="fixed inset-0 z-50 hidden overflow-y-auto" style="background-color: rgba(0,0,0,0.8);">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="relative w-full max-w-sm rounded-2xl p-8 text-center" style="background-color: #2b211e; border: 1px solid #D4A574;">
+            <button onclick="closeQRModal()" class="absolute top-4 right-4 text-2xl" style="color: #a89890;">×</button>
+            
+            <h3 class="text-xl font-bold mb-6" style="color: #f0f2bd;">QR Code Meja <span id="modalTableNumber"></span></h3>
+            
+            <div id="qrPlaceholder" class="aspect-square w-full rounded-xl mb-6 flex items-center justify-center" style="background-color: #3e302b;">
+                <p style="color: #a89890;">Memuat QR Code...</p>
+            </div>
+            
+            <img id="qrImage" src="" alt="QR Code" class="w-full aspect-square rounded-xl mb-6 hidden border-4 border-white">
+            
+            <div class="flex flex-col gap-3">
+                <a id="downloadBtn" href="" download="" class="px-4 py-3 rounded-xl font-bold hidden" 
+                   style="background-color: #D4A574; color: #1e1715;">
+                    Download QR Code
+                </a>
+                
+                <button onclick="regenerateQR()" class="px-4 py-3 rounded-xl font-semibold" 
+                        style="background-color: transparent; color: #D4A574; border: 1px solid #D4A574;">
+                    Regenerate Token & QR
+                </button>
+                
+                <button onclick="closeQRModal()" class="px-4 py-3 rounded-xl font-semibold" 
+                        style="background-color: #3e302b; color: #f0f2bd;">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTableId = null;
+
+    function showQRCode(id, number, path) {
+        currentTableId = id;
+        document.getElementById('modalTableNumber').textContent = number;
+        document.getElementById('qrModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        if (path) {
+            updateQRDisplay(path);
+        } else {
+            generateQR(id);
+        }
+    }
+
+    function closeQRModal() {
+        document.getElementById('qrModal').classList.add('hidden');
+        document.body.style.overflow = '';
+        // Reset display
+        document.getElementById('qrImage').classList.add('hidden');
+        document.getElementById('downloadBtn').classList.add('hidden');
+        document.getElementById('qrPlaceholder').classList.remove('hidden');
+    }
+
+    function updateQRDisplay(path) {
+        const img = document.getElementById('qrImage');
+        const download = document.getElementById('downloadBtn');
+        const placeholder = document.getElementById('qrPlaceholder');
+        
+        img.src = path;
+        img.classList.remove('hidden');
+        
+        download.href = path;
+        download.download = `QR_Meja_${document.getElementById('modalTableNumber').textContent}.png`;
+        download.classList.remove('hidden');
+        
+        placeholder.classList.add('hidden');
+    }
+
+    function generateQR(id) {
+        fetch(`/admin/tables/${id}/generate-qr`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.data && data.data.qr_code_url) {
+                updateQRDisplay(data.data.qr_code_url);
+            }
+        })
+        .catch(error => alert('Gagal generate QR Code'));
+    }
+
+    function regenerateQR() {
+        if (!confirm('Token lama akan tidak berlaku. Lanjutkan?')) return;
+        
+        const placeholder = document.getElementById('qrPlaceholder');
+        const img = document.getElementById('qrImage');
+        const download = document.getElementById('downloadBtn');
+        
+        img.classList.add('hidden');
+        download.classList.add('hidden');
+        placeholder.classList.remove('hidden');
+        placeholder.innerHTML = '<p style="color: #a89890;">Regenerating...</p>';
+
+        fetch(`/admin/tables/${currentTableId}/regenerate-qr`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.data && data.data.qr_code_url) {
+                updateQRDisplay(data.data.qr_code_url);
+                placeholder.innerHTML = '<p style="color: #a89890;">Memuat QR Code...</p>';
+            }
+        })
+        .catch(error => alert('Gagal regenerate QR Code'));
+    }
+</script>

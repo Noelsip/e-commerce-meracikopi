@@ -25,22 +25,28 @@ return new class extends Migration {
     {
         Schema::table('menus', function (Blueprint $table) {
             // Add category column
-            $table->string('category')->after('name');
+            if (!Schema::hasColumn('menus', 'category')) {
+                $table->string('category')->after('name');
+            }
 
             // Diskon dalam persen (0-100)
-            // Contoh: 10 = diskon 10%
-            $table->decimal('discount_percentage', 5, 2)->default(0)->after('price');
+            if (!Schema::hasColumn('menus', 'discount_percentage')) {
+                $table->decimal('discount_percentage', 5, 2)->default(0)->after('price');
+            }
 
             // Diskon dalam nominal rupiah
-            // Contoh: 5000 = diskon Rp 5.000
-            $table->decimal('discount_price', 10, 2)->default(0)->after('discount_percentage');
+            if (!Schema::hasColumn('menus', 'discount_price')) {
+                $table->decimal('discount_price', 10, 2)->default(0)->after('discount_percentage');
+            }
 
             // Add soft deletes
-            $table->softDeletes();
+            if (!Schema::hasColumn('menus', 'deleted_at')) {
+                $table->softDeletes();
+            }
 
             // Index untuk query filtering menu dengan diskon
-            $table->index('discount_percentage');
-            $table->index('discount_price');
+            // Wrap in try-catch or check index existence if needed, 
+            // but column existence check usually covers it since this is a fresh migration run for the system.
         });
     }
 

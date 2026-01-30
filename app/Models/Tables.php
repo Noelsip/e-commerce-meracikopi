@@ -15,6 +15,7 @@ class Tables extends Model
         'table_number',
         'capacity',
         'status',
+        'qr_token',
         'qr_code_path',
         'is_active',
     ];
