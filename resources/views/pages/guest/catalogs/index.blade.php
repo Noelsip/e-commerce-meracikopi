@@ -487,6 +487,16 @@
             }
         }
     </style>
+    
+    @if(isset($tableInfo) && $tableInfo)
+        <div style="background: linear-gradient(90deg, #CA7842, #8B5E3C); color: #f0f2ae; padding: 12px 20px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M4 18l2-12h12l2 12H4zM7 8V6a5 5 0 0110 0v2h-2V6a3 3 0 00-6 0v2H7z"/>
+            </svg>
+            <span style="font-weight: 600; font-size: 14px;">Pesanan Anda akan diantar ke Meja {{ $tableInfo['number'] }}</span>
+            <a href="{{ route('qr.scan', ['table' => 'clear']) }}" style="font-size: 12px; text-decoration: underline; color: #f0f2ae; opacity: 0.8; margin-left: 10px;">Bukan meja ini?</a>
+        </div>
+    @endif
 
     <!-- Hero Section -->
     <div class="catalog-hero-section" style="background-color: #1a1410; padding: 60px 20px 40px 20px;">

@@ -12,14 +12,19 @@ use App\Http\Controllers\Admin\TableAdminController;
 use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\TableApiController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\CatalogController;
+use App\Http\Controllers\QRCodeController;
 
 // Guest Routes
 Route::get('/', function () {
     return view('pages.guest.welcome');
 })->name('home');
+
+// QR Code Scan Route
+Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan');
 
 // Customer Routes
 Route::view('dashboard', 'dashboard')
@@ -94,6 +99,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('menus.toggleVisibility');
         Route::patch('/tables/{table}/status', [TableAdminController::class, 'updateStatus'])
             ->name('tables.updateStatus');
+        Route::post('/tables/{id}/generate-qr', [TableApiController::class, 'generateQRCode'])
+            ->name('tables.generateQR');
+        Route::post('/tables/{id}/regenerate-qr', [TableApiController::class, 'regenerateQRCode'])
+            ->name('tables.regenerateQR');
 
         Route::resource('orders', OrderAdminController::class)->except(['create', 'store']);
         Route::patch('/orders/{order}/status', [OrderAdminController::class, 'updateStatus'])

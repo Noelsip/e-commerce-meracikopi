@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tables;
 use Illuminate\Http\Request;
+use App\Services\QRCodeService;
+use Illuminate\Support\Str;
 
 class TableAdminController extends Controller
 {
@@ -31,8 +33,14 @@ class TableAdminController extends Controller
 
         $data = $request->only(['table_number', 'capacity', 'status']);
         $data['is_active'] = $request->has('is_active');
+        $data['qr_token'] = Str::random(32);
 
-        Tables::create($data);
+        $table = Tables::create($data);
+
+        // Generate QR Code
+        $qrService = new QRCodeService();
+        $qrCodePath = $qrService->generateTableQRCode($table->qr_token, $table->table_number);
+        $table->update(['qr_code_path' => $qrCodePath]);
 
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil ditambahkan.');
     }
@@ -52,10 +60,19 @@ class TableAdminController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $data = $request->only(['table_number', 'capacity', 'status']);
-        $data['is_active'] = $request->has('is_active');
-
+        $oldTableNumber = $table->table_number;
         $table->update($data);
+
+        // Regenerate QR if table number changed (to update the label)
+        if ($oldTableNumber !== $data['table_number'] && $table->qr_token) {
+            $qrService = new QRCodeService();
+            // Delete old QR if exists
+            if ($table->qr_code_path) {
+                $qrService->deleteQRCode($table->qr_code_path);
+            }
+            $qrCodePath = $qrService->generateTableQRCode($table->qr_token, $table->table_number);
+            $table->update(['qr_code_path' => $qrCodePath]);
+        }
 
         return redirect()->route('admin.tables.index')->with('success', 'Meja berhasil diperbarui.');
     }
