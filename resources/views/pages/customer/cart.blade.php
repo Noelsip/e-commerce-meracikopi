@@ -144,8 +144,10 @@
                 <div class="cart-summary">
                     <!-- Left side: Checkbox + Pilih Semua -->
                     <div class="cart-summary-left">
-                        <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
-                            @change="toggleSelectAll">
+                        <div class="header-checkbox">
+                            <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
+                                @change="toggleSelectAll">
+                        </div>
                         <span class="select-all-text">Pilih Semua</span>
                     </div>
 

@@ -17,15 +17,16 @@ class CartController extends Controller
         // 1. Ambil guest token dari middleware
         $guestToken = $request->attributes->get('guest_token');
 
-        // 2. Cache cart data (30 detik) untuk mengurangi load database
+        // 2. Skip cache to ensure notes are always fresh
         $cacheKey = 'cart_' . $guestToken;
-        
-        $result = Cache::remember($cacheKey, 30, function () use ($guestToken) {
+        Cache::forget($cacheKey); // Always get fresh data
+
+        $result = (function () use ($guestToken) {
             // Query cart data directly (Eager Loading)
             $cart = Cart::with([
                 'items' => function ($query) {
                     // Select only necessary columns from cart_items
-                    $query->select('id', 'cart_id', 'menu_id', 'quantity');
+                    $query->select('id', 'cart_id', 'menu_id', 'quantity', 'note');
                 },
                 'items.menu' => function ($query) {
                     // Select only necessary columns from menus
@@ -63,6 +64,7 @@ class CartController extends Controller
                     'menu_image' => $item->menu->image_path ? asset($item->menu->image_path) : null,
                     'price' => $item->menu->price,
                     'quantity' => $item->quantity,
+                    'note' => $item->note,
                     'subtotal' => $subtotal
                 ];
             }
@@ -71,7 +73,7 @@ class CartController extends Controller
                 'items' => $items,
                 'total_price' => $totalPrice
             ];
-        });
+        })();
 
         return response()->json([
             'data' => [

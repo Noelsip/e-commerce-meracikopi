@@ -43,6 +43,11 @@
             --stroke-color: #D9D9D9;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;
@@ -147,18 +152,24 @@
             gap: 16px;
         }
 
-        /* Order Item Card */
+        /* Order Item Card - Desktop seperti mobile */
         .order-item-card {
-            display: flex;
-            align-items: center;
+            display: grid;
+            grid-template-columns: auto 80px 1fr auto;
+            grid-template-rows: auto auto;
+            gap: 8px 16px;
             padding: 16px 20px;
             border: 1px solid #D9D9D9;
             border-radius: 8px;
             background: #241813;
-            gap: 16px;
+            align-items: start;
         }
 
+        /* Checkbox - Column 1, Row 1-2 span */
         .order-item-checkbox {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            align-self: center;
             width: 18px;
             height: 18px;
             border: 2px solid rgba(255, 255, 255, 0.4);
@@ -188,25 +199,81 @@
             font-weight: bold;
         }
 
+        /* Image - Column 2, Row 1-2 span */
         .order-item-image {
+            grid-column: 2;
+            grid-row: 1 / span 2;
             width: 80px;
             height: 80px;
             background-color: rgba(100, 80, 70, 0.5);
             border-radius: 8px;
-            flex-shrink: 0;
+            object-fit: cover;
+            align-self: center;
         }
 
+        /* Product Info - Unwrap untuk grid */
+        .order-item-info {
+            display: contents;
+        }
+
+        /* Details container - Column 3, Row 1 */
         .order-item-details {
-            flex: 1;
+            grid-column: 3;
+            grid-row: 1;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 4px;
         }
 
+        /* Name */
         .order-item-name {
             color: white;
             font-size: 14px;
             font-weight: 500;
+        }
+
+        /* Hide individual price in details, show in actions */
+        .order-item-details .order-item-price {
+            display: none;
+        }
+
+        /* Actions - Column 3, Row 2 */
+        .order-item-actions {
+            grid-column: 3;
+            grid-row: 2;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Price in actions area */
+        .order-item-subtotal {
+            color: #ca7842;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Delete button - Column 4, Row 1-2 span */
+        .order-item-delete {
+            grid-column: 4;
+            grid-row: 1 / span 2;
+            align-self: center;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            padding: 8px;
+            transition: color 0.2s ease;
+        }
+
+        .order-item-delete:hover {
+            color: #e74c3c;
+        }
+
+        .order-item-price {
+            color: #ca7842;
+            font-size: 15px;
+            font-weight: 600;
         }
 
         .order-item-quantity {
@@ -244,48 +311,30 @@
             pointer-events: none;
         }
 
-        .order-item-delete {
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            font-size: 18px;
-            transition: color 0.2s ease;
-        }
-
-        .order-item-delete:hover {
-            color: #e74c3c;
-        }
-
-        .order-item-price {
-            color: #ca7842;
-            font-size: 16px;
-            font-weight: 600;
-            margin-left: auto;
-        }
-
         /* Checkout Quantity Controls */
         .checkout-quantity-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .checkout-qty-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.2s ease;
         }
 
         .checkout-qty-minus {
-            background-color: #4b3c35;
-            color: white;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .checkout-qty-minus:disabled {
@@ -295,18 +344,19 @@
         }
 
         .checkout-qty-plus {
-            background-color: var(--secondary);
-            color: white;
+            background-color: rgba(202, 120, 66, 0.3);
+            color: #CA7842;
+            border-color: rgba(202, 120, 66, 0.4);
         }
 
         .checkout-qty-btn:hover:not(:disabled) {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .checkout-qty-value {
             color: white;
             font-size: 14px;
-            min-width: 20px;
+            min-width: 24px;
             text-align: center;
         }
 
@@ -1039,9 +1089,18 @@
                 margin-bottom: 0;
             }
 
-            .section-title {
+            /* Hide 'Jumlah Pesanan' title only in mobile order summary footer */
+            .order-summary-section > .section-title {
                 display: none;
-                /* Hide 'Jumlah Pesanan' title in mobile footer */
+            }
+
+            /* Show section titles for payment and delivery methods */
+            .payment-methods-section .section-title,
+            .delivery-methods-section .section-title {
+                display: block;
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 16px;
             }
 
             /* Ensure the order items take full width */

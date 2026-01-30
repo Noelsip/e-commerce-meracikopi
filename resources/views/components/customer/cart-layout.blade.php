@@ -183,41 +183,42 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 8px;
         }
 
         .quantity-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.2s ease;
         }
 
         .quantity-btn-minus {
-            background-color: #4b3c35;
-            color: white;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .quantity-btn-plus {
-            background-color: var(--secondary);
-            color: white;
+            background-color: rgba(202, 120, 66, 0.3);
+            color: #CA7842;
+            border-color: rgba(202, 120, 66, 0.4);
         }
 
         .quantity-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         .quantity-value {
             color: white;
             font-size: 14px;
-            min-width: 20px;
+            min-width: 24px;
             text-align: center;
         }
 
@@ -310,7 +311,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-left: 1px;
+            padding-left: 0;
+        }
+
+        .cart-summary-left .header-checkbox {
+            width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .cart-summary-right {
@@ -703,7 +711,7 @@
                 display: flex;
                 align-items: center;
                 gap: 8px;
-                padding-left: 0;
+                padding-left: 8px;
             }
 
             .select-all-text {

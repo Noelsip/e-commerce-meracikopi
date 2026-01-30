@@ -75,25 +75,59 @@
                     <thead>
                         <tr style="border-bottom: 1px solid #3e302b;">
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">ID</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Meja</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Tipe</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Customer</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Total</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Status</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Tanggal</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Catatan</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($recentOrders as $order)
                             <tr style="border-bottom: 1px solid #3e302b;">
-                                <td class="py-3 px-4 text-sm" style="color: #ccc;">#{{ $order->id }}</td>
-                                <td class="py-3 px-4 text-sm" style="color: #ccc;">{{ $order->user->name ?? 'Guest' }}</td>
-                                <td class="py-3 px-4 text-sm" style="color: #ccc;">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">#{{ $order->id }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->tables?->table_number ?? '-' }}</td>
                                 <td class="py-3 px-4 text-sm">
-                                    <span class="px-2 py-1 rounded-full text-xs font-medium" 
-                                          style="background-color: {{ $order->status->value == 'completed' ? '#22c55e' : ($order->status->value == 'pending' ? '#eab308' : '#3b82f6') }}; color: white;">
-                                        {{ ucfirst(str_replace('_', ' ', $order->status->value ?? 'pending')) }}
+                                    <span class="px-2 py-1 rounded text-xs font-medium"
+                                        style="background-color: #3e302b; color: #D4A574;">
+                                        {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-4 text-sm" style="color: #ccc;">{{ $order->created_at->format('d M Y H:i') }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->customer_name ?? 'Guest' }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #22c55e;">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</td>
+                                <td class="py-3 px-4 text-sm">
+                                    @php
+                                        $statusColors = [
+                                            'created' => '#eab308',
+                                            'pending_payment' => '#eab308',
+                                            'paid' => '#3b82f6',
+                                            'processing' => '#3b82f6',
+                                            'ready' => '#22c55e',
+                                            'on_delivery' => '#f97316',
+                                            'completed' => '#22c55e',
+                                            'cancelled' => '#ef4444',
+                                        ];
+                                        $statusLabels = [
+                                            'created' => 'Dibuat',
+                                            'pending_payment' => 'Menunggu Pembayaran',
+                                            'paid' => 'Dibayar',
+                                            'processing' => 'Diproses',
+                                            'ready' => 'Siap',
+                                            'on_delivery' => 'Diantar',
+                                            'completed' => 'Selesai',
+                                            'cancelled' => 'Batal',
+                                        ];
+                                        $currentColor = $statusColors[$order->status->value] ?? '#f0f2bd';
+                                    @endphp
+                                    <span class="px-2 py-1 rounded-full text-xs font-medium" 
+                                          style="background-color: {{ $currentColor }}; color: white;">
+                                        {{ $statusLabels[$order->status->value] ?? ucfirst(str_replace('_', ' ', $order->status->value)) }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->notes ?? '-' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
