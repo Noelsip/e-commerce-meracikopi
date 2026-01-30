@@ -26,7 +26,7 @@ class DashboardAdminController extends Controller
         $totalRevenue = Orders::where('status', OrderStatus::COMPLETED)->sum('total_price');
 
         // Orders terbaru (5 terakhir)
-        $recentOrders = Orders::with('user')
+        $recentOrders = Orders::with(['user', 'tables'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
