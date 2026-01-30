@@ -6,22 +6,11 @@ echo "🚀 Starting Meracikopi E-Commerce Application..."
 # Create required directories
 mkdir -p /var/log/supervisor /var/log/php /var/log/nginx
 
-# Wait for MySQL to be ready
-echo "⏳ Waiting for MySQL to be ready..."
-MAX_TRIES=30
-TRIES=0
-until php artisan db:monitor --databases=mysql > /dev/null 2>&1 || [ $TRIES -eq $MAX_TRIES ]; do
-    TRIES=$((TRIES + 1))
-    echo "Waiting for MySQL... (attempt $TRIES/$MAX_TRIES)"
-    sleep 2
-done
+# Tunggu sebentar agar MySQL siap (opsional di Railway karena ada healthcheck)
+echo "⏳ Waiting for services to stabilize..."
+sleep 5
 
-if [ $TRIES -eq $MAX_TRIES ]; then
-    echo "❌ MySQL is not available after $MAX_TRIES attempts"
-    exit 1
-fi
-
-echo "✅ MySQL is ready!"
+echo "✅ Moving forward with startup..."
 
 # Generate app key if not set
 if [ -z "$APP_KEY" ]; then
