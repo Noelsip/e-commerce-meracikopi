@@ -96,6 +96,18 @@
             @endif
         </div>
 
+        <!-- Order Notes -->
+        @if($order->notes)
+        <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
+            <div class="px-6 py-4" style="background-color: #3e302b;">
+                <h3 class="font-semibold" style="color: #f0f2bd;">Catatan Pesanan</h3>
+            </div>
+            <div class="px-6 py-4">
+                <p class="text-sm" style="color: #f0f2bd; white-space: pre-line;">{{ $order->notes }}</p>
+            </div>
+        </div>
+        @endif
+
         <!-- Actions -->
         <div class="flex gap-3 mt-6">
             <a href="{{ route('admin.orders.edit', $order->id) }}" class="px-4 py-2 rounded-lg text-sm font-medium"

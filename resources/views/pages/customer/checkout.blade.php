@@ -697,7 +697,8 @@
                         <span class="recipient-divider">|</span>
                         <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan, Kalimantan Timur 76614</p>
+                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan,
+                        Kalimantan Timur 76614</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>
@@ -740,11 +741,19 @@
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nomor
                             Telepon <span style="opacity: 0.5;">(Opsional)</span></label>
-                        <input type="tel" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx" 
+                        <input type="tel" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx"
                             inputmode="numeric" pattern="[0-9]*"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
+                </div>
+                <div class="form-group" style="margin-top: 16px; margin-bottom: 0;">
+                    <label
+                        style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Catatan
+                        untuk Barista <span style="opacity: 0.5;">(Opsional)</span></label>
+                    <textarea id="orderNotes" class="form-input"
+                        placeholder="Contoh: Gula sedikit, tanpa es, extra shot, dll." rows="3"
+                        style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease; resize: vertical; min-height: 80px;"></textarea>
                 </div>
             </div>
         </div>
@@ -762,74 +771,56 @@
                     </div>
                 </div>
 
-                <!-- Delivery Methods Section (Hidden by default, shown when Delivery is selected) -->
-                <div class="delivery-methods-section" id="deliveryMethodsSection"
-                    style="display: none; margin-top: 40px;">
-                    <p class="section-title">Metode Pengiriman</p>
-
-                    <!-- J&T Express -->
-                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jnt')">
-                        <input type="radio" name="delivery_method" value="jnt" class="delivery-radio">
-                        <span class="delivery-method-name">J&T Express</span>
-                    </label>
-
-                    <!-- JNE -->
-                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'jne')">
-                        <input type="radio" name="delivery_method" value="jne" class="delivery-radio">
-                        <span class="delivery-method-name">JNE</span>
-                    </label>
-
-                    <!-- Grab Express -->
-                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'grab_express')">
-                        <input type="radio" name="delivery_method" value="grab_express" class="delivery-radio">
-                        <span class="delivery-method-name">Grab Express</span>
-                    </label>
-
-                    <!-- Go Send -->
-                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'gosend')">
-                        <input type="radio" name="delivery_method" value="gosend" class="delivery-radio">
-                        <span class="delivery-method-name">Go Send</span>
-                    </label>
-
-                    <!-- SiCepat Express -->
-                    <label class="delivery-method-card" onclick="toggleRadio(event, 'delivery_method', 'sicepat')">
-                        <input type="radio" name="delivery_method" value="sicepat" class="delivery-radio">
-                        <span class="delivery-method-name">SiCepat Express</span>
-                    </label>
-                </div>
-
                 <!-- Payment Methods Section (Shown for Dine In and Takeaway) -->
                 <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
                     <p class="section-title">Metode Pembayaran</p>
 
                     <!-- DANA -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
-                        <input type="radio" name="payment_method" value="dana" class="payment-radio">
-                        <span class="payment-method-name">DANA</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="dana" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">DANA</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- QRIS -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')">
-                        <input type="radio" name="payment_method" value="qris" class="payment-radio">
-                        <span class="payment-method-name">Qris</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="qris" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">QRIS</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
                     </label>
 
                     <!-- Transfer Bank -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')">
-                        <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
-                        <span class="payment-method-name">Transfer Bank</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">Transfer Bank</span>
+                        </div>
+                        <svg class="payment-logo" style="height: 22px; width: 28px;" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
                     </label>
 
                     <!-- GoPay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')">
-                        <input type="radio" name="payment_method" value="gopay" class="payment-radio">
-                        <span class="payment-method-name">GoPay</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="gopay" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">GoPay</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- ShopeePay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')">
-                        <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
-                        <span class="payment-method-name">ShopeePay</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">ShopeePay</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
                 </div>
             </div>
@@ -937,16 +928,6 @@
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                             Kantor
-                        </button>
-                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kos')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
-                                <path d="M9 21v-6h6v6"></path>
-                                <path d="M9 9h.01"></path>
-                                <path d="M15 9h.01"></path>
-                            </svg>
-                            Kos
                         </button>
                     </div>
                     <input type="hidden" id="addressLabel" value="rumah">
@@ -1056,7 +1037,7 @@
                     return itemId ? parseInt(itemId, 10) : null;
                 })
                 .filter(id => id !== null && !isNaN(id));
-            
+
             console.log('📋 Selected item IDs:', selectedItemIds);
 
             // 2. Validate Payment/Delivery Method
@@ -1119,7 +1100,7 @@
                 order_type: backendOrderType,
                 customer_name: customerName,
                 customer_phone: customerPhone || null,
-                notes: '', // Notes field - can be enhanced with a notes input later
+                notes: document.getElementById('orderNotes')?.value || '',
                 selected_item_ids: selectedItemIds,
                 // Delivery specific fields (only for delivery order type)
                 ...(orderType === 'delivery' ? {
@@ -1174,7 +1155,7 @@
 
                 // Step 2: Call payment API to get snap_token
                 checkoutBtn.innerText = 'Memproses Pembayaran...';
-                
+
                 const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
                     method: 'POST',
                     headers: {
@@ -1207,14 +1188,14 @@
                 }
 
                 window.snap.pay(snapToken, {
-                    onSuccess: function(result) {
+                    onSuccess: function (result) {
                         console.log('✅ Payment success:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
                         // Show success modal
                         showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
                     },
-                    onPending: function(result) {
+                    onPending: function (result) {
                         console.log('⏳ Payment pending:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
@@ -1225,11 +1206,11 @@
                             window.location.href = '/customer/order-history';
                         }, 2000);
                     },
-                    onError: function(result) {
+                    onError: function (result) {
                         console.error('❌ Payment error:', result);
                         showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
                     },
-                    onClose: function() {
+                    onClose: function () {
                         console.log('ℹ️ Payment popup closed');
                         // User closed the popup without completing payment
                         showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
@@ -1393,9 +1374,9 @@
         // Function to render checkout items
         function renderCheckoutItems(items) {
             const container = document.getElementById('checkoutItemsContainer');
-            
+
             console.log('🎨 renderCheckoutItems called with', items.length, 'items');
-            
+
             if (!items || items.length === 0) {
                 console.log('⚠️ No items to render, showing empty state');
                 container.innerHTML = `
@@ -1423,10 +1404,10 @@
                             data-quantity="${item.quantity}"
                             onchange="updateOrderTotal()">
                         <div class="order-item-info">
-                            ${item.menu_image ? 
-                                `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
-                                '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
-                            }
+                            ${item.menu_image ?
+                        `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
+                        '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
+                    }
                             <div class="order-item-details">
                                 <p class="order-item-name">${item.menu_name}</p>
                                 <p class="order-item-price">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p>
@@ -1439,23 +1420,35 @@
                                 <button type="button" class="checkout-qty-btn checkout-qty-plus" onclick="updateQuantityCheckout(${item.id}, ${item.quantity + 1})">+</button>
                             </div>
                             <p class="order-item-subtotal">Rp ${new Intl.NumberFormat('id-ID').format(item.subtotal)}</p>
-                            <button class="order-item-delete" onclick="showDeleteConfirm(${item.id})">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                </svg>
-                            </button>
                         </div>
+                        <button class="order-item-delete" onclick="showDeleteConfirm(${item.id})">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
                     </div>
                 `;
             });
 
             console.log('✓ Setting innerHTML to container');
             container.innerHTML = html;
-            
+
             console.log('✓ Calling updateOrderTotal');
             updateOrderTotal();
-            
+
+            // Collect notes from all items and fill the orderNotes field
+            const allNotes = items
+                .filter(item => item.note && item.note.trim() !== '')
+                .map(item => item.note.trim())
+                .join('\n');
+
+            const orderNotesField = document.getElementById('orderNotes');
+            if (orderNotesField && allNotes) {
+                orderNotesField.value = allNotes;
+                console.log('✓ Filled orderNotes with item notes:', allNotes);
+            }
+
             console.log('✅ renderCheckoutItems completed');
         }
 
@@ -1511,7 +1504,7 @@
                 // Filter items based on selection from cart page
                 const selectedIdsString = localStorage.getItem('selected_cart_items');
                 console.log('🎯 Selected IDs from localStorage:', selectedIdsString);
-                
+
                 if (selectedIdsString) {
                     try {
                         const selectedIds = JSON.parse(selectedIdsString);
@@ -1530,10 +1523,10 @@
                 // Render items
                 console.log('🎨 Rendering items...');
                 renderCheckoutItems(items);
-                
+
                 const renderTime = Date.now() - startTime;
                 console.log(`✅ Checkout items loaded successfully in ${renderTime}ms`);
-                
+
                 isLoadingCheckoutItems = false;
             } catch (error) {
                 const errorTime = Date.now() - startTime;
@@ -1699,48 +1692,69 @@
         function setupMobileInputHandlers() {
             const dineInName = document.getElementById('dineInName');
             const dineInPhone = document.getElementById('dineInPhone');
+            const orderNotes = document.getElementById('orderNotes');
             const orderSummary = document.querySelector('.order-summary-section');
-            
+
             if (!dineInName || !dineInPhone || !orderSummary) return;
-            
+
             // Check if mobile (window width <= 600px)
             function isMobile() {
                 return window.innerWidth <= 600;
             }
-            
+
             function hideOrderSummary() {
                 if (isMobile()) {
                     orderSummary.style.display = 'none';
                 }
             }
-            
+
             function showOrderSummary() {
                 if (isMobile()) {
                     orderSummary.style.display = 'block';
                 }
             }
-            
+
+            // Check if active element is one of the inputs
+            function isActiveInputField() {
+                return document.activeElement === dineInName || 
+                       document.activeElement === dineInPhone || 
+                       document.activeElement === orderNotes;
+            }
+
             // Add event listeners for focus (ketika input di-klik)
             dineInName.addEventListener('focus', hideOrderSummary);
             dineInPhone.addEventListener('focus', hideOrderSummary);
-            
+            if (orderNotes) {
+                orderNotes.addEventListener('focus', hideOrderSummary);
+            }
+
             // Add event listeners for blur (ketika keluar dari input)
-            dineInName.addEventListener('blur', function() {
+            dineInName.addEventListener('blur', function () {
                 // Delay to check if user is moving to another input
                 setTimeout(() => {
-                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                    if (!isActiveInputField()) {
                         showOrderSummary();
                     }
                 }, 100);
             });
-            
-            dineInPhone.addEventListener('blur', function() {
+
+            dineInPhone.addEventListener('blur', function () {
                 setTimeout(() => {
-                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                    if (!isActiveInputField()) {
                         showOrderSummary();
                     }
                 }, 100);
             });
+
+            if (orderNotes) {
+                orderNotes.addEventListener('blur', function () {
+                    setTimeout(() => {
+                        if (!isActiveInputField()) {
+                            showOrderSummary();
+                        }
+                    }, 100);
+                });
+            }
         }
 
         // Initialize
