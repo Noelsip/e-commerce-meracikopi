@@ -6,7 +6,7 @@
     },
     "deploy": {
         "startCommand": "/entrypoint.sh",
-        "healthcheckPath": "/",
+        "healthcheckPath": "/up",
         "healthcheckTimeout": 100,
         "restartPolicyType": "ON_FAILURE"
     }
