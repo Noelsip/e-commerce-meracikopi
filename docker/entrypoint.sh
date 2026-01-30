@@ -37,7 +37,5 @@ echo "🔒 Setting permissions..."
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-echo "✅ Application ready! Starting services..."
-
-# Execute the main command
+echo "🚀 ALL DONE! Starting Nginx & PHP-FPM via Supervisord..."
 exec "$@"

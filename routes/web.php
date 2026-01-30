@@ -18,6 +18,10 @@ use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\CatalogController;
 use App\Http\Controllers\QRCodeController;
 
+Route::get('/up', function () {
+    return response()->noContent();
+});
+
 // Guest Routes
 Route::get('/', function () {
     return view('pages.guest.welcome');
