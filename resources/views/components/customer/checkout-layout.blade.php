@@ -43,6 +43,11 @@
             --stroke-color: #D9D9D9;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             margin: 0;

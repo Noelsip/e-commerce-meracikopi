@@ -65,7 +65,7 @@ class Orders extends Model
 
     public function tables()
     {
-        return $this->belongsTo(Tables::class);
+        return $this->belongsTo(Tables::class, 'table_id');
     }
 
     public function order_items()

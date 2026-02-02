@@ -85,7 +85,7 @@
                         @foreach($recentOrders as $order)
                             <tr style="border-bottom: 1px solid #3e302b;">
                                 <td class="py-3 px-4 text-sm" style="color: #ccc;">#{{ $order->id }}</td>
-                                <td class="py-3 px-4 text-sm" style="color: #ccc;">{{ $order->user->name ?? 'Guest' }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #ccc;">{{ $order->customer_name ?? 'Guest' }}</td>
                                 <td class="py-3 px-4 text-sm" style="color: #ccc;">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</td>
                                 <td class="py-3 px-4 text-sm">
                                     <span class="px-2 py-1 rounded-full text-xs font-medium" 

@@ -74,12 +74,13 @@
             <thead>
                 <tr style="background-color: #3e302b;">
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">ID</th>
-                    <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">User</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">User</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Meja</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Tipe</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Status</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Total</th>
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Tanggal</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">Catatan</th>
                     <th class="px-4 py-3 text-right text-xs font-medium uppercase" style="color: #f0f2bd;">Aksi</th>
                 </tr>
             </thead>
@@ -87,9 +88,8 @@
                 @forelse($orders as $order)
                     <tr class="border-t" style="border-color: #3e302b;">
                         <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">#{{ $order->id }}</td>
-                        <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">
-                            {{ $order->user?->name ?? '-' }}
-                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-300" style="color: #f0f2bd;">
+                            {{ $order->customer_name ?? '-' }}</td>
                         <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">
                             {{ $order->tables?->table_number ?? '-' }}
                         </td>
@@ -116,14 +116,19 @@
                             <select onchange="updateOrderStatus({{ $order->id }}, this.value)"
                                 class="px-2 py-1 rounded text-xs cursor-pointer"
                                 style="background-color: #3e302b; border: none; color: {{ $currentColor }};">
-                                <option value="created" {{ $order->status->value == 'created' ? 'selected' : '' }}>Dibuat</option>
+                                <option value="created" {{ $order->status->value == 'created' ? 'selected' : '' }}>Dibuat
+                                </option>
                                 <option value="pending_payment" {{ $order->status->value == 'pending_payment' ? 'selected' : '' }}>Menunggu Pembayaran</option>
                                 <option value="paid" {{ $order->status->value == 'paid' ? 'selected' : '' }}>Dibayar</option>
-                                <option value="processing" {{ $order->status->value == 'processing' ? 'selected' : '' }}>Diproses</option>
+                                <option value="processing" {{ $order->status->value == 'processing' ? 'selected' : '' }}>
+                                    Diproses</option>
                                 <option value="ready" {{ $order->status->value == 'ready' ? 'selected' : '' }}>Siap</option>
-                                <option value="on_delivery" {{ $order->status->value == 'on_delivery' ? 'selected' : '' }}>Diantar</option>
-                                <option value="completed" {{ $order->status->value == 'completed' ? 'selected' : '' }}>Selesai</option>
-                                <option value="cancelled" {{ $order->status->value == 'cancelled' ? 'selected' : '' }}>Batal</option>
+                                <option value="on_delivery" {{ $order->status->value == 'on_delivery' ? 'selected' : '' }}>
+                                    Diantar</option>
+                                <option value="completed" {{ $order->status->value == 'completed' ? 'selected' : '' }}>Selesai
+                                </option>
+                                <option value="cancelled" {{ $order->status->value == 'cancelled' ? 'selected' : '' }}>Batal
+                                </option>
                             </select>
                         </td>
                         <td class="px-4 py-3 text-sm font-medium" style="color: #22c55e;">
@@ -131,6 +136,12 @@
                         </td>
                         <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">
                             {{ $order->created_at->format('d/m/Y H:i') }}
+                        </td>
+                        <td class="px-4 py-3 text-sm" style="color: #f0f2bd; max-width: 150px;">
+                            <span title="{{ $order->notes ?? '-' }}"
+                                style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                {{ $order->notes ?? '-' }}
+                            </span>
                         </td>
                         <td class="px-4 py-3 text-right">
                             <div class="flex justify-end gap-2">
@@ -156,7 +167,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-4 py-12 text-center" style="color: #f0f2bd;">
+                        <td colspan="9" class="px-4 py-12 text-center" style="color: #f0f2bd;">
                             Belum ada pesanan.
                         </td>
                     </tr>

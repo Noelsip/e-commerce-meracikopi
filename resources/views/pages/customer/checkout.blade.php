@@ -697,7 +697,8 @@
                         <span class="recipient-divider">|</span>
                         <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail" id="deliveryAddressDetail">Silakan isi alamat pengiriman</p>
+                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan,
+                        Kalimantan Timur 76614</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>
@@ -739,12 +740,20 @@
                     <div class="form-group" style="flex: 1; margin-bottom: 0;">
                         <label
                             style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Nomor
-                            Telepon <span style="opacity: 0.5;">(Opsional Jika Tidak Memiliki Member)</span></label>
-                        <input type="tel" id="dineInPhone" class="form-input" placeholder="Masukkan nomor telpon" 
+                            Telepon <span style="opacity: 0.5;">(Opsional)</span></label>
+                        <input type="tel" id="dineInPhone" class="form-input" placeholder="08xxxxxxxxxx"
                             inputmode="numeric" pattern="[0-9]*"
                             oninput="this.value = this.value.replace(/[^0-9]/g, '');"
                             style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease;">
                     </div>
+                </div>
+                <div class="form-group" style="margin-top: 16px; margin-bottom: 0;">
+                    <label
+                        style="display: block; color: rgba(255, 244, 214, 0.7); font-size: 12px; margin-bottom: 8px;">Catatan
+                        untuk Barista <span style="opacity: 0.5;">(Opsional)</span></label>
+                    <textarea id="orderNotes" class="form-input"
+                        placeholder="Contoh: Gula sedikit, tanpa es, extra shot, dll." rows="3"
+                        style="width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 244, 214, 0.15); color: #FFF4D6; padding: 12px 14px; border-radius: 8px; outline: none; transition: all 0.3s ease; resize: vertical; min-height: 80px;"></textarea>
                 </div>
             </div>
         </div>
@@ -1020,7 +1029,7 @@
                     return itemId ? parseInt(itemId, 10) : null;
                 })
                 .filter(id => id !== null && !isNaN(id));
-            
+
             console.log('📋 Selected item IDs:', selectedItemIds);
 
             // 2. Validate Payment Method (required for all order types)
@@ -1110,7 +1119,7 @@
                 order_type: backendOrderType,
                 customer_name: customerName,
                 customer_phone: customerPhone || null,
-                notes: '', // Notes field - can be enhanced with a notes input later
+                notes: document.getElementById('orderNotes')?.value || '',
                 selected_item_ids: selectedItemIds,
                 // Delivery specific fields (only for delivery order type)
                 ...(orderType === 'delivery' ? {
@@ -1165,7 +1174,7 @@
 
                 // Step 2: Call payment API to get snap_token
                 checkoutBtn.innerText = 'Memproses Pembayaran...';
-                
+
                 const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
                     method: 'POST',
                     headers: {
@@ -1198,14 +1207,14 @@
                 }
 
                 window.snap.pay(snapToken, {
-                    onSuccess: function(result) {
+                    onSuccess: function (result) {
                         console.log('✅ Payment success:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
                         // Show success modal
                         showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
                     },
-                    onPending: function(result) {
+                    onPending: function (result) {
                         console.log('⏳ Payment pending:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
@@ -1216,11 +1225,11 @@
                             window.location.href = '/customer/order-history';
                         }, 2000);
                     },
-                    onError: function(result) {
+                    onError: function (result) {
                         console.error('❌ Payment error:', result);
                         showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
                     },
-                    onClose: function() {
+                    onClose: function () {
                         console.log('ℹ️ Payment popup closed');
                         // User closed the popup without completing payment
                         showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
@@ -1417,9 +1426,9 @@
         // Function to render checkout items
         function renderCheckoutItems(items) {
             const container = document.getElementById('checkoutItemsContainer');
-            
+
             console.log('🎨 renderCheckoutItems called with', items.length, 'items');
-            
+
             if (!items || items.length === 0) {
                 console.log('⚠️ No items to render, showing empty state');
                 container.innerHTML = `
@@ -1447,10 +1456,10 @@
                             data-quantity="${item.quantity}"
                             onchange="updateOrderTotal()">
                         <div class="order-item-info">
-                            ${item.menu_image ? 
-                                `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
-                                '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
-                            }
+                            ${item.menu_image ?
+                        `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
+                        '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
+                    }
                             <div class="order-item-details">
                                 <p class="order-item-name">${item.menu_name}</p>
                                 <p class="order-item-price">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p>
@@ -1476,10 +1485,22 @@
 
             console.log('✓ Setting innerHTML to container');
             container.innerHTML = html;
-            
+
             console.log('✓ Calling updateOrderTotal');
             updateOrderTotal();
-            
+
+            // Collect notes from all items and fill the orderNotes field
+            const allNotes = items
+                .filter(item => item.note && item.note.trim() !== '')
+                .map(item => item.note.trim())
+                .join('\n');
+
+            const orderNotesField = document.getElementById('orderNotes');
+            if (orderNotesField && allNotes) {
+                orderNotesField.value = allNotes;
+                console.log('✓ Filled orderNotes with item notes:', allNotes);
+            }
+
             console.log('✅ renderCheckoutItems completed');
         }
 
@@ -1535,7 +1556,7 @@
                 // Filter items based on selection from cart page
                 const selectedIdsString = localStorage.getItem('selected_cart_items');
                 console.log('🎯 Selected IDs from localStorage:', selectedIdsString);
-                
+
                 if (selectedIdsString) {
                     try {
                         const selectedIds = JSON.parse(selectedIdsString);
@@ -1554,10 +1575,10 @@
                 // Render items
                 console.log('🎨 Rendering items...');
                 renderCheckoutItems(items);
-                
+
                 const renderTime = Date.now() - startTime;
                 console.log(`✅ Checkout items loaded successfully in ${renderTime}ms`);
-                
+
                 isLoadingCheckoutItems = false;
             } catch (error) {
                 const errorTime = Date.now() - startTime;
@@ -1724,32 +1745,32 @@
             const dineInName = document.getElementById('dineInName');
             const dineInPhone = document.getElementById('dineInPhone');
             const orderSummary = document.querySelector('.order-summary-section');
-            
+
             if (!dineInName || !dineInPhone || !orderSummary) return;
-            
+
             // Check if mobile (window width <= 600px)
             function isMobile() {
                 return window.innerWidth <= 600;
             }
-            
+
             function hideOrderSummary() {
                 if (isMobile()) {
                     orderSummary.style.display = 'none';
                 }
             }
-            
+
             function showOrderSummary() {
                 if (isMobile()) {
                     orderSummary.style.display = 'block';
                 }
             }
-            
+
             // Add event listeners for focus (ketika input di-klik)
             dineInName.addEventListener('focus', hideOrderSummary);
             dineInPhone.addEventListener('focus', hideOrderSummary);
-            
+
             // Add event listeners for blur (ketika keluar dari input)
-            dineInName.addEventListener('blur', function() {
+            dineInName.addEventListener('blur', function () {
                 // Delay to check if user is moving to another input
                 setTimeout(() => {
                     if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
@@ -1757,8 +1778,8 @@
                     }
                 }, 100);
             });
-            
-            dineInPhone.addEventListener('blur', function() {
+
+            dineInPhone.addEventListener('blur', function () {
                 setTimeout(() => {
                     if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
                         showOrderSummary();
