@@ -699,7 +699,7 @@
                             border-radius: 40px;
                             overflow: hidden;
                         ">
-                            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&q=80"
+                            <img src="https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=500&q=80"
                                 alt="Sachet Drip" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="category-title" style="color: white; font-size: 26px; font-weight: 700; margin: 0;">
