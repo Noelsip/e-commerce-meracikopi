@@ -73,38 +73,37 @@
                     {{ $table->status === 'available' ? 'Tersedia' : ($table->status === 'occupied' ? 'Terisi' : 'Reserved') }} · {{ $table->capacity }} Kursi
                 </p>
 
-                    <div class="flex flex-col gap-2 flex-1">
-                        <select onchange="updateStatus({{ $table->id }}, this.value)"
-                            class="px-3 py-2 text-xs cursor-pointer rounded-lg"
-                            style="background-color: #3e302b; color: #f0f2bd; border: none;">
-                            <option value="available" {{ $table->status === 'available' ? 'selected' : '' }}>Tersedia</option>
-                            <option value="occupied" {{ $table->status === 'occupied' ? 'selected' : '' }}>Terisi</option>
-                            <option value="reserved" {{ $table->status === 'reserved' ? 'selected' : '' }}>Reserved</option>
-                        </select>
-                        
-                        <div class="flex gap-2">
-                            <button onclick="showQRCode({{ $table->id }}, '{{ $table->table_number }}', '{{ $table->qr_code_path ? asset('storage/' . $table->qr_code_path) : '' }}')"
-                                    class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
-                                    style="background-color: #3e302b; color: #D4A574; border: 1px solid #D4A574;">
-                                QR Code
-                            </button>
-                            
-                            <a href="{{ route('admin.tables.edit', $table->id) }}"
+                <div class="flex flex-col gap-2 mt-4">
+                    <select onchange="updateStatus({{ $table->id }}, this.value)"
+                        class="w-full px-3 py-2 text-xs cursor-pointer rounded-lg"
+                        style="background-color: #3e302b; color: #f0f2bd; border: none;">
+                        <option value="available" {{ $table->status === 'available' ? 'selected' : '' }}>Tersedia</option>
+                        <option value="occupied" {{ $table->status === 'occupied' ? 'selected' : '' }}>Terisi</option>
+                        <option value="reserved" {{ $table->status === 'reserved' ? 'selected' : '' }}>Reserved</option>
+                    </select>
+                    
+                    <div class="flex gap-2">
+                        <button onclick="showQRCode({{ $table->id }}, '{{ $table->table_number }}', '{{ $table->qr_code_path ? asset('storage/' . $table->qr_code_path) : '' }}')"
                                 class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
-                                style="background-color: #3e302b; color: #f0f2bd;">
-                                Edit
-                            </a>
-                            
-                            <form action="{{ route('admin.tables.destroy', $table->id) }}" method="POST"
-                                onsubmit="return confirm('Hapus meja ini?');" class="flex-1">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full px-3 py-2 text-xs rounded-lg"
-                                    style="background-color: #3e302b; color: #ef4444;">
-                                    Hapus
-                                </button>
-                            </form>
-                        </div>
+                                style="background-color: #3e302b; color: #D4A574; border: 1px solid #D4A574;">
+                            QR Code
+                        </button>
+                        
+                        <a href="{{ route('admin.tables.edit', $table->id) }}"
+                            class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
+                            style="background-color: #3e302b; color: #f0f2bd;">
+                            Edit
+                        </a>
+                        
+                        <form action="{{ route('admin.tables.destroy', $table->id) }}" method="POST"
+                            onsubmit="return confirm('Hapus meja ini?');" class="flex-1">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="w-full px-3 py-2 text-xs rounded-lg"
+                                style="background-color: #3e302b; color: #ef4444;">
+                                Hapus
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -187,8 +186,8 @@
 <!-- QR Code Modal -->
 <div id="qrModal" class="fixed inset-0 z-50 hidden overflow-y-auto" style="background-color: rgba(0,0,0,0.8);">
     <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="relative w-full max-w-sm rounded-2xl p-8 text-center" style="background-color: #2b211e; border: 1px solid #D4A574;">
-            <button onclick="closeQRModal()" class="absolute top-4 right-4 text-2xl" style="color: #a89890;">×</button>
+        <div class="relative w-full max-w-sm p-8 text-center" style="background-color: #2b211e; border: 1px solid #D4A574; border-radius: 24px;">
+            <button onclick="closeQRModal()" class="absolute top-3 right-3 w-8 h-8 flex items-center justify-center text-xl rounded-lg transition-colors hover:bg-opacity-80" style="color: #a89890; background-color: #3e302b;">×</button>
             
             <h3 class="text-xl font-bold mb-6" style="color: #f0f2bd;">QR Code Meja <span id="modalTableNumber"></span></h3>
             
@@ -196,7 +195,7 @@
                 <p style="color: #a89890;">Memuat QR Code...</p>
             </div>
             
-            <img id="qrImage" src="" alt="QR Code" class="w-full aspect-square rounded-xl mb-6 hidden border-4 border-white">
+            <img id="qrImage" src="" alt="QR Code" class="w-full aspect-square rounded-xl mb-6 hidden" style="border: 4px solid white; border-radius: 16px;">
             
             <div class="flex flex-col gap-3">
                 <a id="downloadBtn" href="" download="" class="px-4 py-3 rounded-xl font-bold hidden" 
