@@ -15,7 +15,7 @@
         rel="stylesheet">
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -256,7 +256,7 @@
         .swipe-delete-btn {
             display: none;
         }
-        
+
         @media (max-width: 768px) {
             .cart-item-wrapper {
                 overflow: hidden;
@@ -357,7 +357,7 @@
         }
 
         .cart-table-header .header-checkbox,
-        .cart-item-row > .header-checkbox {
+        .cart-item-row>.header-checkbox {
             justify-content: center;
             align-items: center;
             align-self: center;
@@ -616,7 +616,7 @@
                 z-index: 2;
                 will-change: transform;
             }
-            
+
             .cart-item-wrapper .cart-item-row.swiping {
                 transition: none;
             }

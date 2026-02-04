@@ -27,16 +27,20 @@
             box-shadow: none !important;
             -webkit-tap-highlight-color: transparent;
             text-decoration: none;
+            overflow: hidden;
+            background: transparent !important;
+            outline: none !important;
         }
 
         .category-card:hover {
             transform: scale(1.05) !important;
             z-index: 10;
+            box-shadow: none !important;
         }
 
         .category-card:hover .category-card-inner {
             border: 2px solid #CA7842 !important;
-            box-shadow: 0 0 15px rgba(202, 120, 66, 0.4) !important;
+            box-shadow: none !important;
         }
 
         .category-card-inner {
@@ -47,12 +51,13 @@
             overflow: hidden;
             border: 2px solid transparent !important;
             box-sizing: border-box;
+            outline: none !important;
         }
 
         /* Mobile - Hover shadow exactly matching card edges */
         @media (max-width: 768px) {
             .category-card:hover {
-                box-shadow: 0 0 0 1px rgba(202, 120, 66, 0.3), 0 4px 12px rgba(202, 120, 66, 0.4) !important;
+                box-shadow: none !important;
                 transform: scale(1.01) !important;
             }
         }

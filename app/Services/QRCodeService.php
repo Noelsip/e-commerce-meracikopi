@@ -2,12 +2,10 @@
 
 namespace App\Services;
 
-use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Writer\SvgWriter;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\Label\Font\OpenSans;
-use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Storage;
 
 class QRCodeService
@@ -24,20 +22,21 @@ class QRCodeService
         // Generate URL untuk scan
         $scanUrl = route('qr.scan', ['table' => $token]);
 
-        // Build QR Code
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->data($scanUrl)
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(ErrorCorrectionLevel::High)
-            ->size(400)
-            ->margin(20)
-            ->labelText("Meja {$tableNumber}")
-            ->labelFont(new OpenSans(20))
-            ->build();
+        // Create QR Code (endroid/qr-code v6.x)
+        $qrCode = new QrCode(
+            data: $scanUrl,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::High,
+            size: 400,
+            margin: 20
+        );
+
+        // Write to SVG (tidak memerlukan GD extension)
+        $writer = new SvgWriter();
+        $result = $writer->write($qrCode);
 
         // Path untuk menyimpan QR code
-        $fileName = "table-qr-{$token}.png";
+        $fileName = "table-qr-{$token}.svg";
         $filePath = "qrcodes/tables/{$fileName}";
 
         // Simpan ke storage (public disk)

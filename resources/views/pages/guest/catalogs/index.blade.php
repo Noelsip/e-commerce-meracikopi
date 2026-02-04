@@ -577,7 +577,6 @@
             @if($menus->isEmpty())
                 <!-- Empty State -->
                 <div style="text-align: center; padding: 64px 20px; background: #2b211e; border-radius: 16px;">
-                    <div style="font-size: 64px; margin-bottom: 16px;">☕</div>
                     <h3 style="font-size: 20px; font-weight: 600; color: #f0f2bd; margin-bottom: 8px;">Menu tidak ditemukan</h3>
                     <p style="color: #a89890; margin-bottom: 24px;">Coba kata kunci lain atau lihat semua menu</p>
                     <a href="{{ url('/customer/catalogs') }}" 
@@ -779,8 +778,8 @@
             const overlay = document.getElementById('bottomSheetOverlay');
             const sheet = document.getElementById('productBottomSheet');
 
-            overlay.classList.remove('active');
-            sheet.classList.remove('active');
+            if (overlay) overlay.classList.remove('active');
+            if (sheet) sheet.classList.remove('active');
             document.body.style.overflow = '';
         }
 
