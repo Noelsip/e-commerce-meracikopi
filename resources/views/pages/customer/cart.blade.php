@@ -36,30 +36,25 @@
             <!-- Cart Items -->
             <div class="cart-items-list">
                 <template x-for="item in items" :key="item.id">
-                    <div class="cart-item-wrapper" 
-                        x-data="{
+                    <div class="cart-item-wrapper" x-data="{
                             startX: 0,
                             offsetX: 0,
                             isDragging: false,
                             itemRow: null
-                        }"
-                        x-init="
+                        }" x-init="
                             itemRow = $el.querySelector('.cart-item-row');
-                        "
-                        @touchstart="
+                        " @touchstart="
                             startX = $event.touches[0].clientX;
                             isDragging = true;
                             itemRow.style.transition = 'none';
-                        "
-                        @touchmove.prevent="
+                        " @touchmove.prevent="
                             if (!isDragging) return;
                             let diff = $event.touches[0].clientX - startX;
                             if (diff < 0) {
                                 offsetX = Math.max(-90, diff);
                                 itemRow.style.transform = 'translateX(' + offsetX + 'px)';
                             }
-                        "
-                        @touchend="
+                        " @touchend="
                             isDragging = false;
                             itemRow.style.transition = 'transform 0.3s ease';
                             if (offsetX < -45) {
@@ -112,7 +107,7 @@
                         </div>
 
                         <!-- Swipe Delete Button (Mobile only) -->
-                        <button class="swipe-delete-btn" 
+                        <button class="swipe-delete-btn"
                             @click="removeItem(item.id); offsetX = 0; itemRow.style.transform = 'translateX(0px)'">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -209,7 +204,7 @@
                             console.error('Error parsing cached cart:', e);
                         }
                     }
-                    
+
                     // Fetch data terbaru di background
                     this.fetchCart();
                 },
@@ -279,7 +274,7 @@
 
                         this.totalPrice = result.data.total_price || 0;
                         this.itemToDelete = null; // Reset delete state
-                        
+
                         // Simpan ke localStorage untuk instant load next time
                         localStorage.setItem('cart_data', JSON.stringify({
                             items: this.items,
@@ -356,13 +351,13 @@
                 },
 
                 proceedToCheckout() {
-                    console.log('🛒 Proceed to checkout clicked');
-                    console.log('📦 Current items:', this.items);
-                    console.log('✓ Selected count:', this.selectedCount);
-                    
+                    console.log('Proceed to checkout clicked');
+                    console.log('Current items:', this.items);
+                    console.log('Selected count:', this.selectedCount);
+
                     // Check if any item is selected
                     if (this.selectedCount === 0) {
-                        console.warn('⚠️ No items selected');
+                        console.warn('No items selected');
                         // Show error modal
                         const modal = document.getElementById('errorModal');
                         if (modal) {
@@ -375,13 +370,13 @@
                     const selectedIds = this.items
                         .filter(item => item.selected)
                         .map(item => item.id);
-                    
-                    console.log('💾 Saving selected IDs to localStorage:', selectedIds);
+
+                    console.log('Saving selected IDs to localStorage:', selectedIds);
                     localStorage.setItem('selected_cart_items', JSON.stringify(selectedIds));
-                    
+
                     // Verify saved data
                     const saved = localStorage.getItem('selected_cart_items');
-                    console.log('✓ Verified saved data:', saved);
+                    console.log('Verified saved data:', saved);
 
                     window.location.href = '/customer/checkout';
                 }

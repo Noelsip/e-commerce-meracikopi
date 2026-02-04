@@ -15,13 +15,14 @@
         rel="stylesheet">
 
     <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
     <!-- Midtrans Snap -->
     @if(config('midtrans.is_production'))
         <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
     @else
-        <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ config('midtrans.client_key') }}"></script>
     @endif
 
     <!-- Scripts -->
@@ -43,7 +44,8 @@
             --stroke-color: #D9D9D9;
         }
 
-        html, body {
+        html,
+        body {
             overflow-x: hidden;
             max-width: 100vw;
         }
@@ -1090,7 +1092,7 @@
             }
 
             /* Hide 'Jumlah Pesanan' title only in mobile order summary footer */
-            .order-summary-section > .section-title {
+            .order-summary-section>.section-title {
                 display: none;
             }
 
