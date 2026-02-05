@@ -120,7 +120,8 @@ class DokuService
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
         
-        $timestamp = self::generateTimestamp();
+        // Use specific timestamp format for B2B access token
+        $timestamp = gmdate('Y-m-d\TH:i:s.v\Z');
         $signature = hash_hmac('sha256', $clientId . $timestamp, $secretKey);
         
         $response = Http::withHeaders([
