@@ -78,7 +78,11 @@ RUN composer dump-autoload --optimize \
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+    && chmod -R 755 /var/www/html/bootstrap/cache \
+    && mkdir -p /var/www/html/storage/logs \
+    && touch /var/www/html/storage/logs/queue.log \
+    && touch /var/www/html/storage/logs/scheduler.log \
+    && chown -R www-data:www-data /var/www/html/storage/logs
 
 # Copy configuration files
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/custom.ini
