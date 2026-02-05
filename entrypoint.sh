@@ -43,9 +43,15 @@ fi
 echo "📦 Running database migrations..."
 php artisan migrate --force || echo "⚠️ Migration failed, app may still work if already migrated"
 
-# Run database seeder (add this part)
-echo "🌱 Running database seeder..."
-php artisan db:seed --force || echo "⚠️ Seeding failed, but app will continue"
+# Check if we need to seed the database
+echo "🌱 Checking if database needs seeding..."
+user_count=$(php artisan tinker --execute="echo \App\Models\User::count();")
+if [ "$user_count" -eq "0" ] || [ "$FORCE_SEED" = "true" ]; then
+    echo "🌱 Running database seeder..."
+    php artisan db:seed --force || echo "⚠️ Seeding failed, but app will continue"
+else
+    echo "✅ Database already has data, skipping seed"
+fi
 
 # Clear and cache configs for production
 echo "⚡ Optimizing application..."
