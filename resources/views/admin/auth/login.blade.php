@@ -56,7 +56,7 @@
                             placeholder="••••••••">
                         <button type="button" onclick="togglePassword()" 
                             class="absolute right-0 top-0 h-full px-4 flex items-center justify-center hover:opacity-80"
-                            style="color: #f0f2bd;">
+                            style="color: #8b7355;">
                             <!-- Eye Icon (show password) -->
                             <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
