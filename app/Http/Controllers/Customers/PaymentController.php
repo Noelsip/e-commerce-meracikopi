@@ -13,24 +13,16 @@ use App\Models\Orders;
 use App\Enums\OrderStatus;
 use App\Enums\StatusPayments;
 
-use App\Services\MidtransService;
+use App\Services\DokuService;
 
 class PaymentController extends Controller
 {
     /**
-     * Map frontend payment method to Midtrans enabled_payments
+     * Map frontend payment method to DOKU payment channels
      */
-    private function mapPaymentMethod(?string $paymentMethod): ?array
+    private function mapPaymentMethod(?string $paymentMethod): ?string
     {
-        $mapping = [
-            'qris' => ['other_qris'],
-            'dana' => ['other_qris'], // DANA uses QRIS in Midtrans Snap
-            'gopay' => ['gopay'],
-            'shopeepay' => ['shopeepay'],
-            'transfer_bank' => ['bca_va', 'bni_va', 'bri_va', 'permata_va', 'other_va'],
-        ];
-
-        return $mapping[$paymentMethod] ?? null;
+        return DokuService::mapPaymentMethod($paymentMethod);
     }
 
     public function pay(Request $request, $orderId)
@@ -62,40 +54,42 @@ class PaymentController extends Controller
             // Membuat record pembayaran
             $payment = Payments::create([
                 'order_id' => $order->id,
-                'payment_gateway' => 'midtrans',
-                'payment_method' => $selectedPaymentMethod ?? 'snap',
+                'payment_gateway' => 'doku',
+                'payment_method' => $selectedPaymentMethod ?? 'qris',
                 'transaction_id' => $transactionId,
                 'amount' => $order->final_price,
                 'status' => StatusPayments::PENDING,
                 'payload' => [],
             ]);
 
-            // Payload Snap
-            $snapPayload = [
-                'transaction_details' => [
-                    'order_id' => $transactionId,
-                    'gross_amount' => (int) $payment->amount,
-                ],
-                'customer_details' => [
-                    'first_name' => $order->customer_name,
-                    'phone' => $order->customer_phone ?? '',
-                ],
-            ];
-
-            // If payment method is selected, only show that method in Snap
-            $enabledPayments = $this->mapPaymentMethod($selectedPaymentMethod);
-            if ($enabledPayments) {
-                $snapPayload['enabled_payments'] = $enabledPayments;
+            // Validate payment method
+            if (!$selectedPaymentMethod) {
+                $payment->delete();
+                abort(422, 'Metode pembayaran harus dipilih');
             }
 
-            // Request Snap token using custom HTTP client (bypasses Midtrans library CURL issues)
+            // Prepare order data for DOKU
+            $orderData = [
+                'amount' => $payment->amount,
+                'invoice_number' => $transactionId,
+                'merchant_order_id' => $order->id,
+            ];
+
+            // Prepare customer data for DOKU
+            $customerData = [
+                'name' => $order->customer_name,
+                'phone' => $order->customer_phone ?? '',
+                'email' => $order->customer_email ?? 'customer@meracikopi.com',
+            ];
+
+            // Request payment from DOKU with specific method
             try {
-                $snapToken = MidtransService::getSnapToken($snapPayload);
+                $dokuResponse = DokuService::createSpecificPayment($selectedPaymentMethod, $orderData, $customerData);
             } catch (\Exception $e) {
-                Log::error('Midtrans Snap Error', [
+                Log::error('DOKU Payment Error', [
                     'error' => $e->getMessage(),
                     'order_id' => $order->id,
-                    'payload' => $snapPayload,
+                    'payment_method' => $selectedPaymentMethod,
                 ]);
                 
                 // Delete the pending payment record
@@ -104,47 +98,68 @@ class PaymentController extends Controller
                 abort(500, 'Gagal terhubung ke payment gateway. Silahkan coba lagi.');
             }
 
-            // Menyimpan payload token
+            // Menyimpan payload response dari DOKU
             $payment->update([
                 'payload' => [
-                    'snap_request' => $snapPayload,
-                    'snap_token' => $snapToken,
+                    'doku_request' => $orderData,
+                    'doku_response' => $dokuResponse,
                     'selected_payment_method' => $selectedPaymentMethod,
                 ]
             ]);
 
+            // Prepare response data based on payment method
+            $responseData = [
+                'payment_id' => $payment->id,
+                'payment_method' => $selectedPaymentMethod,
+                'invoice_number' => $transactionId,
+            ];
+
+            // Add specific data based on payment method
+            if (isset($dokuResponse['qr_code_data']) && $dokuResponse['qr_code_data']) {
+                $responseData['qr_code'] = $dokuResponse['qr_code_data'];
+            }
+            
+            if (isset($dokuResponse['virtual_account_info']) && $dokuResponse['virtual_account_info']) {
+                $responseData['virtual_account'] = $dokuResponse['virtual_account_info'];
+            }
+            
+            if (isset($dokuResponse['ewallet_info']) && $dokuResponse['ewallet_info']) {
+                $responseData['ewallet'] = $dokuResponse['ewallet_info'];
+            }
+            
+            if (isset($dokuResponse['payment_url']) && $dokuResponse['payment_url']) {
+                $responseData['payment_url'] = $dokuResponse['payment_url'];
+            }
+            
+            if (isset($dokuResponse['instructions']) && $dokuResponse['instructions']) {
+                $responseData['instructions'] = $dokuResponse['instructions'];
+            }
+
             return response()->json([
                 'message' => 'Payment initiated',
-                'data' => [
-                    'snap_token' => $snapToken,
-                    'payment_id' => $payment->id,
-                    'payment_method' => $selectedPaymentMethod,
-                ]
+                'data' => $responseData
             ]);
         });
     }
 
-    public function midtransWebhook(Request $request)
+    public function dokuWebhook(Request $request)
     {
-        // Validasi signature midtrans
-        $serverKey = config('midtrans.server_key');
-        $expectedSignature = hash(
-            'sha512',
-            $request->order_id .
-            $request->status_code .
-            $request->gross_amount .
-            $serverKey
-        );
-
-        if ($expectedSignature !== $request->signature_key) {
-            Log::warning('Invalid Midtrans signature', $request->all());
+        // Validasi signature DOKU menggunakan RSA verification
+        $signature = $request->header('X-SIGNATURE') ?? $request->input('signature');
+        
+        if (!$signature || !DokuService::verifyDokuSignature($request->all(), $signature)) {
+            Log::warning('Invalid DOKU signature', [
+                'signature' => $signature,
+                'data' => $request->all()
+            ]);
             abort(403, 'Invalid signature');
         }
 
         return DB::transaction(function () use ($request) {
 
-            // Mengambil payment & lock
-            $payment = Payments::where('transaction_id', $request->order_id)
+            // Mengambil payment & lock berdasarkan invoice number
+            $invoiceNumber = $request->input('order.invoiceNumber');
+            $payment = Payments::where('transaction_id', $invoiceNumber)
                 ->lockForUpdate()
                 ->firstOrFail();
 
@@ -154,13 +169,14 @@ class PaymentController extends Controller
                 ]);
             }
 
-            // Mapping status midtrans
-            if (in_array($request->transaction_status, ['settlement', 'capture'])) {
+            // Mapping status DOKU
+            $transactionStatus = $request->input('transaction.status');
+            if (in_array($transactionStatus, ['SUCCESS', 'COMPLETE'])) {
 
                 $payment->update([
                     'status' => StatusPayments::PAID,
                     'paid_at' => now(),
-                    'payload' => $request->all(),
+                    'payload' => array_merge($payment->payload, ['webhook_data' => $request->all()]),
                 ]);
 
                 $payment->order->update([
@@ -172,5 +188,114 @@ class PaymentController extends Controller
                 'message' => 'Payment status updated'
             ]);
         });
+    }
+
+    public function checkPaymentStatus($orderId)
+    {
+        $guestToken = request()->attributes->get('guest_token');
+        
+        $order = Orders::where('id', $orderId)
+            ->where('guest_token', $guestToken)
+            ->firstOrFail();
+
+        $payment = Payments::where('order_id', $order->id)->first();
+
+        if (!$payment) {
+            return response()->json([
+                'message' => 'Payment not found',
+                'status' => 'not_found'
+            ]);
+        }
+
+        // Jika sudah paid, return status
+        if ($payment->status === StatusPayments::PAID) {
+            return response()->json([
+                'message' => 'Payment completed',
+                'status' => 'paid',
+                'payment_id' => $payment->id
+            ]);
+        }
+
+        // Check status dari DOKU jika masih pending
+        try {
+            $statusResponse = DokuService::getPaymentStatus($payment->transaction_id);
+            
+            // Update status jika ada perubahan
+            $transactionStatus = $statusResponse['transaction']['status'] ?? 'PENDING';
+            if (in_array($transactionStatus, ['SUCCESS', 'COMPLETE'])) {
+                $payment->update([
+                    'status' => StatusPayments::PAID,
+                    'paid_at' => now(),
+                    'payload' => array_merge($payment->payload, ['status_check' => $statusResponse]),
+                ]);
+
+                $payment->order->update([
+                    'status' => OrderStatus::PAID,
+                ]);
+
+                return response()->json([
+                    'message' => 'Payment completed',
+                    'status' => 'paid',
+                    'payment_id' => $payment->id
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Payment still pending',
+                'status' => 'pending',
+                'payment_id' => $payment->id,
+                'transaction_status' => $transactionStatus
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('DOKU Status Check Error', [
+                'error' => $e->getMessage(),
+                'payment_id' => $payment->id,
+            ]);
+
+            return response()->json([
+                'message' => 'Payment status check failed',
+                'status' => 'unknown',
+                'payment_id' => $payment->id
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate token untuk DOKU SNAP
+     * Endpoint ini akan dipanggil oleh DOKU untuk mendapatkan access token
+     */
+    public function generateDokuToken(Request $request)
+    {
+        try {
+            // Validasi request dari DOKU
+            $clientId = $request->header('X-CLIENT-KEY') ?: $request->input('client_id');
+            
+            if ($clientId !== config('doku.client_id')) {
+                return response()->json([
+                    'error' => 'Invalid client ID'
+                ], 401);
+            }
+
+            // Generate access token
+            $tokenData = DokuService::getAccessTokenForSnap();
+
+            return response()->json([
+                'access_token' => $tokenData['accessToken'],
+                'token_type' => 'Bearer',
+                'expires_in' => $tokenData['expiresIn']
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('DOKU Token Generation Error', [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+            
+            return response()->json([
+                'error' => 'Token generation failed',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

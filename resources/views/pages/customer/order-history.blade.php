@@ -1176,7 +1176,7 @@
                         'debit_card': 'Debit Card',
                         'ovo': 'OVO',
                         'linkaja': 'LinkAja',
-                        'snap': 'Midtrans Snap'
+                        'doku': 'DOKU Payment'
                     };
                     return paymentMethods[method] || method || 'Belum dipilih';
                 }

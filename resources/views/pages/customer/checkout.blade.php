@@ -1073,7 +1073,7 @@
                 }
                 deliveryMethod = selectedDelivery.value;
             } else {
-                // Payment method is required - will be passed to Midtrans
+                // Payment method is required - will be passed to DOKU
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
@@ -1166,7 +1166,7 @@
                 console.log('Order created successfully:', data);
                 const orderId = data.data.id;
 
-                // Step 2: Call payment API to get snap_token
+                // Step 2: Call payment API to get DOKU payment data
                 checkoutBtn.innerText = 'Memproses Pembayaran...';
 
                 const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
@@ -1189,9 +1189,8 @@
                 }
 
                 console.log('Payment initiated:', paymentData);
-                const snapToken = paymentData.data.snap_token;
-
-                // Step 3: Open Midtrans Snap popup
+                
+                // Step 3: Handle DOKU payment
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
 
