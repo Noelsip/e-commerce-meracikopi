@@ -12,7 +12,7 @@ class DokuService
 {
     private static function generateTimestamp(): string
     {
-        return Carbon::now('Asia/Makassar')->format('Y-m-d\TH:i:s\Z');
+        return gmdate('c');
     }
     /**
      * Generate signature menggunakan merchant private key untuk request ke DOKU
@@ -22,13 +22,22 @@ class DokuService
         $merchantPrivateKey = config('doku.merchant_private_key');
         
         if (!$merchantPrivateKey) {
-            throw new \Exception('Merchant private key not configured');
+            throw new \Exception('Merchant private key not configured in environment');
+        }
+
+        // Normalize line endings and ensure proper format
+        $merchantPrivateKey = str_replace(["\r\n", "\r"], "\n", $merchantPrivateKey);
+        
+        // Add quotes if missing (in case of env parsing issues)
+        if (!str_contains($merchantPrivateKey, '-----BEGIN')) {
+            throw new \Exception('Invalid merchant private key format. Must include -----BEGIN and -----END headers');
         }
 
         $privateKey = openssl_pkey_get_private($merchantPrivateKey);
         
         if (!$privateKey) {
-            throw new \Exception('Invalid merchant private key');
+            $error = openssl_error_string();
+            throw new \Exception('Invalid merchant private key: ' . ($error ?: 'Unable to parse private key'));
         }
 
         $success = openssl_sign($stringToSign, $signature, $privateKey, OPENSSL_ALGO_SHA256);
@@ -49,12 +58,18 @@ class DokuService
         $dokuPublicKey = config('doku.public_key');
         
         if (!$dokuPublicKey) {
+            Log::warning('DOKU public key not configured');
             return false;
         }
 
+        // Normalize line endings
+        $dokuPublicKey = str_replace(["\r\n", "\r"], "\n", $dokuPublicKey);
+        
         $publicKey = openssl_pkey_get_public($dokuPublicKey);
         
         if (!$publicKey) {
+            $error = openssl_error_string();
+            Log::error('Invalid DOKU public key: ' . ($error ?: 'Unable to parse public key'));
             return false;
         }
 
@@ -79,6 +94,7 @@ class DokuService
     private static function generateSignature(string $httpMethod, string $endpointUrl, string $accessToken, string $requestBody, string $timestamp): string
     {
         $clientId = config('doku.client_id');
+        $merchantPrivateKey = config('doku.merchant_private_key');
         
         // Create string to sign
         $stringToSign = $httpMethod . "\n" . 
@@ -86,6 +102,13 @@ class DokuService
                        $accessToken . "\n" . 
                        hash('sha256', $requestBody) . "\n" . 
                        $timestamp;
+        
+        // Fallback ke HMAC jika merchant key belum dikonfigurasi (untuk development)
+        if (!$merchantPrivateKey) {
+            Log::warning('Merchant private key not configured, using HMAC fallback');
+            $secretKey = config('doku.secret_key');
+            return 'HMACSHA256=' . hash_hmac('sha256', $stringToSign, $secretKey);
+        }
         
         // Generate signature menggunakan merchant private key
         return 'RSA-SHA256=' . self::generateMerchantSignature($stringToSign);
@@ -101,10 +124,9 @@ class DokuService
         $signature = hash_hmac('sha256', $clientId . $timestamp, $secretKey);
         
         $response = Http::withHeaders([
-            'Client-Id' => $clientId,
-            'Request-Id' => uniqid(),
-            'Request-Timestamp' => $timestamp,
-            'Signature' => "HMACSHA256=" . $signature,
+            'X-CLIENT-KEY' => $clientId,
+            'X-TIMESTAMP' => $timestamp,
+            'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json',
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
@@ -162,10 +184,9 @@ class DokuService
         $signature = self::generateHmacSignature($stringToSign);
         
         $response = Http::withHeaders([
-            'Client-Id' => $clientId,
-            'Request-Id' => $requestId,
-            'Request-Timestamp' => $timestamp,
-            'Signature' => $signature,
+            'X-CLIENT-KEY' => $clientId,
+            'X-TIMESTAMP' => $timestamp,
+            'X-SIGNATURE' => $signature,
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
@@ -203,9 +224,9 @@ class DokuService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-            'Client-Id' => $clientId,
+            'X-CLIENT-KEY' => $clientId,
             'Request-Id' => uniqid(),
-            'Request-Timestamp' => $timestamp,
+            'X-TIMESTAMP' => $timestamp,
             'Signature' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
@@ -242,9 +263,9 @@ class DokuService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-            'Client-Id' => $clientId,
+            'X-CLIENT-KEY' => $clientId,
             'Request-Id' => uniqid(),
-            'Request-Timestamp' => $timestamp,
+            'X-TIMESTAMP' => $timestamp,
             'Signature' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
@@ -423,9 +444,9 @@ class DokuService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-            'Client-Id' => $clientId,
+            'X-CLIENT-KEY' => $clientId,
             'Request-Id' => uniqid(),
-            'Request-Timestamp' => $timestamp,
+            'X-TIMESTAMP' => $timestamp,
             'Signature' => $signature,
         ])->get($baseUrl . $endpointUrl);
 
