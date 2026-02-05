@@ -49,14 +49,14 @@
                 <div>
                     <label for="password" class="block text-sm font-medium mb-2"
                         style="color: #f0f2bd;">Password</label>
-                    <div class="relative flex items-center">
+                    <div class="relative">
                         <input type="password" id="password" name="password" required
-                            class="w-full px-4 py-3 pr-12 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
-                            style="background-color: #5a4032; border: 1px solid #6b4d3a; color: #f0f2bd;"
+                            class="w-full px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                            style="background-color: #5a4032; border: 1px solid #6b4d3a; color: #f0f2bd; padding-right: 48px;"
                             placeholder="••••••••">
                         <button type="button" onclick="togglePassword()" 
-                            class="absolute right-4 p-1"
-                            style="color: #8b7355;">
+                            class="absolute right-0 top-0 h-full px-4 flex items-center justify-center hover:opacity-80"
+                            style="color: #f0f2bd;">
                             <!-- Eye Icon (show password) -->
                             <svg id="eye-open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
