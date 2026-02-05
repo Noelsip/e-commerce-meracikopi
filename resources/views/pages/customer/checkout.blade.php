@@ -1070,7 +1070,7 @@
                 }
                 deliveryMethod = selectedDelivery.value;
             } else {
-                // Payment method is required - will be passed to Midtrans
+                // Payment method is required - will be passed to DOKU
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
@@ -1163,7 +1163,7 @@
                 console.log('Order created successfully:', data);
                 const orderId = data.data.id;
 
-                // Step 2: Call payment API to get snap_token
+                // Step 2: Call payment API to get DOKU payment data
                 checkoutBtn.innerText = 'Memproses Pembayaran...';
 
                 const paymentResponse = await fetch(`/api/customer/orders/${orderId}/pay`, {
@@ -1186,46 +1186,27 @@
                 }
 
                 console.log('Payment initiated:', paymentData);
-                const snapToken = paymentData.data.snap_token;
-
-                // Step 3: Open Midtrans Snap popup
+                
+                // Step 3: Handle DOKU payment
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
 
-                // Check if Midtrans Snap is loaded
-                if (typeof window.snap === 'undefined') {
-                    throw new Error('Payment gateway belum siap. Silahkan refresh halaman dan coba lagi.');
-                }
+                // Set up payment success and error callbacks
+                window.onPaymentSuccess = function(result) {
+                    console.log('Payment success:', result);
+                    // Clear cart selection
+                    localStorage.removeItem('selected_cart_items');
+                    // Show success modal
+                    showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), paymentMethod || 'Online Payment');
+                };
 
-                window.snap.pay(snapToken, {
-                    onSuccess: function (result) {
-                        console.log('Payment success:', result);
-                        // Clear cart selection
-                        localStorage.removeItem('selected_cart_items');
-                        // Show success modal
-                        showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
-                    },
-                    onPending: function (result) {
-                        console.log('Payment pending:', result);
-                        // Clear cart selection
-                        localStorage.removeItem('selected_cart_items');
-                        // Show pending message
-                        showErrorModal('Pembayaran Pending', 'Silahkan selesaikan pembayaran Anda. Status akan diupdate otomatis.');
-                        // Redirect to order history after 2 seconds
-                        setTimeout(() => {
-                            window.location.href = '/customer/order-history';
-                        }, 2000);
-                    },
-                    onError: function (result) {
-                        console.error('Payment error:', result);
-                        showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
-                    },
-                    onClose: function () {
-                        console.log('Payment popup closed');
-                        // User closed the popup without completing payment
-                        showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
-                    }
-                });
+                window.onPaymentError = function(result) {
+                    console.error('Payment error:', result);
+                    showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
+                };
+
+                // Handle DOKU payment based on response
+                window.dokuPayment.handlePayment(paymentData.data);
 
             } catch (error) {
                 console.error('Checkout error:', error);
