@@ -771,38 +771,56 @@
                     </div>
                 </div>
 
-                <!-- Payment Methods Section (Always shown for all order types) -->
+                <!-- Payment Methods Section (Shown for Dine In and Takeaway) -->
                 <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
                     <p class="section-title">Metode Pembayaran</p>
 
                     <!-- DANA -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')">
-                        <input type="radio" name="payment_method" value="dana" class="payment-radio">
-                        <span class="payment-method-name">DANA</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="dana" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">DANA</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- QRIS -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')">
-                        <input type="radio" name="payment_method" value="qris" class="payment-radio">
-                        <span class="payment-method-name">Qris</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="qris" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">QRIS</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
                     </label>
 
                     <!-- Transfer Bank -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')">
-                        <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
-                        <span class="payment-method-name">Transfer Bank</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">Transfer Bank</span>
+                        </div>
+                        <svg class="payment-logo" style="height: 22px; width: 28px;" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                            <line x1="1" y1="10" x2="23" y2="10"></line>
+                        </svg>
                     </label>
 
                     <!-- GoPay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')">
-                        <input type="radio" name="payment_method" value="gopay" class="payment-radio">
-                        <span class="payment-method-name">GoPay</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="gopay" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">GoPay</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- ShopeePay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')">
-                        <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
-                        <span class="payment-method-name">ShopeePay</span>
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')" style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">ShopeePay</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay" class="payment-logo" style="height: 22px; width: auto;">
                     </label>
                 </div>
             </div>
@@ -910,16 +928,6 @@
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
                             Kantor
-                        </button>
-                        <button type="button" class="label-btn" onclick="selectAddressLabel(this, 'kos')">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16"></path>
-                                <path d="M9 21v-6h6v6"></path>
-                                <path d="M9 9h.01"></path>
-                                <path d="M15 9h.01"></path>
-                            </svg>
-                            Kos
                         </button>
                     </div>
                     <input type="hidden" id="addressLabel" value="rumah">
@@ -1744,6 +1752,7 @@
         function setupMobileInputHandlers() {
             const dineInName = document.getElementById('dineInName');
             const dineInPhone = document.getElementById('dineInPhone');
+            const orderNotes = document.getElementById('orderNotes');
             const orderSummary = document.querySelector('.order-summary-section');
 
             if (!dineInName || !dineInPhone || !orderSummary) return;
@@ -1765,15 +1774,25 @@
                 }
             }
 
+            // Check if active element is one of the inputs
+            function isActiveInputField() {
+                return document.activeElement === dineInName || 
+                       document.activeElement === dineInPhone || 
+                       document.activeElement === orderNotes;
+            }
+
             // Add event listeners for focus (ketika input di-klik)
             dineInName.addEventListener('focus', hideOrderSummary);
             dineInPhone.addEventListener('focus', hideOrderSummary);
+            if (orderNotes) {
+                orderNotes.addEventListener('focus', hideOrderSummary);
+            }
 
             // Add event listeners for blur (ketika keluar dari input)
             dineInName.addEventListener('blur', function () {
                 // Delay to check if user is moving to another input
                 setTimeout(() => {
-                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                    if (!isActiveInputField()) {
                         showOrderSummary();
                     }
                 }, 100);
@@ -1781,11 +1800,21 @@
 
             dineInPhone.addEventListener('blur', function () {
                 setTimeout(() => {
-                    if (document.activeElement !== dineInName && document.activeElement !== dineInPhone) {
+                    if (!isActiveInputField()) {
                         showOrderSummary();
                     }
                 }, 100);
             });
+
+            if (orderNotes) {
+                orderNotes.addEventListener('blur', function () {
+                    setTimeout(() => {
+                        if (!isActiveInputField()) {
+                            showOrderSummary();
+                        }
+                    }, 100);
+                });
+            }
         }
 
         // Initialize
