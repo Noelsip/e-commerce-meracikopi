@@ -51,7 +51,7 @@
 
                 .product-box {
                     height: auto !important;
-                    min-height: auto;
+                    min-height: auto !important;
                     padding: 20px 0 24px 0;
                     background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
                 }
@@ -274,8 +274,9 @@
             position: relative; 
             width: 100%;
             max-width: 1440px; 
-            height: 350px; 
+            min-height: 350px; 
             margin: 0 auto;
+            padding-bottom: 40px;
         ">
             <!-- Background Layer -->
             <div style="
@@ -476,202 +477,202 @@
                 </div>
             </div>
             <!-- description-section closes here -->
+
+            <!-- Related Menus Section - Now inside product-box, below description -->
+            @if(isset($relatedMenus) && $relatedMenus->count() > 0)
+                <div class="related-menus-section"
+                    style="max-width: 1440px; margin: 0 auto; padding: 0 40px 40px 40px; position: relative; z-index: 1; background: transparent;">
+                    <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
+                        Lainnya</h3>
+
+
+                    <!-- Horizontal Scroll Container -->
+                    <div class="other-menus-scroll-container">
+                        @foreach($relatedMenus as $related)
+                            <a href="{{ route('catalogs.show', $related->id) }}" class="menu-rec-card">
+                                <div class="menu-rec-image"
+                                    style="background-image: url('{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}');">
+                                    @if(!$related->image_path)
+                                        <span
+                                            style="display:flex; height:100%; align-items:center; justify-content:center; font-size:24px;">☕</span>
+                                    @endif
+                                </div>
+
+                                <div class="menu-rec-name" title="{{ $related->name }}">{{ $related->name }}</div>
+
+                                <div class="menu-rec-footer">
+                                    <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
+                                    @if($related->is_available)
+                                        <span class="menu-rec-badge-available">
+                                            Tersedia
+                                        </span>
+                                    @else
+                                        <span class="menu-rec-badge-unavailable">
+                                            Habis
+                                        </span>
+                                    @endif
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
         <!-- product-box with x-data closes here -->
 
-        <!-- Related Menus Section -->
-        @if(isset($relatedMenus) && $relatedMenus->count() > 0)
-            <div class="related-menus-section"
-                style="max-width: 1440px; margin: 0 auto; padding: 0 40px 80px 40px; position: relative; z-index: 10;">
-                <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
-                    Lainnya</h3>
+        <style>
+            /* Base Styles (Mobile & General) */
+            .other-menus-scroll-container {
+                display: flex;
+                /* Mobile default: Flex for scrolling */
+                gap: 16px;
+                overflow-x: auto;
+                padding-bottom: 20px;
+                scrollbar-width: none;
+                /* Firefox */
+                -ms-overflow-style: none;
+                /* IE 10+ */
+                margin: 0 -20px;
+                /* Values to hit edges on mobile */
+                padding: 0 20px 20px 20px;
+                /* Padding inside scroll */
+            }
 
+            .other-menus-scroll-container::-webkit-scrollbar {
+                display: none;
+                /* Chrome/Safari */
+            }
 
-                <!-- Horizontal Scroll Container -->
-                <div class="other-menus-scroll-container">
-                    @foreach($relatedMenus as $related)
-                        <a href="{{ route('catalogs.show', $related->id) }}" class="menu-rec-card">
-                            <div class="menu-rec-image"
-                                style="background-image: url('{{ filter_var($related->image_path, FILTER_VALIDATE_URL) ? $related->image_path : asset($related->image_path) }}');">
-                                @if(!$related->image_path)
-                                    <span
-                                        style="display:flex; height:100%; align-items:center; justify-content:center; font-size:24px;">☕</span>
-                                @endif
-                            </div>
+            .menu-rec-card {
+                flex: 0 0 160px;
+                /* Mobile width */
+                background: linear-gradient(145deg, rgba(42, 27, 20, 0.6), rgba(42, 27, 20, 0.3));
+                border: 1px solid rgba(202, 120, 66, 0.1);
+                border-radius: 12px;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                gap: 8px;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                text-decoration: none;
+                position: relative;
+                overflow: hidden;
+            }
 
-                            <div class="menu-rec-name" title="{{ $related->name }}">{{ $related->name }}</div>
+            .menu-rec-card:hover {
+                transform: translateY(-4px);
+                background: linear-gradient(145deg, rgba(62, 37, 26, 0.7), rgba(42, 27, 20, 0.4));
+                border-color: rgba(202, 120, 66, 0.2);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
 
-                            <div class="menu-rec-footer">
-                                <div class="menu-rec-price">Rp {{ number_format($related->price, 0, ',', '.') }}</div>
-                                @if($related->is_available)
-                                    <span class="menu-rec-badge-available">
-                                        Tersedia
-                                    </span>
-                                @else
-                                    <span class="menu-rec-badge-unavailable">
-                                        Habis
-                                    </span>
-                                @endif
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
+            .menu-rec-image {
+                width: 100%;
+                aspect-ratio: 1/1;
+                border-radius: 8px;
+                background-size: cover;
+                background-position: center;
+                background-color: #1a1410;
+            }
 
-                <style>
-                    /* Base Styles (Mobile & General) */
-                    .other-menus-scroll-container {
-                        display: flex;
-                        /* Mobile default: Flex for scrolling */
-                        gap: 16px;
-                        overflow-x: auto;
-                        padding-bottom: 20px;
-                        scrollbar-width: none;
-                        /* Firefox */
-                        -ms-overflow-style: none;
-                        /* IE 10+ */
-                        margin: 0 -20px;
-                        /* Values to hit edges on mobile */
-                        padding: 0 20px 20px 20px;
-                        /* Padding inside scroll */
-                    }
+            .menu-rec-name {
+                font-size: 14px;
+                font-weight: 600;
+                color: white;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin-top: 4px;
+                margin-bottom: 4px;
+                /* Space before footer */
+            }
 
-                    .other-menus-scroll-container::-webkit-scrollbar {
-                        display: none;
-                        /* Chrome/Safari */
-                    }
+            .menu-rec-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: auto;
+                gap: 8px;
+            }
 
-                    .menu-rec-card {
-                        flex: 0 0 160px;
-                        /* Mobile width */
-                        background: linear-gradient(145deg, rgba(42, 27, 20, 0.6), rgba(42, 27, 20, 0.3));
-                        border: 1px solid rgba(202, 120, 66, 0.1);
-                        border-radius: 12px;
-                        padding: 12px;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: space-between;
-                        gap: 8px;
-                        transition: transform 0.2s ease, box-shadow 0.2s ease;
-                        text-decoration: none;
-                        position: relative;
-                        overflow: hidden;
-                    }
+            .menu-rec-price {
+                font-size: 13px;
+                font-weight: 700;
+                color: #CA7842;
+                white-space: nowrap;
+            }
 
-                    .menu-rec-card:hover {
-                        transform: translateY(-4px);
-                        background: linear-gradient(145deg, rgba(62, 37, 26, 0.7), rgba(42, 27, 20, 0.4));
-                        border-color: rgba(202, 120, 66, 0.2);
-                        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-                    }
+            .menu-rec-badge-available {
+                padding: 4px 12px;
+                background: linear-gradient(135deg, #CA7842, #8B5E3C);
+                color: #f0f2ae;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 20px;
+                box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);
+                white-space: nowrap;
+            }
 
-                    .menu-rec-image {
-                        width: 100%;
-                        aspect-ratio: 1/1;
-                        border-radius: 8px;
-                        background-size: cover;
-                        background-position: center;
-                        background-color: #1a1410;
-                    }
+            .menu-rec-badge-unavailable {
+                padding: 4px 12px;
+                background-color: #3e302b;
+                color: #a89890;
+                font-size: 11px;
+                font-weight: 500;
+                border-radius: 20px;
+                white-space: nowrap;
+            }
 
-                    .menu-rec-name {
-                        font-size: 14px;
-                        font-weight: 600;
-                        color: white;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        margin-top: 4px;
-                        margin-bottom: 4px;
-                        /* Space before footer */
-                    }
+            /* Desktop Styles (Grid Layout) */
+            @media (min-width: 769px) {
+                .other-menus-scroll-container {
+                    display: grid;
+                    /* Switch to Grid */
+                    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                    /* Responsive columns */
+                    gap: 32px;
+                    overflow: visible;
+                    /* No scroll */
+                    margin: 0;
+                    padding: 0;
+                }
 
-                    .menu-rec-footer {
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-top: auto;
-                        gap: 8px;
-                    }
+                .menu-rec-card {
+                    flex: none;
+                    /* Disable flex behavior */
+                    width: auto;
+                    padding: 16px;
+                    /* Larger padding */
+                    border-radius: 16px;
+                    gap: 12px;
+                }
 
-                    .menu-rec-price {
-                        font-size: 13px;
-                        font-weight: 700;
-                        color: #CA7842;
-                        white-space: nowrap;
-                    }
+                .menu-rec-name {
+                    font-size: 18px;
+                    /* Larger font */
+                    margin-bottom: 0;
+                }
 
-                    .menu-rec-badge-available {
-                        padding: 4px 12px;
-                        background: linear-gradient(135deg, #CA7842, #8B5E3C);
-                        color: #f0f2ae;
-                        font-size: 11px;
-                        font-weight: 600;
-                        border-radius: 20px;
-                        box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);
-                        white-space: nowrap;
-                    }
+                .menu-rec-price {
+                    font-size: 18px;
+                    /* Larger price */
+                }
 
-                    .menu-rec-badge-unavailable {
-                        padding: 4px 12px;
-                        background-color: #3e302b;
-                        color: #a89890;
-                        font-size: 11px;
-                        font-weight: 500;
-                        border-radius: 20px;
-                        white-space: nowrap;
-                    }
+                .menu-rec-btn {
+                    font-size: 13px;
+                    padding: 8px 18px;
+                }
+            }
+        </style>
 
-                    /* Desktop Styles (Grid Layout) */
-                    @media (min-width: 769px) {
-                        .other-menus-scroll-container {
-                            display: grid;
-                            /* Switch to Grid */
-                            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-                            /* Responsive columns */
-                            gap: 32px;
-                            overflow: visible;
-                            /* No scroll */
-                            margin: 0;
-                            padding: 0;
-                        }
-
-                        .menu-rec-card {
-                            flex: none;
-                            /* Disable flex behavior */
-                            width: auto;
-                            padding: 16px;
-                            /* Larger padding */
-                            border-radius: 16px;
-                            gap: 12px;
-                        }
-
-                        .menu-rec-name {
-                            font-size: 18px;
-                            /* Larger font */
-                            margin-bottom: 0;
-                        }
-
-                        .menu-rec-price {
-                            font-size: 18px;
-                            /* Larger price */
-                        }
-
-                        .menu-rec-btn {
-                            font-size: 13px;
-                            padding: 8px 18px;
-                        }
-                    }
-                </style>
-
-                <!-- Mobile padding fix style -->
-                <style>
-                    @media (max-width: 768px) {
-                        .related-menus-section {
-                            padding: 0 20px 80px 20px !important;
-                        }
-                    }
-                </style>
-            </div>
-        @endif
+        <!-- Mobile padding fix style -->
+        <style>
+            @media (max-width: 768px) {
+                .related-menus-section {
+                    padding: 0 20px 80px 20px !important;
+                }
+            }
+        </style>
     </div>
 </x-customer.layout>
