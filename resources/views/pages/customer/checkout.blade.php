@@ -403,6 +403,9 @@
 
         .receipt-cart-icon {
             margin-bottom: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .receipt-label {
@@ -1202,8 +1205,8 @@
                         console.log('Payment success:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
-                        // Show success modal
-                        showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
+                        // Show success modal with real order data
+                        showSuccessModal(data.data, result.payment_type || paymentMethod);
                     },
                     onPending: function (result) {
                         console.log('Payment pending:', result);
@@ -1235,16 +1238,15 @@
             }
         }
 
-        // Show success modal
-        function showSuccessModal(orderType, paymentMethod) {
-            // Generate order number
-            const now = new Date();
-            const orderNumber = 'MRK-' + now.getFullYear() +
-                String(now.getMonth() + 1).padStart(2, '0') +
-                String(now.getDate()).padStart(2, '0') + '-' +
-                String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
-
-            // Format date
+        // Show success modal with real order data
+        function showSuccessModal(orderData, paymentMethod) {
+            console.log('Order data for receipt:', orderData);
+            
+            // Use real order number from API response
+            const orderNumber = orderData.order_number || orderData.id;
+            
+            // Format date from order created_at or use current time
+            const now = orderData.created_at ? new Date(orderData.created_at) : new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
                 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             const orderDate = now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() +
@@ -1262,10 +1264,17 @@
                 'jne': 'JNE',
                 'grab_express': 'Grab Express',
                 'gosend': 'Go Send',
-                'sicepat': 'SiCepat Express'
+                'sicepat': 'SiCepat Express',
+                'credit_card': 'Credit Card',
+                'bank_transfer': 'Bank Transfer'
             };
 
-            // Update modal content
+            // Format order type
+            const orderType = orderData.order_type ? 
+                orderData.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 
+                'Takeaway';
+
+            // Update modal content with real data
             document.getElementById('orderNumber').textContent = orderNumber;
             document.getElementById('orderDate').textContent = orderDate;
             document.getElementById('receiptOrderType').textContent = orderType;
@@ -1273,20 +1282,110 @@
 
             // Update table info based on order type
             const tableInfo = document.getElementById('receiptTableInfo');
-            if (orderType === 'Dine In') {
-                tableInfo.textContent = 'Meja 10';
+            if (orderData.order_type === 'dine_in' && orderData.table) {
+                tableInfo.textContent = 'Meja ' + (orderData.table.table_number || orderData.table_id);
                 tableInfo.style.display = 'block';
-            } else if (orderType === 'Delivery') {
-                tableInfo.textContent = '';
-                tableInfo.style.display = 'none';
+            } else if (orderData.order_type === 'dine_in' && orderData.table_id) {
+                tableInfo.textContent = 'Meja ' + orderData.table_id;
+                tableInfo.style.display = 'block';
             } else {
                 tableInfo.textContent = '';
                 tableInfo.style.display = 'none';
             }
 
+            // Update order items list with real data
+            const itemsList = document.getElementById('receiptItemsList');
+            itemsList.innerHTML = ''; // Clear existing items
+            
+            // Try to get items from order data, otherwise get from page cart
+            let items = orderData.items || orderData.order_items || [];
+            let totalAmount = orderData.total_amount || orderData.total || 0;
+            let calculatedTotal = 0;
+            
+            // Fallback: get items from page if API doesn't return them
+            if (items.length === 0) {
+                const cartItems = document.querySelectorAll('.order-item-card');
+                cartItems.forEach(cartItem => {
+                    const checkbox = cartItem.querySelector('.order-item-checkbox');
+                    // Only include checked items
+                    if (checkbox && checkbox.checked) {
+                        const nameEl = cartItem.querySelector('.order-item-name');
+                        const subtotalEl = cartItem.querySelector('.order-item-subtotal');
+                        const qtyEl = cartItem.querySelector('.checkout-qty-value');
+                        
+                        if (nameEl) {
+                            const subtotal = subtotalEl ? parseInt(subtotalEl.textContent.replace(/[^0-9]/g, '')) || 0 : 0;
+                            items.push({
+                                menu_name: nameEl.textContent.trim(),
+                                variant: '',
+                                quantity: qtyEl ? parseInt(qtyEl.textContent) || 1 : 1,
+                                subtotal: subtotal
+                            });
+                            calculatedTotal += subtotal;
+                        }
+                    }
+                });
+            }
+            
+            // Always get total from page as backup if totalAmount is 0
+            if (totalAmount === 0) {
+                const totalEl = document.querySelector('.summary-row.total .summary-value');
+                if (totalEl) {
+                    totalAmount = parseInt(totalEl.textContent.replace(/[^0-9]/g, '')) || 0;
+                }
+                // If still 0, use calculated total from items
+                if (totalAmount === 0 && calculatedTotal > 0) {
+                    totalAmount = calculatedTotal;
+                }
+                // Last resort - calculate from items array
+                if (totalAmount === 0 && items.length > 0) {
+                    totalAmount = items.reduce((sum, item) => sum + (item.subtotal || item.sub_total || 0), 0);
+                }
+            }
+            
+            if (items.length > 0) {
+                items.forEach(item => {
+                    const variant = item.variant || item.options || item.note || '';
+                    const itemName = item.menu_name || item.name || item.menu?.name || 'Item';
+                    const qty = item.quantity || 1;
+                    const subtotal = item.subtotal || item.sub_total || (item.price * qty) || 0;
+                    
+                    const itemHtml = `
+                        <div class="receipt-item">
+                            <div class="receipt-item-info">
+                                <span class="receipt-item-name">${itemName}</span>
+                                <span class="receipt-item-variant">${variant ? variant + ' | ' : ''}Qty: ${qty}</span>
+                            </div>
+                            <span class="receipt-item-price">RP ${formatRupiah(subtotal)}</span>
+                        </div>
+                    `;
+                    itemsList.innerHTML += itemHtml;
+                });
+            } else {
+                itemsList.innerHTML = '<p style="color: #FFF4D6; opacity: 0.7; text-align: center;">Pesanan sedang diproses</p>';
+            }
+
+            // Update total with real data
+            document.getElementById('receiptTotal').textContent = 'RP ' + formatRupiah(totalAmount);
+
+            // Update notes with real data
+            const noteElement = document.getElementById('receiptNote');
+            const noteSection = noteElement.closest('.receipt-note-section');
+            if (orderData.notes && orderData.notes.trim()) {
+                noteElement.textContent = orderData.notes;
+                noteSection.style.display = 'block';
+            } else {
+                noteSection.style.display = 'none';
+            }
+
             // Show modal
             document.getElementById('successModal').classList.add('show');
             document.body.style.overflow = 'hidden';
+        }
+        
+        // Helper function to format number to Rupiah format
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID').format(number);
         }
 
         // Close success modal
