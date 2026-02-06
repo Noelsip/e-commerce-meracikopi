@@ -835,6 +835,17 @@
                         <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"
                             class="payment-logo" style="height: 22px; width: auto;">
                     </label>
+
+                    <!-- OVO -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'ovo')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="ovo" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">OVO</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"
+                            class="payment-logo" style="height: 22px; width: auto;">
+                    </label>
                 </div>
             </div>
 
@@ -1001,7 +1012,7 @@
             const modal = document.getElementById('errorModal');
             const title = document.getElementById('errorModalTitle');
             const msgEl = document.getElementById('errorModalMessage');
-            
+
             title.textContent = 'Metode Pembayaran Tidak Tersedia';
             msgEl.innerHTML = `
                 <p style="margin-bottom: 15px;">${message}</p>
@@ -1009,14 +1020,14 @@
                     Silahkan pilih metode pembayaran lain di bawah, lalu klik Checkout kembali.
                 </p>
             `;
-            
+
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
-            
+
             // Scroll to payment methods section after modal is closed
             const closeBtn = modal.querySelector('.close-btn') || modal.querySelector('button');
             if (closeBtn) {
-                closeBtn.onclick = function() {
+                closeBtn.onclick = function () {
                     closeErrorModal();
                     // Scroll to payment methods
                     const paymentSection = document.querySelector('.payment-method');
@@ -1231,7 +1242,7 @@
                 }
 
                 console.log('Payment initiated:', paymentData);
-                
+
                 // Step 3: Handle DOKU payment
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
@@ -1246,17 +1257,17 @@
                 }
 
                 // Setup payment success/error callbacks for DOKU
-                window.onPaymentSuccess = function(result) {
+                window.onPaymentSuccess = function (result) {
                     console.log('DOKU Payment success:', result);
                     showSuccessModal(data.data, paymentMethod);
                 };
 
-                window.onPaymentError = function(result) {
+                window.onPaymentError = function (result) {
                     console.error('DOKU Payment error:', result);
                     showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
                 };
 
-                window.onPaymentPending = function(result) {
+                window.onPaymentPending = function (result) {
                     console.log('DOKU Payment pending:', result);
                     showErrorModal('Pembayaran Pending', 'Silahkan selesaikan pembayaran Anda. Status akan diupdate otomatis.');
                     // Redirect to order history after 3 seconds
@@ -1270,10 +1281,10 @@
                     window.dokuPayment.handlePayment(paymentData.data);
                 } catch (paymentHandlerError) {
                     console.error('DOKU Payment handler error:', paymentHandlerError);
-                    showErrorModal('Gagal Memuat Payment', 
+                    showErrorModal('Gagal Memuat Payment',
                         'Gateway pembayaran tidak dapat dimuat. Pesanan Anda tetap tersimpan. ' +
                         'Silahkan coba lagi atau lihat di riwayat pesanan untuk melanjutkan pembayaran.');
-                    
+
                     // Optional: Redirect to order history
                     setTimeout(() => {
                         window.location.href = '/customer/order-history';
@@ -1291,10 +1302,10 @@
         // Show success modal with real order data
         function showSuccessModal(orderData, paymentMethod) {
             console.log('Order data for receipt:', orderData);
-            
+
             // Use real order number from API response
             const orderNumber = orderData.order_number || orderData.id;
-            
+
             // Format date from order created_at or use current time
             const now = orderData.created_at ? new Date(orderData.created_at) : new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -1320,8 +1331,8 @@
             };
 
             // Format order type
-            const orderType = orderData.order_type ? 
-                orderData.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 
+            const orderType = orderData.order_type ?
+                orderData.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) :
                 'Takeaway';
 
             // Update modal content with real data
@@ -1346,12 +1357,12 @@
             // Update order items list with real data
             const itemsList = document.getElementById('receiptItemsList');
             itemsList.innerHTML = ''; // Clear existing items
-            
+
             // Try to get items from order data, otherwise get from page cart
             let items = orderData.items || orderData.order_items || [];
             let totalAmount = orderData.total_amount || orderData.total || 0;
             let calculatedTotal = 0;
-            
+
             // Fallback: get items from page if API doesn't return them
             if (items.length === 0) {
                 const cartItems = document.querySelectorAll('.order-item-card');
@@ -1362,7 +1373,7 @@
                         const nameEl = cartItem.querySelector('.order-item-name');
                         const subtotalEl = cartItem.querySelector('.order-item-subtotal');
                         const qtyEl = cartItem.querySelector('.checkout-qty-value');
-                        
+
                         if (nameEl) {
                             const subtotal = subtotalEl ? parseInt(subtotalEl.textContent.replace(/[^0-9]/g, '')) || 0 : 0;
                             items.push({
@@ -1376,7 +1387,7 @@
                     }
                 });
             }
-            
+
             // Always get total from page as backup if totalAmount is 0
             if (totalAmount === 0) {
                 const totalEl = document.querySelector('.summary-row.total .summary-value');
@@ -1392,14 +1403,14 @@
                     totalAmount = items.reduce((sum, item) => sum + (item.subtotal || item.sub_total || 0), 0);
                 }
             }
-            
+
             if (items.length > 0) {
                 items.forEach(item => {
                     const variant = item.variant || item.options || item.note || '';
                     const itemName = item.menu_name || item.name || item.menu?.name || 'Item';
                     const qty = item.quantity || 1;
                     const subtotal = item.subtotal || item.sub_total || (item.price * qty) || 0;
-                    
+
                     const itemHtml = `
                         <div class="receipt-item">
                             <div class="receipt-item-info">
@@ -1432,7 +1443,7 @@
             document.getElementById('successModal').classList.add('show');
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Helper function to format number to Rupiah format
         function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID').format(number);
@@ -1510,18 +1521,17 @@
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
             const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
-
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
-                deliveryAddressSection.style.display = 'block';
-                deliveryMethodsSection.style.display = 'block';
-                paymentMethodsSection.style.display = 'none';
+                if (deliveryAddressSection) deliveryAddressSection.style.display = 'block';
+                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'block';
+                if (paymentMethodsSection) paymentMethodsSection.style.display = 'none';
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
-                deliveryAddressSection.style.display = 'none';
-                deliveryMethodsSection.style.display = 'none';
-                paymentMethodsSection.style.display = 'block';
+                if (deliveryAddressSection) deliveryAddressSection.style.display = 'none';
+                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'none';
+                if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }

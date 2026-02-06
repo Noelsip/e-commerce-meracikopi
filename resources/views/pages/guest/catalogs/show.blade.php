@@ -278,19 +278,13 @@
             margin: 0 auto;
             padding-bottom: 40px;
         ">
-            <!-- Background Layer -->
+            <!-- Background Layer - Only for product content area -->
             <div style="
                 position: absolute;
-                inset: 0;
-                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
-                z-index: 1;
-                pointer-events: none;
-            "></div>
-
-            <!-- Background Layer -->
-            <div style="
-                position: absolute;
-                inset: 0;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 350px;
                 background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
                 z-index: 1;
                 pointer-events: none;
@@ -301,11 +295,11 @@
                 position: relative;
                 z-index: 2;
                 width: 100%;
-                height: 100%;
+                height: 350px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                gap: 60px;
+                gap: 40px;
             ">
 
                 <script>
@@ -370,7 +364,7 @@
 
                 <!-- Product Image -->
                 <div class="product-image"
-                    style="position: relative; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
+                    style="position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; margin-left: -80px;">
                     <!-- Shadow -->
                     <div
                         style="position: absolute; bottom: 10%; width: 60%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); filter: blur(10px);">
@@ -378,7 +372,7 @@
 
                     @if($menu->image_path)
                         <img src="{{ asset($menu->image_path) }}" alt="{{ $menu->name }}"
-                            style="width: 80%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
+                            style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
                     @else
                         <div
                             style="width: 100%; height: 100%; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
@@ -448,7 +442,7 @@
 
             <!-- Description and Notes Section - inside product-box for Alpine.js scope -->
             <div class="description-section"
-                style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
+                style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10; background-color: #1a1410;">
                 <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
                     <!-- Description -->
                     <div>
@@ -481,7 +475,7 @@
             <!-- Related Menus Section - Now inside product-box, below description -->
             @if(isset($relatedMenus) && $relatedMenus->count() > 0)
                 <div class="related-menus-section"
-                    style="max-width: 1440px; margin: 0 auto; padding: 0 40px 40px 40px; position: relative; z-index: 1; background: transparent;">
+                    style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 1; background-color: #1a1410;">
                     <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
                         Lainnya</h3>
 
