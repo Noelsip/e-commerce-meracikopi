@@ -776,51 +776,61 @@
                     <p class="section-title">Metode Pembayaran</p>
 
                     <!-- DANA -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
                             <input type="radio" name="payment_method" value="dana" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">DANA</span>
                         </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA" class="payment-logo" style="height: 22px; width: auto;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"
+                            class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- QRIS -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
                             <input type="radio" name="payment_method" value="qris" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">QRIS</span>
                         </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS" class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"
+                            class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
                     </label>
 
                     <!-- Transfer Bank -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
                             <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">Transfer Bank</span>
                         </div>
-                        <svg class="payment-logo" style="height: 22px; width: 28px;" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg class="payment-logo" style="height: 22px; width: 28px;" viewBox="0 0 24 24" fill="none"
+                            stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                             <line x1="1" y1="10" x2="23" y2="10"></line>
                         </svg>
                     </label>
 
                     <!-- GoPay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
                             <input type="radio" name="payment_method" value="gopay" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">GoPay</span>
                         </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay" class="payment-logo" style="height: 22px; width: auto;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"
+                            class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 
                     <!-- ShopeePay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')" style="display: flex; align-items: center; justify-content: space-between;">
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
                             <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">ShopeePay</span>
                         </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay" class="payment-logo" style="height: 22px; width: auto;">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"
+                            class="payment-logo" style="height: 22px; width: auto;">
                     </label>
                 </div>
             </div>
@@ -1038,7 +1048,7 @@
                 })
                 .filter(id => id !== null && !isNaN(id));
 
-            console.log('📋 Selected item IDs:', selectedItemIds);
+            console.log('Selected item IDs:', selectedItemIds);
 
             // 2. Validate Payment Method (required for all order types)
             let paymentMethod = null;
@@ -1152,7 +1162,7 @@
             checkoutBtn.innerText = 'Memproses...';
             checkoutBtn.disabled = true;
 
-            console.log('📦 Sending order payload:', payload);
+            console.log('Sending order payload:', payload);
 
             try {
                 const response = await fetch('/api/customer/orders', {
@@ -1177,7 +1187,7 @@
                     throw new Error(data.message || 'Gagal memproses pesanan');
                 }
 
-                console.log('✅ Order created successfully:', data);
+                console.log('Order created successfully:', data);
                 const orderId = data.data.id;
 
                 // Step 2: Call payment API to get snap_token
@@ -1202,7 +1212,7 @@
                     throw new Error(paymentData.message || 'Gagal memproses pembayaran');
                 }
 
-                console.log('✅ Payment initiated:', paymentData);
+                console.log('Payment initiated:', paymentData);
                 const snapToken = paymentData.data.snap_token;
 
                 // Step 3: Open Midtrans Snap popup
@@ -1216,14 +1226,14 @@
 
                 window.snap.pay(snapToken, {
                     onSuccess: function (result) {
-                        console.log('✅ Payment success:', result);
+                        console.log('Payment success:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
                         // Show success modal
                         showSuccessModal(data.data.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()), result.payment_type || 'Online Payment');
                     },
                     onPending: function (result) {
-                        console.log('⏳ Payment pending:', result);
+                        console.log('Payment pending:', result);
                         // Clear cart selection
                         localStorage.removeItem('selected_cart_items');
                         // Show pending message
@@ -1234,11 +1244,11 @@
                         }, 2000);
                     },
                     onError: function (result) {
-                        console.error('❌ Payment error:', result);
+                        console.error('Payment error:', result);
                         showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
                     },
                     onClose: function () {
-                        console.log('ℹ️ Payment popup closed');
+                        console.log('Payment popup closed');
                         // User closed the popup without completing payment
                         showErrorModal('Pembayaran Dibatalkan', 'Anda menutup halaman pembayaran. Pesanan tetap tersimpan, silahkan selesaikan pembayaran di riwayat pesanan.');
                     }
@@ -1435,10 +1445,10 @@
         function renderCheckoutItems(items) {
             const container = document.getElementById('checkoutItemsContainer');
 
-            console.log('🎨 renderCheckoutItems called with', items.length, 'items');
+            console.log('renderCheckoutItems called with', items.length, 'items');
 
             if (!items || items.length === 0) {
-                console.log('⚠️ No items to render, showing empty state');
+                console.log('No items to render, showing empty state');
                 container.innerHTML = `
                     <div style="text-align: center; padding: 60px 40px; color: rgba(255,255,255,0.6);">
                         <p style="font-size: 16px; margin-bottom: 12px;">Tidak ada produk yang dipilih</p>
@@ -1450,7 +1460,7 @@
                 return;
             }
 
-            console.log('✓ Building HTML for', items.length, 'items');
+            console.log('Building HTML for', items.length, 'items');
 
             // Build HTML
             let html = '';
@@ -1491,10 +1501,10 @@
                 `;
             });
 
-            console.log('✓ Setting innerHTML to container');
+            console.log('Setting innerHTML to container');
             container.innerHTML = html;
 
-            console.log('✓ Calling updateOrderTotal');
+            console.log('Calling updateOrderTotal');
             updateOrderTotal();
 
             // Collect notes from all items and fill the orderNotes field
@@ -1506,28 +1516,28 @@
             const orderNotesField = document.getElementById('orderNotes');
             if (orderNotesField && allNotes) {
                 orderNotesField.value = allNotes;
-                console.log('✓ Filled orderNotes with item notes:', allNotes);
+                console.log('Filled orderNotes with item notes:', allNotes);
             }
 
-            console.log('✅ renderCheckoutItems completed');
+            console.log('renderCheckoutItems completed');
         }
 
         // Fetch and render cart items
         async function loadCheckoutItems() {
             // Prevent multiple simultaneous calls
             if (isLoadingCheckoutItems) {
-                console.log('⏳ Already loading checkout items, skipping...');
+                console.log('Already loading checkout items, skipping...');
                 return;
             }
 
             isLoadingCheckoutItems = true;
-            console.log('🔄 Starting loadCheckoutItems...');
+            console.log('Starting loadCheckoutItems...');
             const startTime = Date.now();
             const token = localStorage.getItem('guest_token') || '';
             const container = document.getElementById('checkoutItemsContainer');
 
             if (!token) {
-                console.warn('⚠️ No guest token found');
+                console.warn('No guest token found');
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: #ef4444;">
                         <p>Session tidak ditemukan. Silakan kembali ke cart.</p>
@@ -1539,7 +1549,7 @@
             }
 
             try {
-                console.log('📡 Fetching cart from API...');
+                console.log('Fetching cart from API...');
 
                 const response = await fetch('/api/customer/cart', {
                     headers: {
@@ -1549,48 +1559,48 @@
                 });
 
                 const fetchTime = Date.now() - startTime;
-                console.log(`✓ API response received in ${fetchTime}ms`);
+                console.log(`API response received in ${fetchTime}ms`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                console.log('📦 Cart data from API:', result);
+                console.log('Cart data from API:', result);
 
                 let items = result.data.items || [];
                 console.log(`Found ${items.length} items in cart`);
 
                 // Filter items based on selection from cart page
                 const selectedIdsString = localStorage.getItem('selected_cart_items');
-                console.log('🎯 Selected IDs from localStorage:', selectedIdsString);
+                console.log('Selected IDs from localStorage:', selectedIdsString);
 
                 if (selectedIdsString) {
                     try {
                         const selectedIds = JSON.parse(selectedIdsString);
-                        console.log('✓ Parsed selected IDs:', selectedIds);
+                        console.log('Parsed selected IDs:', selectedIds);
 
                         const selectedIdStrings = selectedIds.map(id => String(id));
                         items = items.filter(item => selectedIdStrings.includes(String(item.id)));
-                        console.log(`✓ Filtered to ${items.length} selected items`);
+                        console.log(`Filtered to ${items.length} selected items`);
                     } catch (e) {
-                        console.error('❌ Error parsing selected_cart_items:', e);
+                        console.error('Error parsing selected_cart_items:', e);
                     }
                 } else {
-                    console.warn('⚠️ No selected items found in localStorage, showing all items');
+                    console.warn('No selected items found in localStorage, showing all items');
                 }
 
                 // Render items
-                console.log('🎨 Rendering items...');
+                console.log('Rendering items...');
                 renderCheckoutItems(items);
 
                 const renderTime = Date.now() - startTime;
-                console.log(`✅ Checkout items loaded successfully in ${renderTime}ms`);
+                console.log(`Checkout items loaded successfully in ${renderTime}ms`);
 
                 isLoadingCheckoutItems = false;
             } catch (error) {
                 const errorTime = Date.now() - startTime;
-                console.error(`❌ Error loading checkout items after ${errorTime}ms:`, error);
+                console.error(`Error loading checkout items after ${errorTime}ms:`, error);
 
                 let errorMessage = error.message;
                 if (error.name === 'AbortError') {
@@ -1776,9 +1786,9 @@
 
             // Check if active element is one of the inputs
             function isActiveInputField() {
-                return document.activeElement === dineInName || 
-                       document.activeElement === dineInPhone || 
-                       document.activeElement === orderNotes;
+                return document.activeElement === dineInName ||
+                    document.activeElement === dineInPhone ||
+                    document.activeElement === orderNotes;
             }
 
             // Add event listeners for focus (ketika input di-klik)
@@ -1846,7 +1856,7 @@
             if (!checkoutBtn) return;
 
             const orderType = document.getElementById('orderTypeDisplay')?.textContent.toLowerCase().replace(' ', '_');
-            console.log('🔍 Validating checkout button for order type:', orderType);
+            console.log('Validating checkout button for order type:', orderType);
 
             if (orderType === 'dine_in') {
                 const selectedTableId = localStorage.getItem('selected_table_id');
@@ -1858,14 +1868,14 @@
                     checkoutBtn.title = 'Silahkan pilih meja terlebih dahulu';
                     checkoutBtn.style.cursor = 'not-allowed';
                     checkoutBtn.style.opacity = '0.6';
-                    console.log('⚠️ Checkout disabled: No table selected for Dine In');
+                    console.log('Checkout disabled: No table selected for Dine In');
                 } else {
                     // Enable checkout button
                     checkoutBtn.disabled = false;
                     checkoutBtn.title = '';
                     checkoutBtn.style.cursor = 'pointer';
                     checkoutBtn.style.opacity = '1';
-                    console.log('✓ Checkout enabled: Table', tableNumber, 'selected');
+                    console.log('Checkout enabled: Table', tableNumber, 'selected');
                 }
             } else {
                 // Enable checkout button for non-dine-in orders

@@ -215,7 +215,8 @@
         <!-- Left: Logo and Title -->
         <div class="checkout-logo-section">
             <a href="/" style="display: flex; align-items: center; gap: 12px; text-decoration: none;">
-                <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" style="width: 45px; height: 45px; object-fit: contain;">
+                <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo"
+                    style="width: 45px; height: 45px; object-fit: contain;">
                 <span class="checkout-logo-text">Meracikopi</span>
             </a>
             <div class="checkout-divider"></div>
@@ -260,18 +261,18 @@
     let selectedTableId = null;
 
     // Load available tables on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         loadAvailableTables();
-        
+
         // Initialize order type dari localStorage atau default ke takeaway
         const savedOrderType = localStorage.getItem('selected_order_type') || 'takeaway';
         const orderTypeNavbar = document.getElementById('orderTypeNavbar');
-        
+
         if (orderTypeNavbar) {
             orderTypeNavbar.value = savedOrderType;
             // Trigger sync untuk update tampilan checkout
             syncOrderType(savedOrderType);
-            
+
             // Show/hide table selector based on saved order type
             if (savedOrderType === 'dine_in') {
                 const tableSelector = document.getElementById('tableSelector');
@@ -297,11 +298,11 @@
             })
             .then(data => {
                 console.log('Tables API response:', data);
-                
+
                 if (data.data && Array.isArray(data.data)) {
                     availableTables = data.data;
                     populateTableDropdown();
-                    
+
                     // Load saved table selection if exists
                     const savedTableId = localStorage.getItem('selected_table_id');
                     if (savedTableId && availableTables.find(t => t.id == savedTableId)) {
@@ -322,7 +323,7 @@
     // Populate table dropdown with fetched data
     function populateTableDropdown() {
         const tableSelect = document.getElementById('tableSelect');
-        
+
         if (!availableTables || availableTables.length === 0) {
             showNoTablesAvailable();
             return;
@@ -330,7 +331,7 @@
 
         tableSelect.disabled = false;
         tableSelect.innerHTML = '<option value="">Pilih Meja...</option>';
-        
+
         availableTables.forEach(table => {
             const option = document.createElement('option');
             option.value = table.id;
@@ -360,20 +361,20 @@
         const tableSelector = document.getElementById('tableSelector');
         const tableSelect = document.getElementById('tableSelect');
         const tableWarning = document.getElementById('tableWarning');
-        
+
         // Simpan pilihan order type ke localStorage
         localStorage.setItem('selected_order_type', value);
-        
+
         // Show/hide table selector based on order type
         if (value === 'dine_in') {
             tableSelector.style.display = 'block';
-            
+
             // Reload tables if not loaded yet
             if (availableTables.length === 0) {
                 console.log('Loading tables for Dine In...');
                 loadAvailableTables();
             }
-            
+
             // Restore saved selection if exists
             const savedTableId = localStorage.getItem('selected_table_id');
             if (savedTableId && availableTables.find(t => t.id == savedTableId)) {
@@ -389,7 +390,7 @@
             tableSelect.value = '';
             selectedTableId = null;
             if (tableWarning) tableWarning.classList.remove('show');
-            
+
             // Clear localStorage when switching away from dine in
             localStorage.removeItem('selected_table_id');
             localStorage.removeItem('selected_table_number');
@@ -404,43 +405,43 @@
     function handleTableChange(tableId) {
         selectedTableId = tableId;
         const tableWarning = document.getElementById('tableWarning');
-        
+
         if (tableId) {
             const selectedTable = availableTables.find(t => t.id == tableId);
             if (selectedTable) {
-                console.log('✓ Table selected:', {
+                console.log('Table selected:', {
                     id: selectedTable.id,
                     number: selectedTable.table_number,
                     capacity: selectedTable.capacity,
                     status: selectedTable.status
                 });
-                
+
                 // Store table info for checkout process
                 localStorage.setItem('selected_table_id', tableId);
                 localStorage.setItem('selected_table_number', selectedTable.table_number);
                 localStorage.setItem('selected_table_capacity', selectedTable.capacity);
-                
+
                 // Hide warning
                 if (tableWarning) {
                     tableWarning.classList.remove('show');
                 }
-                
+
                 // Trigger event for other components if needed
                 window.dispatchEvent(new CustomEvent('tableSelected', {
                     detail: selectedTable
                 }));
             }
         } else {
-            console.log('✗ Table selection cleared');
+            console.log('Table selection cleared');
             localStorage.removeItem('selected_table_id');
             localStorage.removeItem('selected_table_number');
             localStorage.removeItem('selected_table_capacity');
-            
+
             // Show warning
             if (tableWarning) {
                 tableWarning.classList.add('show');
             }
-            
+
             window.dispatchEvent(new CustomEvent('tableCleared'));
         }
     }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Tables;
 use Illuminate\Http\Request;
+use App\Services\QRCodeService;
+use Illuminate\Support\Str;
 
 class TableApiController extends Controller
 {
@@ -52,12 +54,21 @@ class TableApiController extends Controller
             'is_active' => 'sometimes|boolean',
         ]);
 
+        // Generate unique token untuk QR code
+        $qrToken = Str::random(32);
+
         $table = Tables::create([
             'table_number' => $validated['table_number'],
             'capacity' => $validated['capacity'],
             'status' => $validated['status'] ?? 'available',
             'is_active' => $validated['is_active'] ?? true,
+            'qr_token' => $qrToken,
         ]);
+
+        // Generate QR Code
+        $qrService = new QRCodeService();
+        $qrCodePath = $qrService->generateTableQRCode($qrToken, $table->table_number);
+        $table->update(['qr_code_path' => $qrCodePath]);
 
         return response()->json([
             'message' => 'Table created successfully',
@@ -67,6 +78,8 @@ class TableApiController extends Controller
                 'capacity' => $table->capacity,
                 'status' => $table->status,
                 'is_active' => $table->is_active,
+                'qr_token' => $table->qr_token,
+                'qr_code_url' => $qrCodePath ? asset('storage/' . $qrCodePath) : null,
             ]
         ], 201);
     }
@@ -167,6 +180,79 @@ class TableApiController extends Controller
             'data' => [
                 'id' => $table->id,
                 'status' => $table->status,
+            ]
+        ], 200);
+    }
+
+    /**
+     * POST /api/admin/tables/{id}/generate-qr - Generate QR code untuk meja
+     */
+    public function generateQRCode($id)
+    {
+        $table = Tables::find($id);
+
+        if (!$table) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
+
+        // Jika belum ada token, buat token baru
+        if (!$table->qr_token) {
+            $table->update(['qr_token' => Str::random(32)]);
+        }
+
+        // Hapus QR code lama jika ada
+        if ($table->qr_code_path) {
+            $qrService = new QRCodeService();
+            $qrService->deleteQRCode($table->qr_code_path);
+        }
+
+        // Generate QR Code baru
+        $qrService = new QRCodeService();
+        $qrCodePath = $qrService->generateTableQRCode($table->qr_token, $table->table_number);
+        $table->update(['qr_code_path' => $qrCodePath]);
+
+        return response()->json([
+            'message' => 'QR Code generated successfully',
+            'data' => [
+                'id' => $table->id,
+                'table_number' => $table->table_number,
+                'qr_code_url' => asset('storage/' . $qrCodePath),
+            ]
+        ], 200);
+    }
+
+    /**
+     * POST /api/admin/tables/{id}/regenerate-qr - Regenerate QR code (dengan token baru)
+     */
+    public function regenerateQRCode($id)
+    {
+        $table = Tables::find($id);
+
+        if (!$table) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
+
+        // Hapus QR code lama
+        if ($table->qr_code_path) {
+            $qrService = new QRCodeService();
+            $qrService->deleteQRCode($table->qr_code_path);
+        }
+
+        // Generate token baru
+        $newToken = Str::random(32);
+        $table->update(['qr_token' => $newToken]);
+
+        // Generate QR Code dengan token baru
+        $qrService = new QRCodeService();
+        $qrCodePath = $qrService->generateTableQRCode($newToken, $table->table_number);
+        $table->update(['qr_code_path' => $qrCodePath]);
+
+        return response()->json([
+            'message' => 'QR Code regenerated successfully',
+            'data' => [
+                'id' => $table->id,
+                'table_number' => $table->table_number,
+                'qr_code_url' => asset('storage/' . $qrCodePath),
             ]
         ], 200);
     }

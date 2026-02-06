@@ -1,21 +1,22 @@
-# Stage 1: Build frontend assets
-FROM node:20-alpine AS node-builder
-
+# Stage 1: Composer dependencies (needed for Flux/Tailwind)
+FROM php:8.2-fpm-alpine AS composer-builder
+RUN apk add --no-cache git unzip libzip-dev icu-dev
+RUN docker-php-ext-install zip intl
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
-# Copy package files
+# Stage 2: Build frontend assets
+FROM node:20-alpine AS node-builder
+WORKDIR /app
+COPY --from=composer-builder /app/vendor ./vendor
 COPY package.json package-lock.json* ./
-
-# Install dependencies
 RUN npm ci --include=optional
-
-# Copy source files
 COPY . .
-
-# Build frontend assets
 RUN npm run build
 
-# Stage 2: PHP/Laravel application
+# Stage 3: PHP/Laravel application
 FROM php:8.2-fpm-alpine AS app
 
 # Install system dependencies
@@ -59,11 +60,8 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files first for better caching
-COPY composer.json composer.lock ./
-
-# Install PHP dependencies (no dev dependencies in production)
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+# Copy vendor from composer builder
+COPY --from=composer-builder /app/vendor ./vendor
 
 # Copy application files
 COPY . .
