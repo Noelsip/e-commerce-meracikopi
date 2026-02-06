@@ -89,7 +89,10 @@ Route::prefix('customer')->middleware('guest.token')->group(function () {
 
     // Payment
     Route::post('/orders/{orderId}/pay', [PaymentController::class, 'pay']);
-    Route::get('/orders/{orderId}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
+    Route::get('/orders/{invoiceNumber}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
+    
+    // Simulate payment (for testing fallback mode only)
+    Route::post('/orders/{invoiceNumber}/simulate-payment', [PaymentController::class, 'simulatePaymentComplete']);
 });
 
 // DOKU webhook

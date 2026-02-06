@@ -12,6 +12,7 @@ class DokuService
 {
     private static function generateTimestamp(): string
     {
+        // Use standard ISO 8601 format for consistency
         return gmdate('c');
     }
     /**
@@ -120,8 +121,8 @@ class DokuService
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
         
-        // Use specific timestamp format for B2B access token
-        $timestamp = gmdate('Y-m-d\TH:i:s.v\Z');
+        // Use standard ISO 8601 format
+        $timestamp = gmdate('c');
         $signature = hash_hmac('sha256', $clientId . $timestamp, $secretKey);
         
         $response = Http::withHeaders([

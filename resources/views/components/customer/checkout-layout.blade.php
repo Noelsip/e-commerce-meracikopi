@@ -66,11 +66,22 @@
             },
             
             handleQRPayment: function(qrData, instructions) {
+                const qrImage = qrData.qr_image || qrData.qr_code || '';
+                console.log('QR Image data length:', qrImage ? qrImage.length : 0);
+                
                 const content = `
                     <div class="qr-payment">
                         <div class="qr-code-container">
-                            <img src="data:image/png;base64,${qrData.qr_image || ''}" 
-                                 alt="QR Code" class="qr-code-image" />
+                            ${qrImage ? 
+                                `<img src="data:image/png;base64,${qrImage}" 
+                                     alt="QR Code" class="qr-code-image" 
+                                     style="max-width: 250px; background: white; padding: 10px; border-radius: 8px;"
+                                     onload="console.log('QR image loaded successfully')"
+                                     onerror="console.error('QR image load error'); this.style.display='none'; this.parentNode.innerHTML='<div style=\\'padding: 40px; text-align: center; border: 2px dashed #ccc;\\'>QR Code Error<br><small>Gagal memuat gambar</small></div>';" />` :
+                                `<div style="padding: 40px; text-align: center; border: 2px dashed #ccc;">
+                                    QR Code Placeholder<br><small>Mock payment mode</small>
+                                 </div>`
+                            }
                         </div>
                         <p class="payment-instructions">${instructions}</p>
                         <div class="payment-details">
@@ -282,6 +293,20 @@
             max-width: 250px;
             width: 100%;
             height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-bottom: 15px;
         }
         
         .va-number-display {

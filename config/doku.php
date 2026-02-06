@@ -9,6 +9,11 @@ return [
     'base_url' => env('DOKU_IS_PRODUCTION', false) 
         ? 'https://api.doku.com' 
         : 'https://api-sandbox.doku.com',
+    
+    // Fallback mode: jika true, gunakan mock data saat DOKU gagal (untuk development)
+    // Set ke false di production untuk memastikan hanya pakai DOKU asli
+    'fallback_enabled' => env('DOKU_FALLBACK_ENABLED', true),
+    
     'snap' => [
         'token_url' => env('DOKU_SNAP_TOKEN_URL'),
         'return_url' => env('DOKU_SNAP_RETURN_URL'),
