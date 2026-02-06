@@ -5,10 +5,31 @@ echo "🚀 Starting Meracikopi E-Commerce Application..."
 
 # Create required directories
 mkdir -p /var/log/supervisor /var/log/php /var/log/nginx
+touch /var/www/html/storage/logs/queue.log
+touch /var/www/html/storage/logs/scheduler.log
+chown -R www-data:www-data /var/www/html/storage/logs
 
-# Tunggu sebentar agar MySQL siap (opsional di Railway karena ada healthcheck)
-echo "⏳ Waiting for services to stabilize..."
-sleep 5
+# Configure PORT for Railway (uses dynamic PORT)
+if [ -n "$PORT" ]; then
+    echo "📌 Configuring Nginx to use PORT: $PORT"
+    sed -i "s/listen 80;/listen $PORT;/g" /etc/nginx/http.d/default.conf
+    sed -i "s/listen \[::\]:80;/listen [::]:$PORT;/g" /etc/nginx/http.d/default.conf
+fi
+
+# Wait for database to be ready (with shorter timeout for Railway)
+echo "⏳ Waiting for database to be ready..."
+max_retries=15
+retry_count=0
+
+while ! php artisan db:monitor --databases=mysql 2>/dev/null; do
+    retry_count=$((retry_count + 1))
+    if [ $retry_count -ge $max_retries ]; then
+        echo "⚠️ Database not ready after $max_retries attempts, continuing anyway..."
+        break
+    fi
+    echo "Waiting for database... attempt $retry_count/$max_retries"
+    sleep 2
+done
 
 echo "✅ Moving forward with startup..."
 
@@ -54,9 +75,19 @@ if [ -z "$APP_KEY" ]; then
     php artisan key:generate --force
 fi
 
-# Run migrations
+# Run migrations with retry
 echo "📦 Running database migrations..."
-php artisan migrate --force
+php artisan migrate --force || echo "⚠️ Migration failed, app may still work if already migrated"
+
+# Check if we need to seed the database
+echo "🌱 Checking if database needs seeding..."
+user_count=$(php artisan tinker --execute="echo \App\Models\User::count();")
+if [ "$user_count" -eq "0" ] || [ "$FORCE_SEED" = "true" ]; then
+    echo "🌱 Running database seeder..."
+    php artisan db:seed --force || echo "⚠️ Seeding failed, but app will continue"
+else
+    echo "✅ Database already has data, skipping seed"
+fi
 
 # Clear and cache configs for production
 echo "⚡ Optimizing application..."
