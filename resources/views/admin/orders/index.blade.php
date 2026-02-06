@@ -69,8 +69,9 @@
     </div>
 
     <!-- Orders Table -->
-    <div class="rounded-xl border overflow-hidden" style="background-color: #2b211e; border-color: #3e302b;">
-        <table class="w-full">
+    <div class="rounded-xl border overflow-hidden overflow-x-auto"
+        style="background-color: #2b211e; border-color: #3e302b;">
+        <table class="w-full min-w-[900px]">
             <thead>
                 <tr style="background-color: #3e302b;">
                     <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: #f0f2bd;">ID</th>
@@ -89,12 +90,13 @@
                     <tr class="border-t" style="border-color: #3e302b;">
                         <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">#{{ $order->id }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-gray-300" style="color: #f0f2bd;">
-                            {{ $order->customer_name ?? '-' }}</td>
+                            {{ $order->customer_name ?? '-' }}
+                        </td>
                         <td class="px-4 py-3 text-sm" style="color: #f0f2bd;">
                             {{ $order->tables?->table_number ?? '-' }}
                         </td>
                         <td class="px-4 py-3 text-sm">
-                            <span class="px-2 py-1 rounded text-xs font-medium"
+                            <span class="px-2 py-1 rounded text-xs font-medium whitespace-nowrap"
                                 style="background-color: #3e302b; color: #D4A574;">
                                 {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
                             </span>
