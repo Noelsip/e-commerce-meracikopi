@@ -29,3 +29,6 @@ yarn-error.log
 /testing/postman_collection.json
 
 /.cursor
+
+merchant_private_key.pem
+merchant_public_key.pem
