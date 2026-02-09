@@ -10,4 +10,28 @@ enum StatusPayments: string
     case FAILED = 'failed';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
+
+    public function label(): string
+    {
+        return match($this) {
+            self::PENDING => 'Menunggu Pembayaran',
+            self::PROCESSING => 'Memproses Pembayaran',
+            self::PAID => 'Sudah Dibayar',
+            self::FAILED => 'Gagal',
+            self::CANCELLED => 'Dibatalkan',
+            self::REFUNDED => 'Refund',
+        };
+    }
+
+    public function color(): string
+    {
+        return match($this) {
+            self::PENDING => '#eab308',      // yellow
+            self::PROCESSING => '#f97316',   // orange
+            self::PAID => '#22c55e',         // green
+            self::FAILED => '#ef4444',       // red
+            self::CANCELLED => '#ef4444',    // red
+            self::REFUNDED => '#8b5cf6',     // purple
+        };
+    }
 }

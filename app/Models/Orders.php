@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Enums\OrderProcessStatus;
+use App\Enums\StatusPayments;
 use App\Models\OrderAddresses;
 use App\Models\OrderItems;
 use App\Models\OrderLogs;
@@ -23,6 +25,8 @@ class Orders extends Model
         'customer_name',
         'customer_phone',
         'status',
+        'order_status',
+        'payment_status',
         'total_price',
         'notes',
         'delivery_fee',
@@ -37,6 +41,8 @@ class Orders extends Model
     protected $casts = [
         'order_type' => OrderType::class,
         'status' => OrderStatus::class,
+        'order_status' => OrderProcessStatus::class,
+        'payment_status' => StatusPayments::class,
         'total_price' => 'decimal:2',
         'delivery_fee' => 'decimal:2',
         'service_fee' => 'decimal:2',
