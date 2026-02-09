@@ -26,6 +26,19 @@ Route::get('/', function () {
 // QR Code Scan Route
 Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan');
 
+// DOKU SNAP Return Routes
+Route::get('/checkout/success', function () {
+    return view('pages.customer.payment-success');
+})->name('doku.success');
+
+Route::get('/checkout/cancel', function () {
+    return view('pages.customer.payment-cancel');  
+})->name('doku.cancel');
+
+Route::get('/checkout/error', function () {
+    return view('pages.customer.payment-error');
+})->name('doku.error');
+
 // Customer Routes
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

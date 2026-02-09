@@ -17,13 +17,337 @@
     <!-- Alpine.js -->
     <script defer src="{{ asset('js/alpine.min.js') }}"></script>
 
-    <!-- Midtrans Snap -->
-    @if(config('midtrans.is_production'))
-        <script src="https://app.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
-    @else
-        <script src="https://app.sandbox.midtrans.com/snap/snap.js"
-            data-client-key="{{ config('midtrans.client_key') }}"></script>
-    @endif
+    <!-- DOKU Payment Gateway -->
+    <script>
+        // DOKU payment handling functions
+        window.dokuPayment = {
+            handlePayment: function(paymentData) {
+                console.log('DOKU Payment Data:', paymentData);
+                
+                const paymentMethod = paymentData.payment_method;
+                
+                // Hide checkout modal and show payment modal
+                this.showPaymentModal(paymentData);
+                
+                // Handle different payment types
+                if (paymentData.qr_code) {
+                    this.handleQRPayment(paymentData.qr_code, paymentData.instructions);
+                } else if (paymentData.virtual_account) {
+                    this.handleVAPayment(paymentData.virtual_account, paymentData.instructions);
+                } else if (paymentData.ewallet) {
+                    this.handleEWalletPayment(paymentData.ewallet, paymentData.instructions);
+                } else if (paymentData.payment_url) {
+                    this.handleURLPayment(paymentData.payment_url);
+                }
+                
+                // Start payment status checking
+                this.startPaymentStatusCheck(paymentData.invoice_number);
+            },
+            
+            showPaymentModal: function(paymentData) {
+                // Create and show payment modal
+                const modalHtml = `
+                    <div id="paymentModal" class="payment-modal-overlay">
+                        <div class="payment-modal">
+                            <div class="payment-modal-header">
+                                <h3>Pembayaran ${this.getPaymentMethodName(paymentData.payment_method)}</h3>
+                                <button onclick="window.dokuPayment.closePaymentModal()" class="close-btn">&times;</button>
+                            </div>
+                            <div class="payment-modal-content" id="paymentModalContent">
+                                <div class="loading">Memuat...</div>
+                            </div>
+                            <div class="payment-modal-footer">
+                                <p class="payment-status" id="paymentStatus">Menunggu pembayaran...</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            },
+            
+            handleQRPayment: function(qrData, instructions) {
+                const qrImage = qrData.qr_image || qrData.qr_code || '';
+                console.log('QR Image data length:', qrImage ? qrImage.length : 0);
+                
+                const content = `
+                    <div class="qr-payment">
+                        <div class="qr-code-container">
+                            ${qrImage ? 
+                                `<img src="data:image/png;base64,${qrImage}" 
+                                     alt="QR Code" class="qr-code-image" 
+                                     style="max-width: 250px; background: white; padding: 10px; border-radius: 8px;"
+                                     onload="console.log('QR image loaded successfully')"
+                                     onerror="console.error('QR image load error'); this.style.display='none'; this.parentNode.innerHTML='<div style=\\'padding: 40px; text-align: center; border: 2px dashed #ccc;\\'>QR Code Error<br><small>Gagal memuat gambar</small></div>';" />` :
+                                `<div style="padding: 40px; text-align: center; border: 2px dashed #ccc;">
+                                    QR Code Placeholder<br><small>Mock payment mode</small>
+                                 </div>`
+                            }
+                        </div>
+                        <p class="payment-instructions">${instructions}</p>
+                        <div class="payment-details">
+                            <p><strong>Berlaku hingga:</strong> ${this.formatDate(qrData.expired_at)}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('paymentModalContent').innerHTML = content;
+            },
+            
+            handleVAPayment: function(vaData, instructions) {
+                const content = `
+                    <div class="va-payment">
+                        <div class="va-info">
+                            <div class="va-bank">${vaData.bank_name}</div>
+                            <div class="va-number-container">
+                                <label>Nomor Virtual Account:</label>
+                                <div class="va-number-display">
+                                    <span class="va-number">${vaData.va_number}</span>
+                                    <button onclick="window.dokuPayment.copyToClipboard('${vaData.va_number}')" 
+                                            class="copy-btn">Salin</button>
+                                </div>
+                            </div>
+                            <div class="va-amount">
+                                <label>Jumlah:</label>
+                                <span class="amount">Rp ${this.formatCurrency(vaData.amount)}</span>
+                            </div>
+                        </div>
+                        <p class="payment-instructions">${instructions}</p>
+                        <div class="payment-details">
+                            <p><strong>Berlaku hingga:</strong> ${this.formatDate(vaData.expired_at)}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('paymentModalContent').innerHTML = content;
+            },
+            
+            handleEWalletPayment: function(ewalletData, instructions) {
+                const content = `
+                    <div class="ewallet-payment">
+                        <p class="payment-instructions">${instructions}</p>
+                        <div class="ewallet-actions">
+                            <a href="${ewalletData.payment_url}" 
+                               target="_blank" 
+                               class="ewallet-btn">
+                                Buka Aplikasi E-Wallet
+                            </a>
+                        </div>
+                        <div class="payment-details">
+                            <p><strong>Berlaku hingga:</strong> ${this.formatDate(ewalletData.expired_at)}</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('paymentModalContent').innerHTML = content;
+            },
+            
+            handleURLPayment: function(paymentUrl) {
+                // Redirect to payment URL
+                window.open(paymentUrl, '_blank');
+            },
+            
+            startPaymentStatusCheck: function(invoiceNumber) {
+                // Poll payment status every 10 seconds
+                this.statusInterval = setInterval(() => {
+                    this.checkPaymentStatus(invoiceNumber);
+                }, 10000);
+            },
+            
+            checkPaymentStatus: function(invoiceNumber) {
+                fetch(`/api/customer/orders/${invoiceNumber}/payment-status`, {
+                    headers: {
+                        'X-GUEST-TOKEN': localStorage.getItem('guest_token'),
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('paymentStatus').innerText = this.getStatusText(data.status);
+                    
+                    if (data.status === 'paid') {
+                        clearInterval(this.statusInterval);
+                        this.onPaymentSuccess(data);
+                    } else if (data.status === 'failed') {
+                        clearInterval(this.statusInterval);
+                        this.onPaymentError(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Payment status check error:', error);
+                });
+            },
+            
+            onPaymentSuccess: function(data) {
+                document.getElementById('paymentStatus').innerHTML = 
+                    '<span style="color: green;">✓ Pembayaran Berhasil!</span>';
+                setTimeout(() => {
+                    this.closePaymentModal();
+                    if (typeof window.onPaymentSuccess === 'function') {
+                        window.onPaymentSuccess(data);
+                    }
+                }, 2000);
+            },
+            
+            onPaymentError: function(data) {
+                document.getElementById('paymentStatus').innerHTML = 
+                    '<span style="color: red;">✗ Pembayaran Gagal!</span>';
+                if (typeof window.onPaymentError === 'function') {
+                    window.onPaymentError(data);
+                }
+            },
+            
+            closePaymentModal: function() {
+                const modal = document.getElementById('paymentModal');
+                if (modal) {
+                    modal.remove();
+                }
+                if (this.statusInterval) {
+                    clearInterval(this.statusInterval);
+                }
+            },
+            
+            // Helper functions
+            getPaymentMethodName: function(method) {
+                const names = {
+                    'qris': 'QRIS',
+                    'dana': 'DANA',
+                    'gopay': 'GoPay',
+                    'shopeepay': 'ShopeePay',
+                    'ovo': 'OVO',
+                    'bca_va': 'Virtual Account BCA',
+                    'bni_va': 'Virtual Account BNI',
+                    'bri_va': 'Virtual Account BRI',
+                    'mandiri_va': 'Virtual Account Mandiri'
+                };
+                return names[method] || method.toUpperCase();
+            },
+            
+            getStatusText: function(status) {
+                const texts = {
+                    'pending': 'Menunggu pembayaran...',
+                    'paid': 'Pembayaran berhasil!',
+                    'failed': 'Pembayaran gagal!',
+                    'expired': 'Pembayaran kedaluwarsa'
+                };
+                return texts[status] || 'Status tidak diketahui';
+            },
+            
+            formatDate: function(dateString) {
+                if (!dateString) return '-';
+                const date = new Date(dateString);
+                return date.toLocaleDateString('id-ID', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            },
+            
+            formatCurrency: function(amount) {
+                return new Intl.NumberFormat('id-ID').format(amount);
+            },
+            
+            copyToClipboard: function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Nomor Virtual Account berhasil disalin!');
+                });
+            }
+        };
+    </script>
+    
+    <style>
+        .payment-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .payment-modal {
+            background: white;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .payment-modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .payment-modal-content {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .qr-code-image {
+            max-width: 250px;
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            background: white;
+        }
+        
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .va-number-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .va-number {
+            font-family: monospace;
+            font-size: 18px;
+            font-weight: bold;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            flex: 1;
+        }
+        
+        .copy-btn, .ewallet-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .payment-modal-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

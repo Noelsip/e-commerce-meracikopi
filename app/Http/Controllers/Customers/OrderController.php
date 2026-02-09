@@ -259,8 +259,9 @@ class OrderController extends Controller
                 'note' => 'Order created',
             ]);
 
-            // Empty the cart
-            $cart->items()->delete();
+            // PENTING: Cart tidak langsung dihapus!
+            // Cart items akan dihapus setelah pembayaran berhasil (di webhook handler)
+            // Ini memastikan jika payment gagal, user tidak kehilangan cart-nya
 
             return response()->json([
                 'message' => 'Order created successfully',

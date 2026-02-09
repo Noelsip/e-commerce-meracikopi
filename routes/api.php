@@ -89,7 +89,14 @@ Route::prefix('customer')->middleware('guest.token')->group(function () {
 
     // Payment
     Route::post('/orders/{orderId}/pay', [PaymentController::class, 'pay']);
+    Route::get('/orders/{invoiceNumber}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
+    
+    // Simulate payment (for testing fallback mode only)
+    Route::post('/orders/{invoiceNumber}/simulate-payment', [PaymentController::class, 'simulatePaymentComplete']);
 });
 
-// Midtrans webhook
-Route::post('/webhooks/midtrans', [PaymentController::class, 'midtransWebhook']);
+// DOKU webhook
+Route::post('/webhooks/doku', [PaymentController::class, 'dokuWebhook']);
+
+// DOKU Token Endpoint (untuk SNAP configuration)
+Route::post('/doku/token', [PaymentController::class, 'generateDokuToken']);
