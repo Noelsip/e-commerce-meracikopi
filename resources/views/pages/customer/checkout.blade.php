@@ -878,21 +878,21 @@
             </div>
             <div class="address-modal-body">
                 <div class="form-group">
-                    <label>Nama Penerima</label>
-                    <input type="text" class="form-input" id="recipientName" value="Adwin Ahmad">
+                    <label>Nama Penerima <span style="color: #e74c3c;">*</span></label>
+                    <input type="text" class="form-input" id="recipientName" value="" placeholder="Masukkan nama penerima">
                 </div>
                 <div class="form-group">
-                    <label>Nomor Telepon</label>
-                    <input type="tel" class="form-input" id="recipientPhone" value="(+62) 822 54554411"
+                    <label>Nomor Telepon <span style="color: #e74c3c;">*</span></label>
+                    <input type="tel" class="form-input" id="recipientPhone" value="" placeholder="08xxxxxxxxxx"
                         inputmode="numeric" pattern="[0-9+() -]*"
                         oninput="this.value = this.value.replace(/[^0-9+() -]/g, '');">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Provinsi</label>
+                        <label>Provinsi <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="province">
                             <option value="">Pilih Provinsi</option>
-                            <option value="kaltim" selected>Kalimantan Timur</option>
+                            <option value="kaltim">Kalimantan Timur</option>
                             <option value="kalteng">Kalimantan Tengah</option>
                             <option value="kalsel">Kalimantan Selatan</option>
                             <option value="kalbar">Kalimantan Barat</option>
@@ -900,10 +900,10 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Kota/Kabupaten</label>
+                        <label>Kota/Kabupaten <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="city">
                             <option value="">Pilih Kota</option>
-                            <option value="balikpapan" selected>Kota Balikpapan</option>
+                            <option value="balikpapan">Kota Balikpapan</option>
                             <option value="samarinda">Kota Samarinda</option>
                             <option value="bontang">Kota Bontang</option>
                         </select>
@@ -911,10 +911,10 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Kecamatan</label>
+                        <label>Kecamatan <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="district">
                             <option value="">Pilih Kecamatan</option>
-                            <option value="balikpapan_utara" selected>Balikpapan Utara</option>
+                            <option value="balikpapan_utara">Balikpapan Utara</option>
                             <option value="balikpapan_selatan">Balikpapan Selatan</option>
                             <option value="balikpapan_timur">Balikpapan Timur</option>
                             <option value="balikpapan_barat">Balikpapan Barat</option>
@@ -922,13 +922,13 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Kode Pos</label>
-                        <input type="text" class="form-input" id="postalCode" value="76614" maxlength="5">
+                        <label>Kode Pos <span style="color: #e74c3c;">*</span></label>
+                        <input type="text" class="form-input" id="postalCode" value="" placeholder="Masukkan kode pos" maxlength="5">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Alamat Lengkap</label>
-                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar</textarea>
+                    <label>Alamat Lengkap <span style="color: #e74c3c;">*</span></label>
+                    <textarea class="form-textarea" id="fullAddress" placeholder="Masukkan alamat lengkap"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Detail Lainnya <span class="optional-label">(Opsional)</span></label>
@@ -1095,9 +1095,8 @@
 
             console.log('Selected item IDs:', selectedItemIds);
 
-            // 2. Validate Payment/Delivery Method
+            // 2. Validate Payment Method (required for all order types)
             let paymentMethod = null;
-            let deliveryMethod = null;
 
             // Map order type text to enum value expected by backend
             const orderTypeMap = {
@@ -1107,21 +1106,58 @@
             };
             const backendOrderType = orderTypeMap[orderType] || 'take_away';
 
+            // Payment method is required for all order types
+            const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+            if (!selectedPayment) {
+                showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+                return;
+            }
+            paymentMethod = selectedPayment.value;
+
+            // 2b. Validate delivery address if delivery order
             if (orderType === 'delivery') {
-                const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
-                if (!selectedDelivery) {
-                    showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
+                const recipientName = document.getElementById('recipientName').value.trim();
+                const recipientPhone = document.getElementById('recipientPhone').value.trim();
+                const fullAddress = document.getElementById('fullAddress').value.trim();
+                const province = document.getElementById('province').value;
+                const city = document.getElementById('city').value;
+                const district = document.getElementById('district').value;
+                const postalCode = document.getElementById('postalCode').value.trim();
+
+                if (!recipientName) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nama penerima terlebih dahulu');
+                    editAddress();
                     return;
                 }
+<<<<<<< HEAD
                 deliveryMethod = selectedDelivery.value;
             } else {
                 // Payment method is required - will be passed to DOKU
                 const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
                 if (!selectedPayment) {
                     showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+=======
+                if (!recipientPhone) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
+                    editAddress();
                     return;
                 }
-                paymentMethod = selectedPayment.value;
+                if (!province || !city || !district) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan lengkapi provinsi, kota, dan kecamatan');
+                    editAddress();
+                    return;
+                }
+                if (!postalCode) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi kode pos terlebih dahulu');
+                    editAddress();
+                    return;
+                }
+                if (!fullAddress) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi alamat lengkap terlebih dahulu');
+                    editAddress();
+>>>>>>> 5b3397f93ddca5237c76443c31c6c789dace12b4
+                    return;
+                }
             }
 
             // 3. Prepare Payload
@@ -1487,15 +1523,52 @@
 
         // Save address
         function saveAddress() {
-            const name = document.getElementById('recipientName').value;
-            const phone = document.getElementById('recipientPhone').value;
+            const name = document.getElementById('recipientName').value.trim();
+            const phone = document.getElementById('recipientPhone').value.trim();
             const province = document.getElementById('province');
             const city = document.getElementById('city');
             const district = document.getElementById('district');
-            const postalCode = document.getElementById('postalCode').value;
-            const address = document.getElementById('fullAddress').value;
+            const postalCode = document.getElementById('postalCode').value.trim();
+            const address = document.getElementById('fullAddress').value.trim();
             const detail = document.getElementById('addressDetail').value;
             const label = document.getElementById('addressLabel').value;
+
+            // Validate required fields
+            if (!name) {
+                alert('Nama penerima wajib diisi');
+                document.getElementById('recipientName').focus();
+                return;
+            }
+            if (!phone) {
+                alert('Nomor telepon wajib diisi');
+                document.getElementById('recipientPhone').focus();
+                return;
+            }
+            if (!province.value) {
+                alert('Provinsi wajib dipilih');
+                province.focus();
+                return;
+            }
+            if (!city.value) {
+                alert('Kota/Kabupaten wajib dipilih');
+                city.focus();
+                return;
+            }
+            if (!district.value) {
+                alert('Kecamatan wajib dipilih');
+                district.focus();
+                return;
+            }
+            if (!postalCode) {
+                alert('Kode pos wajib diisi');
+                document.getElementById('postalCode').focus();
+                return;
+            }
+            if (!address) {
+                alert('Alamat lengkap wajib diisi');
+                document.getElementById('fullAddress').focus();
+                return;
+            }
 
             // Build full address string
             const provinceName = province.options[province.selectedIndex]?.text || '';
@@ -1508,10 +1581,10 @@
             if (provinceName) fullAddressText += ', ' + provinceName;
             if (postalCode) fullAddressText += ' ' + postalCode;
 
-            // Update display
-            document.querySelector('.recipient-name').textContent = name;
-            document.querySelector('.recipient-phone').textContent = phone;
-            document.querySelector('.address-detail').textContent = fullAddressText;
+            // Update display - using specific IDs
+            document.getElementById('deliveryRecipientName').textContent = name;
+            document.getElementById('deliveryRecipientPhone').textContent = phone;
+            document.getElementById('deliveryAddressDetail').textContent = fullAddressText;
 
             closeAddressModal();
         }
@@ -1519,11 +1592,11 @@
         // Toggle sections based on order type (called from navbar)
         window.toggleDeliverySection = function (isDelivery) {
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
-            const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
+<<<<<<< HEAD
                 if (deliveryAddressSection) deliveryAddressSection.style.display = 'block';
                 if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'block';
                 if (paymentMethodsSection) paymentMethodsSection.style.display = 'none';
@@ -1532,6 +1605,14 @@
                 if (deliveryAddressSection) deliveryAddressSection.style.display = 'none';
                 if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'none';
                 if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
+=======
+                deliveryAddressSection.style.display = 'block';
+                paymentMethodsSection.style.display = 'block'; // Metode pembayaran selalu tampil
+                if (customerInfoSection) customerInfoSection.style.display = 'none';
+            } else {
+                deliveryAddressSection.style.display = 'none';
+                paymentMethodsSection.style.display = 'block';
+>>>>>>> 5b3397f93ddca5237c76443c31c6c789dace12b4
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }

@@ -8,6 +8,8 @@ use App\Models\Tables;
 use App\Models\User;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Enums\OrderProcessStatus;
+use App\Enums\StatusPayments;
 use Illuminate\Http\Request;
 
 class OrderAdminController extends Controller
@@ -16,9 +18,14 @@ class OrderAdminController extends Controller
     {
         $query = Orders::with(['user', 'tables'])->latest();
 
-        // Filter by status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        // Filter by order status
+        if ($request->filled('order_status')) {
+            $query->where('order_status', $request->order_status);
+        }
+
+        // Filter by payment status
+        if ($request->filled('payment_status')) {
+            $query->where('payment_status', $request->payment_status);
         }
 
         // Filter by order type
@@ -27,10 +34,11 @@ class OrderAdminController extends Controller
         }
 
         $orders = $query->paginate(15);
-        $statuses = OrderStatus::cases();
+        $orderStatuses = OrderProcessStatus::cases();
+        $paymentStatuses = StatusPayments::cases();
         $orderTypes = OrderType::cases();
 
-        return view('admin.orders.index', compact('orders', 'statuses', 'orderTypes'));
+        return view('admin.orders.index', compact('orders', 'orderStatuses', 'paymentStatuses', 'orderTypes'));
     }
 
     public function show(Orders $order)
@@ -41,22 +49,23 @@ class OrderAdminController extends Controller
 
     public function edit(Orders $order)
     {
-        $statuses = OrderStatus::cases();
+        $orderStatuses = OrderProcessStatus::cases();
+        $paymentStatuses = StatusPayments::cases();
         $orderTypes = OrderType::cases();
         $tables = Tables::where('is_active', true)->get();
 
-        return view('admin.orders.edit', compact('order', 'statuses', 'orderTypes', 'tables'));
+        return view('admin.orders.edit', compact('order', 'orderStatuses', 'paymentStatuses', 'orderTypes', 'tables'));
     }
 
     public function update(Request $request, Orders $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,process,done,cancelled',
+            'order_status' => 'required|in:' . implode(',', array_column(OrderProcessStatus::cases(), 'value')),
             'order_type' => 'required|in:dine_in,take_away,delivery',
             'table_id' => 'nullable|exists:tables,id',
         ]);
 
-        $order->update($request->only(['status', 'order_type', 'table_id']));
+        $order->update($request->only(['order_status', 'order_type', 'table_id']));
 
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan berhasil diperbarui.');
     }
@@ -67,14 +76,14 @@ class OrderAdminController extends Controller
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan berhasil dihapus.');
     }
 
-    // Quick status update via AJAX
+    // Quick order status update via AJAX (manual by admin)
     public function updateStatus(Request $request, Orders $order)
     {
         $request->validate([
-            'status' => 'required|in:pending,process,done,cancelled',
+            'order_status' => 'required|in:' . implode(',', array_column(OrderProcessStatus::cases(), 'value')),
         ]);
 
-        $order->update(['status' => $request->status]);
+        $order->update(['order_status' => $request->order_status]);
 
         return response()->json(['success' => true, 'message' => 'Status pesanan berhasil diubah.']);
     }

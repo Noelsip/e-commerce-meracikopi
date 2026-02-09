@@ -80,7 +80,8 @@
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Tipe</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Customer</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Total</th>
-                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Status</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Pembayaran</th>
+                            <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Pesanan</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Tanggal</th>
                             <th class="text-left py-3 px-4 text-sm font-medium" style="color: #f0f2bd;">Catatan</th>
                         </tr>
@@ -97,6 +98,7 @@
                                         {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
                                     </span>
                                 </td>
+<<<<<<< HEAD
                                 <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->customer_name ?? 'Guest' }}
                                 </td>
                                 <td class="py-3 px-4 text-sm" style="color: #22c55e;">Rp
@@ -128,6 +130,22 @@
                                     <span class="px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap"
                                         style="background-color: {{ $currentColor }}; color: white;">
                                         {{ $statusLabels[$order->status->value] ?? ucfirst(str_replace('_', ' ', $order->status->value)) }}
+=======
+                                <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->customer_name ?? 'Guest' }}</td>
+                                <td class="py-3 px-4 text-sm" style="color: #22c55e;">Rp {{ number_format($order->total_price ?? 0, 0, ',', '.') }}</td>
+                                {{-- Status Pembayaran --}}
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block text-center" 
+                                          style="background-color: {{ $order->payment_status?->color() ?? '#eab308' }}; color: white; min-width: 140px;">
+                                        {{ $order->payment_status?->label() ?? 'Menunggu Pembayaran' }}
+                                    </span>
+                                </td>
+                                {{-- Status Pesanan --}}
+                                <td class="py-3 px-4 text-sm">
+                                    <span class="px-4 py-1 rounded-full text-xs font-medium whitespace-nowrap inline-block text-center" 
+                                          style="background-color: {{ $order->order_status?->color() ?? '#eab308' }}; color: white; min-width: 140px;">
+                                        {{ $order->order_status?->label() ?? 'Menunggu Diproses' }}
+>>>>>>> 5b3397f93ddca5237c76443c31c6c789dace12b4
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">
