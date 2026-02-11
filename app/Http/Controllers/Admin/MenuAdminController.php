@@ -37,7 +37,7 @@ class MenuAdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|in:food,drink,coffee_beans',
+            'category' => 'required|in:food,drink,coffee_beans,bottled_coffee,sachet_drip',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',
@@ -75,7 +75,7 @@ class MenuAdminController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'category' => 'required|in:food,drink,coffee_beans',
+            'category' => 'required|in:food,drink,coffee_beans,bottled_coffee,sachet_drip',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'discount_percentage' => 'nullable|numeric|min:0|max:100',

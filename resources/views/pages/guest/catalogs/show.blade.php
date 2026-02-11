@@ -381,8 +381,8 @@
                                 'drink' => 'placeholder-drink.svg',
                                 'food' => 'placeholder-food.svg',
                                 'coffee_beans' => 'placeholder-coffee-beans.svg',
-                                'kopi_botolan' => 'placeholder-drink.svg',
-                                'sachet-drip' => 'placeholder-coffee-beans.svg',
+                                'bottled_coffee' => 'placeholder-drink.svg',
+                                'sachet_drip' => 'placeholder-coffee-beans.svg',
                             ];
                             $placeholderFile = $placeholders[$menu->category] ?? 'placeholder-default.svg';
                         @endphp
