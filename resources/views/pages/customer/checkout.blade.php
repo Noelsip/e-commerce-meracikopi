@@ -1112,15 +1112,26 @@
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                deliveryMethod = selectedDelivery.value;
-            } else {
-                // Payment method is required - will be passed to DOKU
-                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-                if (!selectedPayment) {
-                    showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+                if (!recipientPhone) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
+                    editAddress();
                     return;
                 }
-                paymentMethod = selectedPayment.value;
+                if (!province || !city || !district) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan lengkapi provinsi, kota, dan kecamatan');
+                    editAddress();
+                    return;
+                }
+                if (!postalCode) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi kode pos terlebih dahulu');
+                    editAddress();
+                    return;
+                }
+                if (!fullAddress) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi alamat lengkap terlebih dahulu');
+                    editAddress();
+                    return;
+                }
             }
 
             // 3. Prepare Payload
@@ -1559,14 +1570,12 @@
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
-                if (deliveryAddressSection) deliveryAddressSection.style.display = 'block';
-                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'block';
-                if (paymentMethodsSection) paymentMethodsSection.style.display = 'none';
+                deliveryAddressSection.style.display = 'block';
+                paymentMethodsSection.style.display = 'block'; // Metode pembayaran selalu tampil
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
-                if (deliveryAddressSection) deliveryAddressSection.style.display = 'none';
-                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'none';
-                if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
+                deliveryAddressSection.style.display = 'none';
+                paymentMethodsSection.style.display = 'block';
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }
