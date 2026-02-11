@@ -55,7 +55,9 @@ class MenuAdminController extends Controller
 
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('menus', 'public');
-            $data['image_path'] = 'storage/' . $path; // Adjust based on your storage link setup
+            $data['image_path'] = 'storage/' . $path;
+        } else {
+            $data['image_path'] = '';
         }
 
         $menu = Menus::create($data);

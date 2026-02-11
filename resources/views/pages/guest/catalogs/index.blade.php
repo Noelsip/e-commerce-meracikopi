@@ -6,7 +6,7 @@
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 24px;
         }
-        
+
         .catalog-card {
             background: #2b211e;
             border-radius: 16px;
@@ -15,29 +15,29 @@
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid #3e302b;
         }
-        
+
         .catalog-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
-        
+
         .catalog-card-image {
             aspect-ratio: 1;
             background-color: #3e302b;
             overflow: hidden;
         }
-        
+
         .catalog-card-content {
             padding: 20px;
         }
-        
+
         .catalog-card-title {
             font-weight: 600;
             color: #f0f2bd;
             font-size: 18px;
             margin-bottom: 4px;
         }
-        
+
         .catalog-card-desc {
             color: #a89890;
             font-size: 14px;
@@ -47,34 +47,34 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
-        
+
         .catalog-card-price {
             font-size: 20px;
             font-weight: bold;
             color: #CA7842;
         }
-        
+
         .catalog-card-footer {
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
-        
+
         .catalog-hero-title {
             font-size: 42px;
         }
-        
+
         .catalog-hero-desc {
             font-size: 16px;
         }
-        
+
         .catalog-filter-pills {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 12px;
         }
-        
+
         .catalog-filter-pill {
             padding: 10px 24px;
             border-radius: 50px;
@@ -83,57 +83,57 @@
             text-decoration: none;
             transition: all 0.3s;
         }
-        
+
         /* Catalog Search Input Styling */
         .catalog-search-input:hover {
             background-color: #3a2d26 !important;
             border-color: rgba(240, 242, 189, 0.4) !important;
         }
-        
+
         .catalog-search-input:focus {
             background-color: #3a2d26 !important;
             border-color: #f0f2bd !important;
             transform: scale(1.01);
         }
-        
+
         .catalog-search-wrapper:focus-within .catalog-search-icon {
             color: #f0f2bd !important;
             transform: scale(1.1);
         }
-        
+
         /* iPad/Tablet Responsive (601px - 1024px) */
         @media (min-width: 601px) and (max-width: 1024px) {
             .catalog-filter-pills {
                 justify-content: center;
             }
-            
+
             .catalog-hero-title {
                 font-size: 32px;
             }
         }
-        
+
         /* Mobile Responsive - 2 Column Grid */
         @media (max-width: 600px) {
             .catalog-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 12px;
             }
-            
+
             .catalog-card {
                 border-radius: 12px;
             }
-            
+
             .catalog-card-image {
                 aspect-ratio: 1;
                 border-radius: 8px;
                 margin: 8px;
                 background-color: #f5f0eb;
             }
-            
+
             .catalog-card-content {
                 padding: 0 12px 12px 12px;
             }
-            
+
             .catalog-card-title {
                 font-size: 14px;
                 margin-bottom: 2px;
@@ -141,33 +141,33 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            
+
             .catalog-card-desc {
                 font-size: 12px;
                 margin-bottom: 8px;
                 -webkit-line-clamp: 1;
                 color: #7a7068;
             }
-            
+
             .catalog-card-price {
                 font-size: 14px;
             }
-            
+
             .catalog-card-footer {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 6px;
             }
-            
+
             .catalog-hero-title {
                 font-size: 28px;
             }
-            
+
             .catalog-hero-desc {
                 font-size: 14px;
                 margin-bottom: 24px !important;
             }
-            
+
             .catalog-filter-pills {
                 gap: 8px;
                 justify-content: flex-start;
@@ -175,18 +175,18 @@
                 flex-wrap: nowrap;
                 padding-bottom: 8px;
             }
-            
+
             .catalog-filter-pill {
                 padding: 8px 16px;
                 font-size: 13px;
                 white-space: nowrap;
                 flex-shrink: 0;
             }
-            
+
             .catalog-hero-section {
                 padding: 40px 16px 24px 16px !important;
             }
-            
+
             .catalog-main-content {
                 padding: 20px 12px 60px 12px !important;
             }
@@ -198,7 +198,7 @@
                 font-size: 12px;
                 color: #a89890;
             }
-            
+
             .catalog-rating svg {
                 width: 12px;
                 height: 12px;
@@ -209,40 +209,40 @@
                 position: absolute;
                 top: 12px;
                 right: 12px;
-                background: rgba(255,255,255,0.9);
+                background: rgba(255, 255, 255, 0.9);
                 border-radius: 50%;
                 padding: 6px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
             }
-            
+
             .catalog-card {
                 position: relative;
             }
         }
-        
+
         @media (max-width: 480px) {
             .catalog-grid {
                 gap: 10px;
             }
-            
+
             .catalog-card-image {
                 margin: 6px;
             }
-            
+
             .catalog-card-content {
                 padding: 0 10px 10px 10px;
             }
-            
+
             .catalog-card-title {
                 font-size: 13px;
             }
-            
+
             .catalog-card-price {
                 font-size: 13px;
             }
-            
+
             .catalog-badge-available,
             .catalog-badge-unavailable {
                 padding: 3px 8px !important;
@@ -481,20 +481,25 @@
 
         /* Hide bottom sheet on desktop */
         @media (min-width: 601px) {
+
             .product-bottom-sheet,
             .product-bottom-sheet-overlay {
                 display: none !important;
             }
         }
     </style>
-    
+
     @if(isset($tableInfo) && $tableInfo)
-        <div style="background: linear-gradient(90deg, #CA7842, #8B5E3C); color: #f0f2ae; padding: 12px 20px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <div
+            style="background: linear-gradient(90deg, #CA7842, #8B5E3C); color: #f0f2ae; padding: 12px 20px; text-align: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; gap: 10px;">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M4 18l2-12h12l2 12H4zM7 8V6a5 5 0 0110 0v2h-2V6a3 3 0 00-6 0v2H7z"/>
+                <path d="M4 18l2-12h12l2 12H4zM7 8V6a5 5 0 0110 0v2h-2V6a3 3 0 00-6 0v2H7z" />
             </svg>
-            <span style="font-weight: 600; font-size: 14px;">Pesanan Anda akan diantar ke Meja {{ $tableInfo['number'] }}</span>
-            <a href="{{ route('qr.scan', ['table' => 'clear']) }}" style="font-size: 12px; text-decoration: underline; color: #f0f2ae; opacity: 0.8; margin-left: 10px;">Bukan meja ini?</a>
+            <span style="font-weight: 600; font-size: 14px;">Pesanan Anda akan diantar ke Meja
+                {{ $tableInfo['number'] }}</span>
+            <a href="{{ route('qr.scan', ['table' => 'clear']) }}"
+                style="font-size: 12px; text-decoration: underline; color: #f0f2ae; opacity: 0.8; margin-left: 10px;">Bukan
+                meja ini?</a>
         </div>
     @endif
 
@@ -510,50 +515,45 @@
             </p>
 
             <!-- Search Bar -->
-            <form method="GET" action="{{ url('/customer/catalogs') }}" class="catalog-search-wrapper" style="max-width: 600px; margin: 0 auto 30px auto;">
+            <form method="GET" action="{{ url('/customer/catalogs') }}" class="catalog-search-wrapper"
+                style="max-width: 600px; margin: 0 auto 30px auto;">
                 <div style="position: relative; display: flex; align-items: center;">
-                    <svg class="catalog-search-icon" style="position: absolute; left: 20px; width: 20px; height: 20px; color: #888; transition: all 0.3s ease;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    <svg class="catalog-search-icon"
+                        style="position: absolute; left: 20px; width: 20px; height: 20px; color: #888; transition: all 0.3s ease;"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    <input type="text" 
-                           name="search" 
-                           value="{{ request('search') }}" 
-                           placeholder="Cari Pilihanmu Disini..."
-                           class="catalog-search-input"
-                           style="width: 100%; padding: 16px 20px 16px 52px; background-color: #2b211e; border: 2px solid #3e302b; border-radius: 50px; color: #f0f2bd; font-size: 15px; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                        placeholder="Cari Pilihanmu Disini..." class="catalog-search-input"
+                        style="width: 100%; padding: 16px 20px 16px 52px; background-color: #2b211e; border: 2px solid #3e302b; border-radius: 50px; color: #f0f2bd; font-size: 15px; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
                 </div>
             </form>
 
             <!-- Category Filter Pills -->
             <div class="catalog-filter-pills">
-                <a href="{{ url('/customer/catalogs') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ !request('category') ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs') }}" class="catalog-filter-pill"
+                    style="{{ !request('category') ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Semua Produk
                 </a>
-                <a href="{{ url('/customer/catalogs?category=food') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ request('category') == 'food' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=food') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'food' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Food
                 </a>
-                <a href="{{ url('/customer/catalogs?category=drink') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ request('category') == 'drink' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=drink') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'drink' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Drink
                 </a>
-                <a href="{{ url('/customer/catalogs?category=coffee_beans') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ request('category') == 'coffee_beans' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=coffee_beans') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'coffee_beans' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Coffee Beans
                 </a>
-                <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ request('category') == 'kopi_botolan' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'kopi_botolan' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Kopi Botol
                 </a>
-                <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" 
-                   class="catalog-filter-pill"
-                   style="{{ request('category') == 'sachet-drip' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'sachet-drip' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Sachet Drip
                 </a>
             </div>
@@ -565,10 +565,12 @@
         <div class="catalog-main-content" style="max-width: 1280px; margin: 0 auto; padding: 40px 16px;">
             @if(request('search'))
                 <div style="margin-bottom: 24px; display: flex; align-items: center; gap: 8px;">
-                    <span style="padding: 6px 16px; background-color: #2b211e; color: #f0f2bd; border-radius: 20px; font-size: 14px; font-weight: 500;">
+                    <span
+                        style="padding: 6px 16px; background-color: #2b211e; color: #f0f2bd; border-radius: 20px; font-size: 14px; font-weight: 500;">
                         Hasil: "{{ request('search') }}"
                     </span>
-                    <a href="{{ url('/customer/catalogs') }}" style="color: #CA7842; font-size: 14px; text-decoration: none;">
+                    <a href="{{ url('/customer/catalogs') }}"
+                        style="color: #CA7842; font-size: 14px; text-decoration: none;">
                         × Reset
                     </a>
                 </div>
@@ -577,10 +579,11 @@
             @if($menus->isEmpty())
                 <!-- Empty State -->
                 <div style="text-align: center; padding: 64px 20px; background: #2b211e; border-radius: 16px;">
-                    <h3 style="font-size: 20px; font-weight: 600; color: #f0f2bd; margin-bottom: 8px;">Menu tidak ditemukan</h3>
+                    <h3 style="font-size: 20px; font-weight: 600; color: #f0f2bd; margin-bottom: 8px;">Menu tidak ditemukan
+                    </h3>
                     <p style="color: #a89890; margin-bottom: 24px;">Coba kata kunci lain atau lihat semua menu</p>
-                    <a href="{{ url('/customer/catalogs') }}" 
-                       style="display: inline-block; padding: 12px 24px; background-color: #CA7842; color: white; border-radius: 50px; text-decoration: none; font-weight: 500;">
+                    <a href="{{ url('/customer/catalogs') }}"
+                        style="display: inline-block; padding: 12px 24px; background-color: #CA7842; color: white; border-radius: 50px; text-decoration: none; font-weight: 500;">
                         Lihat Semua Menu
                     </a>
                 </div>
@@ -588,33 +591,42 @@
                 <!-- Menu Grid -->
                 <div class="catalog-grid">
                     @foreach($menus as $menu)
-                        <a href="{{ url('/customer/catalogs/' . $menu->id) }}" 
-                           class="catalog-card"
-                           data-menu-id="{{ $menu->id }}"
-                           data-menu-name="{{ $menu->name }}"
-                           data-menu-desc="{{ $menu->description }}"
-                           data-menu-price="{{ number_format($menu->price, 0, ',', '.') }}"
-                           data-menu-image="{{ $menu->image_path ? asset($menu->image_path) : '' }}"
-                           data-menu-available="{{ $menu->is_available ? '1' : '0' }}"
-                           onclick="handleCardClick(event, this)">
+                        <a href="{{ url('/customer/catalogs/' . $menu->id) }}" class="catalog-card"
+                            data-menu-id="{{ $menu->id }}" data-menu-name="{{ $menu->name }}"
+                            data-menu-desc="{{ $menu->description }}"
+                            data-menu-price="{{ number_format($menu->price, 0, ',', '.') }}"
+                            data-menu-image="{{ $menu->image_path ? asset($menu->image_path) : '' }}"
+                            data-menu-available="{{ $menu->is_available ? '1' : '0' }}"
+                            data-menu-category="{{ $menu->category }}" onclick="handleCardClick(event, this)">
                             <!-- Favorite Button (Mobile) -->
                             <div class="catalog-favorite-btn" style="display: none;">
                                 <svg width="16" height="16" fill="none" stroke="#888" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                 </svg>
                             </div>
-                            
+
                             <!-- Image -->
                             <div class="catalog-card-image">
                                 @if($menu->image_path)
-                                    <img src="{{ asset($menu->image_path) }}" 
-                                         alt="{{ $menu->name }}"
-                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                    <img src="{{ asset($menu->image_path) }}" alt="{{ $menu->name }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
-                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 64px;">☕</div>
+                                    @php
+                                        $placeholders = [
+                                            'drink' => 'placeholder-drink.svg',
+                                            'food' => 'placeholder-food.svg',
+                                            'coffee_beans' => 'placeholder-coffee-beans.svg',
+                                            'kopi_botolan' => 'placeholder-drink.svg',
+                                            'sachet-drip' => 'placeholder-coffee-beans.svg',
+                                        ];
+                                        $placeholderFile = $placeholders[$menu->category] ?? 'placeholder-default.svg';
+                                    @endphp
+                                    <img src="{{ asset('images/placeholders/' . $placeholderFile) }}" alt="{{ $menu->name }}"
+                                        style="width: 100%; height: 100%; object-fit: cover;">
                                 @endif
                             </div>
-                            
+
                             <!-- Content -->
                             <div class="catalog-card-content">
                                 <h3 class="catalog-card-title">
@@ -624,16 +636,19 @@
                                     {{ $menu->description }}
                                 </p>
                                 <div class="catalog-card-footer">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                                    <div
+                                        style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                                         <span class="catalog-card-price">
                                             Rp {{ number_format($menu->price, 0, ',', '.') }}
                                         </span>
                                         @if($menu->is_available)
-                                            <span class="catalog-badge-available" style="padding: 4px 12px; background: linear-gradient(135deg, #CA7842, #8B5E3C); color: #f0f2ae; font-size: 12px; font-weight: 600; border-radius: 20px; box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);">
+                                            <span class="catalog-badge-available"
+                                                style="padding: 4px 12px; background: linear-gradient(135deg, #CA7842, #8B5E3C); color: #f0f2ae; font-size: 12px; font-weight: 600; border-radius: 20px; box-shadow: 0 2px 8px rgba(202, 120, 66, 0.3);">
                                                 Tersedia
                                             </span>
                                         @else
-                                            <span class="catalog-badge-unavailable" style="padding: 4px 12px; background-color: #3e302b; color: #a89890; font-size: 12px; font-weight: 500; border-radius: 20px;">
+                                            <span class="catalog-badge-unavailable"
+                                                style="padding: 4px 12px; background-color: #3e302b; color: #a89890; font-size: 12px; font-weight: 500; border-radius: 20px;">
                                                 Habis
                                             </span>
                                         @endif
@@ -664,10 +679,7 @@
             <!-- Notes/Catatan -->
             <div class="bottom-sheet-note-wrapper">
                 <label class="bottom-sheet-note-label">Catatan</label>
-                <textarea 
-                    class="bottom-sheet-note-input" 
-                    id="bottomSheetNote"
-                    rows="2"
+                <textarea class="bottom-sheet-note-input" id="bottomSheetNote" rows="2"
                     placeholder="Contoh: less sugar, extra shot, tanpa es, dll"></textarea>
             </div>
 
@@ -675,9 +687,11 @@
             <div class="bottom-sheet-quantity-wrapper">
                 <span class="bottom-sheet-quantity-label">Jumlah</span>
                 <div class="bottom-sheet-quantity-controls">
-                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyMinus" onclick="updateQuantity(-1)">−</button>
+                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyMinus"
+                        onclick="updateQuantity(-1)">−</button>
                     <span class="bottom-sheet-qty-value" id="bottomSheetQtyValue">1</span>
-                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyPlus" onclick="updateQuantity(1)">+</button>
+                    <button type="button" class="bottom-sheet-qty-btn" id="bottomSheetQtyPlus"
+                        onclick="updateQuantity(1)">+</button>
                 </div>
             </div>
 
@@ -700,7 +714,7 @@
         let currentQuantity = 1;
 
         // Reset body overflow on page load to fix scroll issues
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
         });
@@ -764,8 +778,17 @@
                 imgTag.src = menuImage;
                 imgTag.style.display = 'block';
             } else {
-                imgTag.style.display = 'none';
-                imageContainer.innerHTML = '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 64px; color: #ccc;">☕</div>';
+                const category = card.dataset.menuCategory || '';
+                const placeholderMap = {
+                    'drink': 'placeholder-drink.svg',
+                    'food': 'placeholder-food.svg',
+                    'coffee_beans': 'placeholder-coffee-beans.svg',
+                    'kopi_botolan': 'placeholder-drink.svg',
+                    'sachet-drip': 'placeholder-coffee-beans.svg',
+                };
+                const placeholderFile = placeholderMap[category] || 'placeholder-default.svg';
+                imgTag.src = `/images/placeholders/${placeholderFile}`;
+                imgTag.style.display = 'block';
             }
 
             // Show bottom sheet
@@ -825,34 +848,34 @@
                     note: note
                 })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Show success toast
-                showToast('Berhasil ditambahkan ke keranjang', 'success');
-                
-                // Trigger cart badge update
-                window.dispatchEvent(new Event('cartUpdated'));
-                
-                // Reset button and close sheet
-                setTimeout(() => {
-                    closeBottomSheet();
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Show success toast
+                    showToast('Berhasil ditambahkan ke keranjang', 'success');
+
+                    // Trigger cart badge update
+                    window.dispatchEvent(new Event('cartUpdated'));
+
+                    // Reset button and close sheet
+                    setTimeout(() => {
+                        closeBottomSheet();
+                        addBtn.textContent = originalText;
+                        addBtn.disabled = false;
+                    }, 800);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error toast
+                    showToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
+
                     addBtn.textContent = originalText;
                     addBtn.disabled = false;
-                }, 800);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                // Show error toast
-                showToast('Gagal menambahkan ke keranjang. Silakan coba lagi.', 'error');
-                
-                addBtn.textContent = originalText;
-                addBtn.disabled = false;
-            });
+                });
         }
 
         // Toast Notification Function
@@ -861,10 +884,10 @@
             if (!toast) {
                 toast = document.createElement('div');
                 toast.id = 'catalog-toast';
-                
+
                 // Check if mobile
                 const isMobile = window.innerWidth <= 600;
-                
+
                 Object.assign(toast.style, {
                     position: 'fixed',
                     top: isMobile ? '100px' : '130px',
@@ -899,10 +922,10 @@
             // Update Content - using theme colors
             const borderColor = type === 'error' ? '#ef4444' : '#D4A574';
             const iconColor = type === 'error' ? '#ef4444' : '#D4A574';
-            const icon = type === 'error' 
-                ? '✕' 
+            const icon = type === 'error'
+                ? '✕'
                 : '✓';
-            
+
             const iconSize = isMobile ? '28px' : '32px';
             const iconFontSize = isMobile ? '18px' : '20px';
             const textSize = isMobile ? '13px' : '14px';
@@ -933,7 +956,7 @@
         }
 
         // Close on escape key
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') {
                 closeBottomSheet();
             }
@@ -943,26 +966,26 @@
         let touchStartY = 0;
         let touchCurrentY = 0;
 
-        document.getElementById('productBottomSheet')?.addEventListener('touchstart', function(e) {
+        document.getElementById('productBottomSheet')?.addEventListener('touchstart', function (e) {
             touchStartY = e.touches[0].clientY;
         });
 
-        document.getElementById('productBottomSheet')?.addEventListener('touchmove', function(e) {
+        document.getElementById('productBottomSheet')?.addEventListener('touchmove', function (e) {
             touchCurrentY = e.touches[0].clientY;
             const diff = touchCurrentY - touchStartY;
-            
+
             if (diff > 0) {
                 this.style.transform = `translateY(${diff}px)`;
             }
         });
 
-        document.getElementById('productBottomSheet')?.addEventListener('touchend', function(e) {
+        document.getElementById('productBottomSheet')?.addEventListener('touchend', function (e) {
             const diff = touchCurrentY - touchStartY;
-            
+
             if (diff > 100) {
                 closeBottomSheet();
             }
-            
+
             this.style.transform = '';
             touchStartY = 0;
             touchCurrentY = 0;

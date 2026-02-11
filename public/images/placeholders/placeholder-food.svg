@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <rect width="400" height="400" fill="#2a1b14"/>
+  <circle cx="200" cy="180" r="120" fill="#3e302b" opacity="0.6"/>
+  <!-- Plate and food -->
+  <g transform="translate(200,185)" fill="none" stroke="#D4A574" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Plate -->
+    <ellipse cx="0" cy="20" rx="60" ry="15" fill="#D4A574" opacity="0.1" stroke="#D4A574"/>
+    <ellipse cx="0" cy="16" rx="45" ry="11" fill="#3e302b" stroke="#D4A574" stroke-width="2"/>
+    <!-- Food dome/cloche -->
+    <path d="M-45,16 C-45,-30 45,-30 45,16" fill="#D4A574" opacity="0.12" stroke="#D4A574" stroke-width="2.5"/>
+    <!-- Handle on top -->
+    <circle cx="0" cy="-30" r="5" fill="#3e302b" stroke="#D4A574" stroke-width="2.5"/>
+    <!-- Fork -->
+    <g transform="translate(-75,-10) rotate(-15)">
+      <line x1="0" y1="-25" x2="0" y2="30" stroke="#D4A574" stroke-width="2" opacity="0.5"/>
+      <line x1="-5" y1="-25" x2="-5" y2="-10" stroke="#D4A574" stroke-width="2" opacity="0.5"/>
+      <line x1="5" y1="-25" x2="5" y2="-10" stroke="#D4A574" stroke-width="2" opacity="0.5"/>
+    </g>
+    <!-- Knife -->
+    <g transform="translate(75,-10) rotate(15)">
+      <line x1="0" y1="-25" x2="0" y2="30" stroke="#D4A574" stroke-width="2" opacity="0.5"/>
+      <path d="M0,-25 C8,-20 8,-5 0,-5" stroke="#D4A574" stroke-width="2" opacity="0.5" fill="none"/>
+    </g>
+  </g>
+  <!-- Brand text -->
+  <text x="200" y="310" text-anchor="middle" fill="#D4A574" font-family="sans-serif" font-size="14" font-weight="500" opacity="0.5" letter-spacing="3">MERACIKOPI</text>
+</svg>
