@@ -261,6 +261,8 @@
                         window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1;
                         this.note = '';
+                        // Trigger cart badge update
+                        window.dispatchEvent(new Event('cartUpdated'));
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -476,7 +478,8 @@
             @if(isset($relatedMenus) && $relatedMenus->count() > 0)
                 <div class="related-menus-section"
                     style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 1; background-color: #1a1410;">
-                    <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
+                    <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">
+                        Menu
                         Lainnya</h3>
 
 

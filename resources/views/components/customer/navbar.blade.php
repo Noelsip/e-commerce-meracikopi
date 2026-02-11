@@ -712,7 +712,7 @@
     });
 
     // Custom event for cart updates
-    window.addEventListener('cartUpdate d', function () {
+    window.addEventListener('cartUpdated', function () {
         fetchCartCount();
     });
 </script>
