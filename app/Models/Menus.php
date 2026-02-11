@@ -81,8 +81,8 @@ class Menus extends Model
         'food' => 'Food',
         'drink' => 'Drink',
         'coffee_beans' => 'Coffee Beans',
-        'kopi_botolan' => 'Bottled Coffee',
-        'sachet-drip' => 'Sachet Drip',
+        'bottled_coffee' => 'Bottled Coffee',
+        'sachet_drip' => 'Sachet Drip',
     ];
 
     public function orderItems()

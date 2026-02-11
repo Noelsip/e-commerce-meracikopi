@@ -50,10 +50,12 @@ class CatalogController extends Controller
             abort(404);
         }
 
-        // Ambil menu lain untuk rekomendasi
+        // Ambil menu lain dengan kategori yang sama untuk rekomendasi
         $relatedMenus = Menus::whereNull('deleted_at')
             ->where('is_available', true)
             ->where('id', '!=', $id)
+            ->where('category', $menu->category)
+            ->inRandomOrder()
             ->take(4)
             ->get();
 

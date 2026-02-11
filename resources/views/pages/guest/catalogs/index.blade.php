@@ -548,12 +548,12 @@
                     style="{{ request('category') == 'coffee_beans' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Coffee Beans
                 </a>
-                <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="catalog-filter-pill"
-                    style="{{ request('category') == 'kopi_botolan' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
-                    Kopi Botol
+                <a href="{{ url('/customer/catalogs?category=bottled_coffee') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'bottled_coffee' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                    Bottled Coffee
                 </a>
-                <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" class="catalog-filter-pill"
-                    style="{{ request('category') == 'sachet-drip' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
+                <a href="{{ url('/customer/catalogs?category=sachet_drip') }}" class="catalog-filter-pill"
+                    style="{{ request('category') == 'sachet_drip' ? 'background-color: transparent; border: 1px solid #f0f2bd; color: #f0f2bd;' : 'background-color: #2b211e; border: 1px solid #2b211e; color: #a89890;' }}">
                     Sachet Drip
                 </a>
             </div>
@@ -617,8 +617,8 @@
                                             'drink' => 'placeholder-drink.svg',
                                             'food' => 'placeholder-food.svg',
                                             'coffee_beans' => 'placeholder-coffee-beans.svg',
-                                            'kopi_botolan' => 'placeholder-drink.svg',
-                                            'sachet-drip' => 'placeholder-coffee-beans.svg',
+                                            'bottled_coffee' => 'placeholder-drink.svg',
+                                            'sachet_drip' => 'placeholder-coffee-beans.svg',
                                         ];
                                         $placeholderFile = $placeholders[$menu->category] ?? 'placeholder-default.svg';
                                     @endphp
@@ -783,8 +783,8 @@
                     'drink': 'placeholder-drink.svg',
                     'food': 'placeholder-food.svg',
                     'coffee_beans': 'placeholder-coffee-beans.svg',
-                    'kopi_botolan': 'placeholder-drink.svg',
-                    'sachet-drip': 'placeholder-coffee-beans.svg',
+                    'bottled_coffee': 'placeholder-drink.svg',
+                    'sachet_drip': 'placeholder-coffee-beans.svg',
                 };
                 const placeholderFile = placeholderMap[category] || 'placeholder-default.svg';
                 imgTag.src = `/images/placeholders/${placeholderFile}`;
