@@ -11,10 +11,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        // Use varchar instead of enum to support all categories flexibly
-        Schema::table('menus', function (Blueprint $table) {
-            $table->string('category', 50)->default('drink')->after('name');
-        });
+        // Check if category column already exists
+        if (Schema::hasColumn('menus', 'category')) {
+            // Change ENUM to VARCHAR(50) to support all categories
+            DB::statement("ALTER TABLE menus MODIFY COLUMN category VARCHAR(50) DEFAULT 'drink'");
+        } else {
+            // Add category column as VARCHAR(50)
+            Schema::table('menus', function (Blueprint $table) {
+                $table->string('category', 50)->default('drink')->after('name');
+            });
+        }
     }
 
     /**
