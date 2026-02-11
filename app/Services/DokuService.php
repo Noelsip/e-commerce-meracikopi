@@ -90,7 +90,7 @@ class DokuService
     private static function generateHmacSignature(string $stringToSign): string
     {
         $secretKey = config('doku.secret_key');
-        return 'HMACSHA256=' . hash_hmac('sha256', $stringToSign, $secretKey);
+        return 'HMACSHA256=' . base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
     }
     private static function generateSignature(string $httpMethod, string $endpointUrl, string $accessToken, string $requestBody, string $timestamp): string
     {
@@ -108,7 +108,7 @@ class DokuService
         if (!$merchantPrivateKey) {
             Log::warning('Merchant private key not configured, using HMAC fallback');
             $secretKey = config('doku.secret_key');
-            return 'HMACSHA256=' . hash_hmac('sha256', $stringToSign, $secretKey);
+            return 'HMACSHA256=' . base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
         }
         
         // Generate signature menggunakan merchant private key
@@ -123,7 +123,8 @@ class DokuService
         
         // Use standard ISO 8601 format
         $timestamp = gmdate('c');
-        $signature = hash_hmac('sha256', $clientId . $timestamp, $secretKey);
+        $stringToSign = $clientId . '|' . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
         
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
@@ -182,7 +183,7 @@ class DokuService
         $requestId = Str::uuid()->toString();
         
         // String to sign untuk B2B access token (menggunakan HMAC)
-        $stringToSign = $clientId . $timestamp;
+        $stringToSign = $clientId . '|' . $timestamp;
         $signature = self::generateHmacSignature($stringToSign);
         
         $response = Http::withHeaders([

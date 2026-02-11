@@ -106,7 +106,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');
 
-        Route::resource('menus', MenuAdminController::class);
+        Route::resource('menus', MenuAdminController::class)->except(['show']);
         Route::resource('tables', TableAdminController::class);
         Route::patch('/menus/{menu}/toggle-visibility', [MenuAdminController::class, 'toggleVisibility'])
             ->name('menus.toggleVisibility');

@@ -111,9 +111,13 @@ class MenuAdminController extends Controller
     {
         $menuName = $menu->name; // Store name before deletion
 
-        if ($menu->image_path) {
-            $oldPath = str_replace('storage/', '', $menu->image_path);
-            Storage::disk('public')->delete($oldPath);
+        try {
+            if ($menu->image_path && $menu->image_path !== '') {
+                $oldPath = str_replace('storage/', '', $menu->image_path);
+                Storage::disk('public')->delete($oldPath);
+            }
+        } catch (\Exception $e) {
+            // Ignore storage errors (file may not exist on server)
         }
 
         $menu->delete();
