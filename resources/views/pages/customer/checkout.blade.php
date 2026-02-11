@@ -1129,14 +1129,6 @@
                     editAddress();
                     return;
                 }
-<<<<<<< HEAD
-                deliveryMethod = selectedDelivery.value;
-            } else {
-                // Payment method is required - will be passed to DOKU
-                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-                if (!selectedPayment) {
-                    showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
-=======
                 if (!recipientPhone) {
                     showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
                     editAddress();
@@ -1155,7 +1147,6 @@
                 if (!fullAddress) {
                     showErrorModal('Alamat Belum Lengkap', 'Silahkan isi alamat lengkap terlebih dahulu');
                     editAddress();
->>>>>>> 5b3397f93ddca5237c76443c31c6c789dace12b4
                     return;
                 }
             }
@@ -1596,23 +1587,12 @@
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
-<<<<<<< HEAD
-                if (deliveryAddressSection) deliveryAddressSection.style.display = 'block';
-                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'block';
-                if (paymentMethodsSection) paymentMethodsSection.style.display = 'none';
-                if (customerInfoSection) customerInfoSection.style.display = 'none';
-            } else {
-                if (deliveryAddressSection) deliveryAddressSection.style.display = 'none';
-                if (deliveryMethodsSection) deliveryMethodsSection.style.display = 'none';
-                if (paymentMethodsSection) paymentMethodsSection.style.display = 'block';
-=======
                 deliveryAddressSection.style.display = 'block';
                 paymentMethodsSection.style.display = 'block'; // Metode pembayaran selalu tampil
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
                 deliveryAddressSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
->>>>>>> 5b3397f93ddca5237c76443c31c6c789dace12b4
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
         }
