@@ -879,7 +879,8 @@
             <div class="address-modal-body">
                 <div class="form-group">
                     <label>Nama Penerima <span style="color: #e74c3c;">*</span></label>
-                    <input type="text" class="form-input" id="recipientName" value="" placeholder="Masukkan nama penerima">
+                    <input type="text" class="form-input" id="recipientName" value=""
+                        placeholder="Masukkan nama penerima">
                 </div>
                 <div class="form-group">
                     <label>Nomor Telepon <span style="color: #e74c3c;">*</span></label>
@@ -923,7 +924,8 @@
                     </div>
                     <div class="form-group">
                         <label>Kode Pos <span style="color: #e74c3c;">*</span></label>
-                        <input type="text" class="form-input" id="postalCode" value="" placeholder="Masukkan kode pos" maxlength="5">
+                        <input type="text" class="form-input" id="postalCode" value="" placeholder="Masukkan kode pos"
+                            maxlength="5">
                     </div>
                 </div>
                 <div class="form-group">
@@ -1636,7 +1638,7 @@
                         <div class="order-item-info">
                             ${item.menu_image ?
                         `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
-                        '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
+                        `<img src="/images/placeholders/placeholder-${item.menu_category === 'food' ? 'food' : item.menu_category === 'coffee_beans' ? 'coffee-beans' : 'drink'}.svg" alt="${item.menu_name}" class="order-item-image" style="object-fit: contain; padding: 8px; background: rgba(100,80,70,0.3);">`
                     }
                             <div class="order-item-details">
                                 <p class="order-item-name">${item.menu_name}</p>
