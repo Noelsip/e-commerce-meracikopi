@@ -376,10 +376,18 @@
                         <img src="{{ asset($menu->image_path) }}" alt="{{ $menu->name }}"
                             style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
                     @else
-                        <div
-                            style="width: 100%; height: 100%; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 80px;">☕</span>
-                        </div>
+                        @php
+                            $placeholders = [
+                                'drink' => 'placeholder-drink.svg',
+                                'food' => 'placeholder-food.svg',
+                                'coffee_beans' => 'placeholder-coffee-beans.svg',
+                                'bottled_coffee' => 'placeholder-drink.svg',
+                                'sachet_drip' => 'placeholder-coffee-beans.svg',
+                            ];
+                            $placeholderFile = $placeholders[$menu->category] ?? 'placeholder-default.svg';
+                        @endphp
+                        <img src="{{ asset('images/placeholders/' . $placeholderFile) }}" alt="{{ $menu->name }}"
+                            style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
                     @endif
                 </div>
 
