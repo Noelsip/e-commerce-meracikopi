@@ -92,13 +92,18 @@
     <!-- Toast Notification -->
     <div id="toast" class="fixed top-20 left-1/2 z-50 transform -translate-x-1/2 transition-all duration-300 opacity-0"
         style="position: fixed !important; top: 5rem !important; left: 50% !important; transform: translateX(-50%) translateY(-100%) !important;">
-        <div class="flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl"
+        <div id="toast-container" class="flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl"
             style="background: linear-gradient(135deg, #3e302b 0%, #2b211e 100%); border: 2px solid #D4A574;">
             <div class="flex-shrink-0">
-                <svg class="w-6 h-6" style="color: #f0f2bd !important;" fill="none" stroke="currentColor"
+                <svg id="toast-icon-success" class="w-6 h-6" style="color: #f0f2bd !important;" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <svg id="toast-icon-error" class="w-6 h-6 hidden" style="color: #ef4444 !important;" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
             </div>
             <p class="font-semibold text-base" style="color: #f0f2bd !important;" id="toast-message"></p>
@@ -126,17 +131,31 @@
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
+            const toastContainer = document.getElementById('toast-container');
+            const iconSuccess = document.getElementById('toast-icon-success');
+            const iconError = document.getElementById('toast-icon-error');
 
             toastMessage.textContent = message;
+
+            // Change style based on type
+            if (type === 'error') {
+                toastContainer.style.border = '2px solid #ef4444';
+                iconSuccess.classList.add('hidden');
+                iconError.classList.remove('hidden');
+            } else {
+                toastContainer.style.border = '2px solid #D4A574';
+                iconError.classList.add('hidden');
+                iconSuccess.classList.remove('hidden');
+            }
 
             // Show with fade in and slide down
             toast.style.transform = 'translateX(-50%) translateY(0)';
             toast.classList.remove('opacity-0');
 
-            // Auto hide after 3 seconds
+            // Auto hide after 5 seconds for errors, 3 seconds for success
             setTimeout(() => {
                 hideToast();
-            }, 3000);
+            }, type === 'error' ? 5000 : 3000);
         }
 
         function hideToast() {

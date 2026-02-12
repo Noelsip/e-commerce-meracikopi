@@ -161,10 +161,40 @@ class AdminMenuController extends Controller
             ], 404);
         }
 
-        $menu->delete();
+        // Check if menu has been ordered
+        $hasOrders = $menu->orderItems()->exists();
+        
+        if ($hasOrders) {
+            return response()->json([
+                'message' => 'Menu cannot be deleted because it has been ordered. Please change availability status instead.'
+            ], 422);
+        }
 
-        return response()->json([
-            'message' => 'Menu Deleted Successfully'
-        ], 200);
+        // Check if menu is in any active cart
+        $inCart = $menu->cartItems()->exists();
+        
+        if ($inCart) {
+            return response()->json([
+                'message' => 'Menu cannot be deleted because it is in customer carts. Please try again later or hide the menu.'
+            ], 422);
+        }
+
+        try {
+            $menu->delete();
+
+            return response()->json([
+                'message' => 'Menu Deleted Successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete menu: ' . $e->getMessage(), [
+                'menu_id' => $menu->id,
+                'menu_name' => $menu->name,
+            ]);
+            
+            return response()->json([
+                'message' => 'Failed to delete menu. Menu may still be in use by the system.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
