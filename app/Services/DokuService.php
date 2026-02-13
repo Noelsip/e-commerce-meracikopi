@@ -298,15 +298,14 @@ class DokuService
     {
         $dokuPaymentMethod = self::mapPaymentMethod($paymentMethod);
 
+        // DOKU Checkout API payload - format minimal
         $payload = [
             'order' => [
                 'amount' => (int) $orderData['amount'],
                 'invoice_number' => $orderData['invoice_number'],
-                'currency' => 'IDR',
             ],
             'payment' => [
-                'payment_due_date' => (int) (24 * 60), // dalam menit
-                'payment_method_types' => [$dokuPaymentMethod],
+                'payment_due_date' => 60, // menit
             ],
             'customer' => [
                 'name' => $customerData['name'] ?: 'Customer',
@@ -317,52 +316,9 @@ class DokuService
             ],
         ];
 
-        // Add specific configurations for different payment methods
-        switch ($paymentMethod) {
-            case 'qris':
-                $payload['payment']['qrisConfiguration'] = [
-                    'generateQr' => true,
-                    'qrFormat' => 'base64'
-                ];
-                break;
-
-            case 'bca_va':
-                $payload['payment']['virtualAccountInfo'] = [
-                    'bank' => 'BCA',
-                    'generateVirtualAccount' => true
-                ];
-                break;
-
-            case 'bni_va':
-                $payload['payment']['virtualAccountInfo'] = [
-                    'bank' => 'BNI',
-                    'generateVirtualAccount' => true
-                ];
-                break;
-
-            case 'bri_va':
-                $payload['payment']['virtualAccountInfo'] = [
-                    'bank' => 'BRI',
-                    'generateVirtualAccount' => true
-                ];
-                break;
-
-            case 'mandiri_va':
-                $payload['payment']['virtualAccountInfo'] = [
-                    'bank' => 'MANDIRI',
-                    'generateVirtualAccount' => true
-                ];
-                break;
-
-            case 'dana':
-            case 'gopay':
-            case 'shopeepay':
-            case 'ovo':
-                $payload['payment']['ewalletConfiguration'] = [
-                    'generateDeeplink' => true,
-                    'returnUrl' => url('/customer/order-history')
-                ];
-                break;
+        // Hanya tambahkan payment_method_types jika ada mapping
+        if ($dokuPaymentMethod) {
+            $payload['payment']['payment_method_types'] = [$dokuPaymentMethod];
         }
 
         return $payload;
