@@ -1108,27 +1108,10 @@
             };
             const backendOrderType = orderTypeMap[orderType] || 'take_away';
 
-            // Payment method is required for all order types
-            const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-            if (!selectedPayment) {
-                showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
-                return;
-            }
-            paymentMethod = selectedPayment.value;
-
-            // 2b. Validate delivery address if delivery order
             if (orderType === 'delivery') {
-                const recipientName = document.getElementById('recipientName').value.trim();
-                const recipientPhone = document.getElementById('recipientPhone').value.trim();
-                const fullAddress = document.getElementById('fullAddress').value.trim();
-                const province = document.getElementById('province').value;
-                const city = document.getElementById('city').value;
-                const district = document.getElementById('district').value;
-                const postalCode = document.getElementById('postalCode').value.trim();
-
-                if (!recipientName) {
-                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nama penerima terlebih dahulu');
-                    editAddress();
+                const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
+                if (!selectedDelivery) {
+                    showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
                 if (!recipientPhone) {

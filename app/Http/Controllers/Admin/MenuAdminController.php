@@ -111,6 +111,22 @@ class MenuAdminController extends Controller
     {
         $menuName = $menu->name; // Store name before deletion
 
+        // Check if menu has been ordered
+        $hasOrders = $menu->orderItems()->exists();
+
+        if ($hasOrders) {
+            return redirect()->route('admin.menus.index')
+                ->with('error', "Menu '{$menuName}' tidak dapat dihapus karena sudah pernah dipesan. Anda bisa menyembunyikan menu ini dengan mengubah status availability.");
+        }
+
+        // Check if menu is in any active cart
+        $inCart = $menu->cartItems()->exists();
+
+        if ($inCart) {
+            return redirect()->route('admin.menus.index')
+                ->with('error', "Menu '{$menuName}' tidak dapat dihapus karena masih ada di cart customer. Silakan coba lagi nanti atau sembunyikan menu.");
+        }
+
         try {
             if ($menu->image_path && $menu->image_path !== '') {
                 $oldPath = str_replace('storage/', '', $menu->image_path);
@@ -120,9 +136,18 @@ class MenuAdminController extends Controller
             // Ignore storage errors (file may not exist on server)
         }
 
-        $menu->delete();
+        try {
+            $menu->delete();
+            return redirect()->route('admin.menus.index')->with('success', "Menu '{$menuName}' berhasil dihapus.");
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete menu: ' . $e->getMessage(), [
+                'menu_id' => $menu->id,
+                'menu_name' => $menuName,
+            ]);
 
-        return redirect()->route('admin.menus.index')->with('success', "Menu '{$menuName}' berhasil dihapus.");
+            return redirect()->route('admin.menus.index')
+                ->with('error', "Gagal menghapus menu '{$menuName}'. Menu mungkin masih digunakan oleh sistem.");
+        }
     }
 
     public function toggleVisibility(Menus $menu)

@@ -255,7 +255,7 @@
                             76114
                         </a>
                     </p>
-                    <p style="color: #a89890; font-size: 14px; margin: 0;">Phone: +62 123 4567 890</p>
+                    <p style="color: #a89890; font-size: 14px; margin: 0;">Phone: +62 525 1833 438</p>
                     <p style="color: #a89890; font-size: 14px; margin: 0;">Email: Meracikopi@gmail.com</p>
                 </div>
             </div>

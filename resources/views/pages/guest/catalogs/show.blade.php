@@ -67,6 +67,7 @@
                     padding: 12px 16px !important;
                     align-items: center !important;
                     justify-content: flex-start !important;
+                    max-width: 100% !important;
                 }
 
                 .product-image {
@@ -82,14 +83,14 @@
 
                 .product-details {
                     width: 100% !important;
-                    max-width: 280px;
+                    max-width: 320px;
                     text-align: center;
                     order: 2;
                 }
 
                 .product-details h1 {
                     font-size: 20px !important;
-                    margin-bottom: 2px !important;
+                    margin-bottom: 4px !important;
                 }
 
                 .product-details>div:nth-child(2) {
@@ -276,7 +277,7 @@
             position: relative; 
             width: 100%;
             max-width: 1440px; 
-            min-height: 350px; 
+            min-height: 380px; 
             margin: 0 auto;
             padding-bottom: 40px;
         ">
@@ -286,7 +287,7 @@
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 350px;
+                height: 380px;
                 background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
                 z-index: 1;
                 pointer-events: none;
@@ -297,11 +298,14 @@
                 position: relative;
                 z-index: 2;
                 width: 100%;
-                height: 350px;
-                display: flex;
+                max-width: 1    440px;
+                margin: 0 auto;
+                min-height: 380px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap:70px;
                 align-items: center;
-                justify-content: center;
-                gap: 40px;
+                padding: 0 40px;
             ">
 
                 <script>
@@ -366,7 +370,7 @@
 
                 <!-- Product Image -->
                 <div class="product-image"
-                    style="position: relative; width: 200px; height: 200px; display: flex; align-items: center; justify-content: center; margin-left: -80px;">
+                    style="position: relative; width: 320px; height: 320px; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto;">
                     <!-- Shadow -->
                     <div
                         style="position: absolute; bottom: 10%; width: 60%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); filter: blur(10px);">
@@ -392,18 +396,18 @@
                 </div>
 
                 <!-- Product Details -->
-                <div class="product-details" style="width: 250px;">
+                <div class="product-details" style="flex: 1; min-width: 0; max-width: 350px;">
                     <h1
-                        style="font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 800; color: #F0F2BD; margin: 0 0 4px 0; line-height: 1.2;">
+                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #F0F2BD; margin: 0 0 8px 0; line-height: 1.35;">
                         {{ $menu->name }}
                     </h1>
 
-                    <div style="font-size: 20px; color: #fff; margin-bottom: 2px; font-weight: 500;">
+                    <div style="font-size: 18px; color: #fff; margin-bottom: 2px; font-weight: 500;">
                         Rp {{ number_format($menu->price, 0, ',', '.') }}
                     </div>
 
                     <div
-                        style="color: #aaa; font-size: 12px; margin-bottom: 24px; font-weight: 400; font-style: italic;">
+                        style="color: #aaa; font-size: 12px; margin-bottom: 20px; font-weight: 400; font-style: italic;">
                         Hot/Ice
                     </div>
 
@@ -422,7 +426,7 @@
                     </div>
 
                     <button @click="addToCart" :disabled="loading" style="
-                        width: 100%;
+                        width: 220px;
                         background-color: #000; 
                         color: #fff; 
                         border: none; 
