@@ -10,35 +10,38 @@ class DokuTestController extends Controller
 {
     public function testConnection()
     {
-        $configs = [
-            'merchant_id' => config('doku.client_id'), // BRN-...
-            'api_key' => config('doku.api_key'),       // doku_key_...
-        ];
-        
-        $secretKey = config('doku.secret_key');
+        $clientId = config('doku.client_id'); // BRN-...
+        $secretKey = config('doku.secret_key'); // SK-...
+        $apiKey = config('doku.api_key'); // doku_key_...
         $baseUrl = config('doku.base_url');
         
         $results = [];
 
-        foreach ($configs as $keyType => $clientId) {
-            // Test 1: Format Standar (With Pipe)
-            $timestamp = date('c');
-            $stringToSign = $clientId . '|' . $timestamp;
-            $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-            $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "$keyType + Pipe + HMAC Prefix");
+        // KITA SUDAH TAHU: Client ID = BRN, Header = Raw (Tanpa Prefix)
+        // VARIABEL YANG DITES: Timestamp Format & Signing Key
 
-            // Test 2: Format Tanpa Pipe
-            $timestamp = date('c');
-            $stringToSign = $clientId . $timestamp;
-            $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-            $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "$keyType + NoPipe + HMAC Prefix");
+        // --- SKENARIO A: Pakai SECRET KEY (SK-...) sebagai Kunci ---
+        
+        // A.1: UTC Time + Pipa
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $stringToSign = $clientId . '|' . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "SK + UTC + Pipe");
 
-            // Test 3: Standard With Pipe but NO HMAC Prefix
-            $timestamp = date('c');
-            $stringToSign = $clientId . '|' . $timestamp;
-            $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-            $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "$keyType + Pipe + NO Prefix");
-        }
+        // A.2: Offset Time (WIB) + Pipa
+        $timestamp = date('c');
+        $stringToSign = $clientId . '|' . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "SK + Offset + Pipe");
+
+
+        // --- SKENARIO B: Pakai API KEY (doku_key_...) sebagai Kunci (Siapa tahu ini kuncinya) ---
+
+        // B.1: UTC Time + Pipa
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $stringToSign = $clientId . '|' . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $apiKey, true));
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "APIKEY + UTC + Pipe");
 
         return response()->json($results);
     }
