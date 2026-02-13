@@ -117,44 +117,8 @@ class DokuService
 
     private static function getAccessToken(): string
     {
-        $clientId = config('doku.client_id');
-        $secretKey = config('doku.secret_key');
-        $baseUrl = config('doku.base_url');
-
-        Log::info('DOKU Auth Debug', [
-            'client_id' => $clientId,
-            'client_id_len' => strlen($clientId),
-            'target_url' => $baseUrl
-        ]);
-
-        // Use standard ISO 8601 format
-        $timestamp = gmdate('c');
-        $stringToSign = $clientId . '|' . $timestamp;
-        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-
-        $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientId,
-            'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => "HMACSHA256=" . $signature,
-            'Content-Type' => 'application/json',
-        ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
-                    'grantType' => 'client_credentials'
-                ]);
-
-        if (!$response->successful()) {
-            $errorBody = $response->body();
-            Log::error('DOKU Access Token Error', [
-                'status' => $response->status(),
-                'headers' => $response->headers(),
-                'body' => $errorBody,
-                'request_client_id' => $clientId,
-                'request_timestamp' => $timestamp
-            ]);
-            throw new \Exception('Failed to get DOKU access token: ' . $errorBody);
-        }
-
-        $data = $response->json();
-        return $data['accessToken'];
+        $tokenData = self::getAccessTokenForSnap();
+        return $tokenData['accessToken'];
     }
 
     /**
@@ -190,27 +154,32 @@ class DokuService
         $baseUrl = config('doku.base_url');
 
         $timestamp = self::generateTimestamp();
-        $requestId = Str::uuid()->toString();
-
-        // String to sign untuk B2B access token (menggunakan HMAC)
         $stringToSign = $clientId . '|' . $timestamp;
-        $signature = self::generateHmacSignature($stringToSign);
+        
+        // Generate HMAC-SHA256 and base64 encode
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => $signature,
+            'X-SIGNATURE' => $signature, // Coba kirim tanpa awalan HMACSHA256= dulu
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
-                    'grantType' => 'client_credentials'
-                ]);
+            'grantType' => 'client_credentials'
+        ]);
 
         if (!$response->successful()) {
+            $errorBody = $response->body();
             Log::error('DOKU SNAP Access Token Error', [
                 'status' => $response->status(),
-                'body' => $response->body(),
+                'body' => $errorBody,
+                'request_data' => [
+                    'clientId' => $clientId,
+                    'timestamp' => $timestamp,
+                    'stringToSign' => $stringToSign
+                ]
             ]);
-            throw new \Exception('Failed to get DOKU SNAP access token: ' . $response->body());
+            throw new \Exception('DOKU Auth Failed: ' . ($errorBody ?: 'Unknown Error'));
         }
 
         $data = $response->json();
