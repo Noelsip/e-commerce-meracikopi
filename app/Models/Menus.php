@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\OrderItems;
+use App\Models\CartItem;
 
 class Menus extends Model
 {
@@ -81,12 +82,17 @@ class Menus extends Model
         'food' => 'Food',
         'drink' => 'Drink',
         'coffee_beans' => 'Coffee Beans',
-        'kopi_botolan' => 'Bottled Coffee',
-        'sachet-drip' => 'Sachet Drip',
+        'bottled_coffee' => 'Bottled Coffee',
+        'sachet_drip' => 'Sachet Drip',
     ];
 
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'menu_id');
     }
 }

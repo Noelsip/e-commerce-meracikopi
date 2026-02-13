@@ -47,22 +47,22 @@ class PaymentController extends Controller
             'bri_va' => 'Virtual Account BRI',
             'mandiri_va' => 'Virtual Account Mandiri',
         ];
-        
+
         $methodName = $methodNames[$paymentMethod] ?? $paymentMethod;
-        
+
         // Parse common DOKU errors
         if (str_contains($errorMessage, 'Unauthorized') || str_contains($errorMessage, 'Unknown Client')) {
             return "Pembayaran {$methodName} tidak tersedia saat ini. Silahkan coba metode pembayaran lain.";
         }
-        
+
         if (str_contains($errorMessage, 'access token') || str_contains($errorMessage, 'Access Token')) {
             return "Koneksi ke payment gateway bermasalah. Silahkan coba beberapa saat lagi atau gunakan metode pembayaran lain.";
         }
-        
+
         if (str_contains($errorMessage, 'timeout') || str_contains($errorMessage, 'Connection')) {
             return "Koneksi ke payment gateway timeout. Silahkan coba lagi atau gunakan metode pembayaran lain.";
         }
-        
+
         return "Tidak dapat memproses pembayaran dengan {$methodName}. Silahkan coba metode pembayaran lain.";
     }
 
@@ -81,7 +81,7 @@ class PaymentController extends Controller
                 ];
             }
         }
-        
+
         // Check for Virtual Account - must have VA number
         if (in_array($paymentMethod, ['bca_va', 'bni_va', 'bri_va', 'mandiri_va'])) {
             $vaInfo = $response['virtual_account_info'] ?? null;
@@ -92,7 +92,7 @@ class PaymentController extends Controller
                 ];
             }
         }
-        
+
         // Check for E-Wallet - must have payment URL or deep link
         if (in_array($paymentMethod, ['dana', 'gopay', 'shopeepay', 'ovo'])) {
             $ewalletInfo = $response['ewallet_info'] ?? null;
@@ -104,7 +104,7 @@ class PaymentController extends Controller
                 ];
             }
         }
-        
+
         return ['valid' => true, 'error' => null];
     }
 
@@ -116,7 +116,7 @@ class PaymentController extends Controller
         try {
             // Find cart by guest_token or user_id
             $cartQuery = Cart::query();
-            
+
             if ($order->user_id) {
                 $cartQuery->where('user_id', $order->user_id);
             } elseif ($order->guest_token) {
@@ -125,9 +125,9 @@ class PaymentController extends Controller
                 Log::warning('Cannot clear cart - no user_id or guest_token', ['order_id' => $order->id]);
                 return;
             }
-            
+
             $cart = $cartQuery->first();
-            
+
             if ($cart) {
                 $itemCount = $cart->items()->count();
                 $cart->items()->delete();
@@ -158,7 +158,7 @@ class PaymentController extends Controller
             'status' => 'PENDING',
             'fallback_mode' => true,
         ];
-        
+
         switch ($paymentMethod) {
             case 'qris':
                 $response['qr_code_data'] = [
@@ -168,14 +168,14 @@ class PaymentController extends Controller
                 ];
                 $response['instructions'] = 'Scan QR Code menggunakan aplikasi e-wallet atau mobile banking Anda';
                 break;
-                
+
             case 'bca_va':
             case 'bni_va':
             case 'bri_va':
             case 'mandiri_va':
                 $bankName = strtoupper(str_replace('_va', '', $paymentMethod));
                 $vaNumber = ($bankName === 'BCA' ? '8808' : '8809') . str_pad($payment->order_id, 6, '0', STR_PAD_LEFT);
-                
+
                 $response['virtual_account_info'] = [
                     'bank_name' => $bankName,
                     'va_number' => $vaNumber,
@@ -184,7 +184,7 @@ class PaymentController extends Controller
                 ];
                 $response['instructions'] = "Transfer ke Virtual Account {$bankName}: {$vaNumber}";
                 break;
-                
+
             case 'dana':
             case 'gopay':
             case 'shopeepay':
@@ -198,12 +198,12 @@ class PaymentController extends Controller
                 ];
                 $response['instructions'] = "Anda akan diarahkan ke aplikasi {$walletName} untuk menyelesaikan pembayaran";
                 break;
-                
+
             default:
                 $response['payment_url'] = url('/checkout/success?payment_id=' . $payment->id);
                 $response['instructions'] = 'Silahkan ikuti petunjuk pembayaran yang muncul';
         }
-        
+
         return $response;
     }
 
@@ -233,7 +233,7 @@ class PaymentController extends Controller
         // Write to PNG and return as base64
         $writer = new PngWriter();
         $result = $writer->write($qrCode);
-        
+
         return base64_encode($result->getString());
     }
 
@@ -243,7 +243,7 @@ class PaymentController extends Controller
         $selectedPaymentMethod = $request->input('payment_method');
 
         return DB::transaction(function () use ($orderId, $guestToken, $selectedPaymentMethod) {
-            
+
             // Mengambil order berdasarkan ID
             $order = Orders::where('id', $orderId)
                 ->where('guest_token', $guestToken)
@@ -297,7 +297,7 @@ class PaymentController extends Controller
             // Request payment from DOKU with specific method
             $dokuResponse = null;
             $useFallback = false;
-            
+
             try {
                 $dokuResponse = DokuService::createSpecificPayment($selectedPaymentMethod, $orderData, $customerData);
             } catch (\Exception $e) {
@@ -307,7 +307,7 @@ class PaymentController extends Controller
                     'payment_method' => $selectedPaymentMethod,
                     'trace' => $e->getTraceAsString(),
                 ]);
-                
+
                 // Check if fallback mode is enabled
                 if (config('doku.fallback_enabled', false)) {
                     Log::info('Using DOKU fallback mode due to error', [
@@ -318,7 +318,7 @@ class PaymentController extends Controller
                 } else {
                     // Fallback disabled - return error to user
                     $payment->delete();
-                    
+
                     return response()->json([
                         'message' => 'Gagal memproses pembayaran dengan metode ini',
                         'error' => 'payment_gateway_error',
@@ -328,12 +328,12 @@ class PaymentController extends Controller
                     ], 422);
                 }
             }
-            
+
             // Use fallback mock data if DOKU failed and fallback is enabled
             if ($useFallback) {
                 $dokuResponse = $this->generateFallbackResponse($selectedPaymentMethod, $transactionId, $orderData, $payment);
             }
-            
+
             // Verify DOKU response has required data for the payment method
             $validationResult = $this->validateDokuResponse($dokuResponse, $selectedPaymentMethod);
             if (!$validationResult['valid']) {
@@ -342,9 +342,9 @@ class PaymentController extends Controller
                     'payment_method' => $selectedPaymentMethod,
                     'validation_error' => $validationResult['error'],
                 ]);
-                
+
                 $payment->delete();
-                
+
                 return response()->json([
                     'message' => 'Metode pembayaran tidak tersedia saat ini',
                     'error' => 'invalid_payment_response',
@@ -374,19 +374,19 @@ class PaymentController extends Controller
             if (isset($dokuResponse['qr_code_data']) && $dokuResponse['qr_code_data']) {
                 $responseData['qr_code'] = $dokuResponse['qr_code_data'];
             }
-            
+
             if (isset($dokuResponse['virtual_account_info']) && $dokuResponse['virtual_account_info']) {
                 $responseData['virtual_account'] = $dokuResponse['virtual_account_info'];
             }
-            
+
             if (isset($dokuResponse['ewallet_info']) && $dokuResponse['ewallet_info']) {
                 $responseData['ewallet'] = $dokuResponse['ewallet_info'];
             }
-            
+
             if (isset($dokuResponse['payment_url']) && $dokuResponse['payment_url']) {
                 $responseData['payment_url'] = $dokuResponse['payment_url'];
             }
-            
+
             if (isset($dokuResponse['instructions']) && $dokuResponse['instructions']) {
                 $responseData['instructions'] = $dokuResponse['instructions'];
             }
@@ -486,27 +486,17 @@ class PaymentController extends Controller
         $guestToken = $request->attributes->get('guest_token');
 
         $payment = Payments::where('transaction_id', $invoiceNumber)
-            ->whereHas('order', function($query) use ($guestToken) {
+            ->whereHas('order', function ($query) use ($guestToken) {
                 $query->where('guest_token', $guestToken);
             })
             ->first();
 
         if (!$payment) {
-            return response()->json(['message' => 'Payment not found'], 404);
+            return response()->json(['success' => false, 'message' => 'Payment not found'], 404);
         }
 
         if ($payment->status === StatusPayments::PAID) {
-            return response()->json(['message' => 'Payment already completed', 'status' => 'paid']);
-        }
-
-        // Check if this is a fallback mode payment
-        $isFallback = isset($payment->payload['doku_response']['fallback_mode']);
-        
-        if (!$isFallback) {
-            return response()->json([
-                'message' => 'Cannot simulate - this is a real DOKU payment',
-                'status' => 'error'
-            ], 400);
+            return response()->json(['success' => true, 'message' => 'Payment already completed', 'status' => 'paid']);
         }
 
         // Simulate successful payment
@@ -521,14 +511,16 @@ class PaymentController extends Controller
 
         $payment->order->update([
             'status' => OrderStatus::PAID,
+            'payment_status' => StatusPayments::PAID,
         ]);
-        
+
         // Clear cart setelah pembayaran berhasil
         $this->clearCartForOrder($payment->order);
 
         Log::info('Payment simulated as complete', ['invoice' => $invoiceNumber]);
 
         return response()->json([
+            'success' => true,
             'message' => 'Payment simulated as complete',
             'status' => 'paid',
             'payment_id' => $payment->id,
@@ -539,15 +531,15 @@ class PaymentController extends Controller
     public function checkPaymentStatus($invoiceNumber)
     {
         $guestToken = request()->attributes->get('guest_token');
-        
+
         // Find payment by transaction_id (invoice number)
         $payment = Payments::where('transaction_id', $invoiceNumber)
-            ->whereHas('order', function($query) use ($guestToken) {
+            ->whereHas('order', function ($query) use ($guestToken) {
                 $query->where('guest_token', $guestToken);
             })
             ->with('order')
             ->firstOrFail();
-            
+
         $order = $payment->order;
 
         // Jika sudah paid, return status
@@ -562,7 +554,7 @@ class PaymentController extends Controller
         // Check status dari DOKU jika masih pending
         try {
             $statusResponse = DokuService::getPaymentStatus($payment->transaction_id);
-            
+
             // Update status jika ada perubahan
             $transactionStatus = $statusResponse['transaction']['status'] ?? 'PENDING';
             if (in_array($transactionStatus, ['SUCCESS', 'COMPLETE'])) {
@@ -631,7 +623,7 @@ class PaymentController extends Controller
             }
 
             $clientId = $request->header('X-CLIENT-KEY') ?: $request->input('client_id');
-            
+
             if ($clientId !== config('doku.client_id')) {
                 return response()->json([
                     'responseCode' => '4017300',
@@ -654,7 +646,7 @@ class PaymentController extends Controller
                 'error' => $e->getMessage(),
                 'request' => $request->all()
             ]);
-            
+
             return response()->json([
                 'error' => 'Token generation failed',
                 'message' => $e->getMessage()

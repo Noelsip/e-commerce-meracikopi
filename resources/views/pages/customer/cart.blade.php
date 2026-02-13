@@ -78,7 +78,7 @@
                                     <img :src="item.menu_image" alt="Product" class="product-image" draggable="false">
                                 </template>
                                 <template x-if="!item.menu_image">
-                                    <div class="product-image-placeholder"></div>
+                                    <img :src="getPlaceholder(item.menu_category)" alt="Product" class="product-image" draggable="false">
                                 </template>
                                 <span class="product-name" x-text="item.menu_name"></span>
                             </div>
@@ -207,6 +207,17 @@
 
                     // Fetch data terbaru di background
                     this.fetchCart();
+                },
+
+                getPlaceholder(category) {
+                    const map = {
+                        'drink': '/images/placeholders/placeholder-drink.svg',
+                        'food': '/images/placeholders/placeholder-food.svg',
+                        'coffee_beans': '/images/placeholders/placeholder-coffee-beans.svg',
+                        'bottled_coffee': '/images/placeholders/placeholder-drink.svg',
+                        'sachet_drip': '/images/placeholders/placeholder-coffee-beans.svg',
+                    };
+                    return map[category] || '/images/placeholders/placeholder-default.svg';
                 },
 
                 // Computed: Check if all items are selected

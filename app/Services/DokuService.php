@@ -21,21 +21,21 @@ class DokuService
     private static function generateMerchantSignature(string $stringToSign): string
     {
         $merchantPrivateKey = config('doku.merchant_private_key');
-        
+
         if (!$merchantPrivateKey) {
             throw new \Exception('Merchant private key not configured in environment');
         }
 
         // Normalize line endings and ensure proper format
         $merchantPrivateKey = str_replace(["\r\n", "\r"], "\n", $merchantPrivateKey);
-        
+
         // Add quotes if missing (in case of env parsing issues)
         if (!str_contains($merchantPrivateKey, '-----BEGIN')) {
             throw new \Exception('Invalid merchant private key format. Must include -----BEGIN and -----END headers');
         }
 
         $privateKey = openssl_pkey_get_private($merchantPrivateKey);
-        
+
         if (!$privateKey) {
             $error = openssl_error_string();
             throw new \Exception('Invalid merchant private key: ' . ($error ?: 'Unable to parse private key'));
@@ -43,7 +43,7 @@ class DokuService
 
         $success = openssl_sign($stringToSign, $signature, $privateKey, OPENSSL_ALGO_SHA256);
         openssl_pkey_free($privateKey);
-        
+
         if (!$success) {
             throw new \Exception('Failed to generate merchant signature');
         }
@@ -57,7 +57,7 @@ class DokuService
     public static function verifyDokuSignature(array $data, string $signature): bool
     {
         $dokuPublicKey = config('doku.public_key');
-        
+
         if (!$dokuPublicKey) {
             Log::warning('DOKU public key not configured');
             return false;
@@ -65,9 +65,9 @@ class DokuService
 
         // Normalize line endings
         $dokuPublicKey = str_replace(["\r\n", "\r"], "\n", $dokuPublicKey);
-        
+
         $publicKey = openssl_pkey_get_public($dokuPublicKey);
-        
+
         if (!$publicKey) {
             $error = openssl_error_string();
             Log::error('Invalid DOKU public key: ' . ($error ?: 'Unable to parse public key'));
@@ -77,10 +77,10 @@ class DokuService
         // Create string to verify dari data yang diterima
         $stringToVerify = json_encode($data, JSON_UNESCAPED_SLASHES);
         $decodedSignature = base64_decode($signature);
-        
+
         $isValid = openssl_verify($stringToVerify, $decodedSignature, $publicKey, OPENSSL_ALGO_SHA256) === 1;
         openssl_pkey_free($publicKey);
-        
+
         return $isValid;
     }
 
@@ -90,27 +90,27 @@ class DokuService
     private static function generateHmacSignature(string $stringToSign): string
     {
         $secretKey = config('doku.secret_key');
-        return 'HMACSHA256=' . hash_hmac('sha256', $stringToSign, $secretKey);
+        return 'HMACSHA256=' . base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
     }
     private static function generateSignature(string $httpMethod, string $endpointUrl, string $accessToken, string $requestBody, string $timestamp): string
     {
         $clientId = config('doku.client_id');
         $merchantPrivateKey = config('doku.merchant_private_key');
-        
+
         // Create string to sign
-        $stringToSign = $httpMethod . "\n" . 
-                       $endpointUrl . "\n" . 
-                       $accessToken . "\n" . 
-                       hash('sha256', $requestBody) . "\n" . 
-                       $timestamp;
-        
+        $stringToSign = $httpMethod . "\n" .
+            $endpointUrl . "\n" .
+            $accessToken . "\n" .
+            hash('sha256', $requestBody) . "\n" .
+            $timestamp;
+
         // Fallback ke HMAC jika merchant key belum dikonfigurasi (untuk development)
         if (!$merchantPrivateKey) {
             Log::warning('Merchant private key not configured, using HMAC fallback');
             $secretKey = config('doku.secret_key');
-            return 'HMACSHA256=' . hash_hmac('sha256', $stringToSign, $secretKey);
+            return 'HMACSHA256=' . base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
         }
-        
+
         // Generate signature menggunakan merchant private key
         return 'RSA-SHA256=' . self::generateMerchantSignature($stringToSign);
     }
@@ -120,19 +120,26 @@ class DokuService
         $clientId = config('doku.client_id');
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
-        
+
+        Log::info('DOKU Auth Debug', [
+            'client_id' => $clientId,
+            'client_id_len' => strlen($clientId),
+            'target_url' => $baseUrl
+        ]);
+
         // Use standard ISO 8601 format
         $timestamp = gmdate('c');
-        $signature = hash_hmac('sha256', $clientId . $timestamp, $secretKey);
-        
+        $stringToSign = $clientId . '|' . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json',
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
-            'grantType' => 'client_credentials'
-        ]);
+                    'grantType' => 'client_credentials'
+                ]);
 
         if (!$response->successful()) {
             $errorBody = $response->body();
@@ -154,7 +161,7 @@ class DokuService
     {
         // Cache key untuk access token
         $cacheKey = 'doku_snap_access_token';
-        
+
         // Cek apakah ada token yang masih valid di cache
         if (Cache::has($cacheKey)) {
             return Cache::get($cacheKey);
@@ -162,11 +169,11 @@ class DokuService
 
         // Generate token baru jika tidak ada di cache
         $tokenData = self::generateAccessTokenFromAPI();
-        
+
         // Cache token dengan expire time dari DOKU (biasanya 15 menit)
         $expiresIn = $tokenData['expiresIn'] - 60; // Kurangi 1 menit untuk safety
         Cache::put($cacheKey, $tokenData, now()->addSeconds($expiresIn));
-        
+
         return $tokenData;
     }
 
@@ -178,22 +185,22 @@ class DokuService
         $clientId = config('doku.client_id');
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
-        
+
         $timestamp = self::generateTimestamp();
         $requestId = Str::uuid()->toString();
-        
+
         // String to sign untuk B2B access token (menggunakan HMAC)
-        $stringToSign = $clientId . $timestamp;
+        $stringToSign = $clientId . '|' . $timestamp;
         $signature = self::generateHmacSignature($stringToSign);
-        
+
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => $signature,
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
-            'grantType' => 'client_credentials'
-        ]);
+                    'grantType' => 'client_credentials'
+                ]);
 
         if (!$response->successful()) {
             Log::error('DOKU SNAP Access Token Error', [
@@ -204,7 +211,7 @@ class DokuService
         }
 
         $data = $response->json();
-        
+
         return [
             'accessToken' => $data['accessToken'],
             'expiresIn' => $data['expiresIn'] ?? 900, // Default 15 menit
@@ -216,14 +223,14 @@ class DokuService
     {
         $baseUrl = config('doku.base_url');
         $clientId = config('doku.client_id');
-        
+
         $accessToken = self::getAccessToken();
         $timestamp = self::generateTimestamp();
         $requestBody = json_encode($payload);
         $endpointUrl = '/checkout/v1/payment';
-        
+
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
-        
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -252,17 +259,17 @@ class DokuService
     {
         $baseUrl = config('doku.base_url');
         $clientId = config('doku.client_id');
-        
+
         // Build payload based on payment method
         $payload = self::buildPaymentPayload($paymentMethod, $orderData, $customerData);
-        
+
         $accessToken = self::getAccessToken();
         $timestamp = self::generateTimestamp();
         $requestBody = json_encode($payload);
         $endpointUrl = '/checkout/v1/payment';
-        
+
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
-        
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -283,7 +290,7 @@ class DokuService
         }
 
         $result = $response->json();
-        
+
         // Process response based on payment method
         return self::processPaymentResponse($paymentMethod, $result);
     }
@@ -294,7 +301,7 @@ class DokuService
     private static function buildPaymentPayload(string $paymentMethod, array $orderData, array $customerData): array
     {
         $dokuPaymentMethod = self::mapPaymentMethod($paymentMethod);
-        
+
         $payload = [
             'order' => [
                 'amount' => (int) $orderData['amount'],
@@ -323,35 +330,35 @@ class DokuService
                     'qrFormat' => 'base64'
                 ];
                 break;
-                
+
             case 'bca_va':
                 $payload['payment']['virtualAccountInfo'] = [
                     'bank' => 'BCA',
                     'generateVirtualAccount' => true
                 ];
                 break;
-                
+
             case 'bni_va':
                 $payload['payment']['virtualAccountInfo'] = [
                     'bank' => 'BNI',
                     'generateVirtualAccount' => true
                 ];
                 break;
-                
+
             case 'bri_va':
                 $payload['payment']['virtualAccountInfo'] = [
                     'bank' => 'BRI',
                     'generateVirtualAccount' => true
                 ];
                 break;
-                
+
             case 'mandiri_va':
                 $payload['payment']['virtualAccountInfo'] = [
                     'bank' => 'MANDIRI',
                     'generateVirtualAccount' => true
                 ];
                 break;
-                
+
             case 'dana':
             case 'gopay':
             case 'shopeepay':
@@ -393,7 +400,7 @@ class DokuService
                     $processedResponse['instructions'] = 'Scan QR Code menggunakan aplikasi e-wallet atau mobile banking Anda';
                 }
                 break;
-                
+
             case 'bca_va':
             case 'bni_va':
             case 'bri_va':
@@ -411,7 +418,7 @@ class DokuService
                     $processedResponse['instructions'] = "Transfer ke Virtual Account {$bankName}: {$vaNumber}";
                 }
                 break;
-                
+
             case 'dana':
             case 'gopay':
             case 'shopeepay':
@@ -436,14 +443,14 @@ class DokuService
     {
         $baseUrl = config('doku.base_url');
         $clientId = config('doku.client_id');
-        
+
         $accessToken = self::getAccessToken();
         $timestamp = self::generateTimestamp();
         $requestBody = '';
         $endpointUrl = '/orders/v1/status/' . $invoiceNumber;
-        
+
         $signature = self::generateSignature('GET', $endpointUrl, $accessToken, $requestBody, $timestamp);
-        
+
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -473,7 +480,7 @@ class DokuService
         $mapping = [
             'qris' => 'QRIS',
             'dana' => 'DANA',
-            'gopay' => 'GOPAY', 
+            'gopay' => 'GOPAY',
             'shopeepay' => 'SHOPEEPAY',
             'ovo' => 'OVO',
             'transfer_bank' => 'VIRTUAL_ACCOUNT_BCA', // Default VA, bisa disesuaikan

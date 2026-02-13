@@ -835,6 +835,17 @@
                         <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"
                             class="payment-logo" style="height: 22px; width: auto;">
                     </label>
+
+                    <!-- OVO -->
+                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'ovo')"
+                        style="display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" name="payment_method" value="ovo" class="payment-radio">
+                            <span class="payment-method-name" style="color: #FFFFFF;">OVO</span>
+                        </div>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"
+                            class="payment-logo" style="height: 22px; width: auto;">
+                    </label>
                 </div>
             </div>
 
@@ -867,21 +878,22 @@
             </div>
             <div class="address-modal-body">
                 <div class="form-group">
-                    <label>Nama Penerima</label>
-                    <input type="text" class="form-input" id="recipientName" value="Adwin Ahmad">
+                    <label>Nama Penerima <span style="color: #e74c3c;">*</span></label>
+                    <input type="text" class="form-input" id="recipientName" value=""
+                        placeholder="Masukkan nama penerima">
                 </div>
                 <div class="form-group">
-                    <label>Nomor Telepon</label>
-                    <input type="tel" class="form-input" id="recipientPhone" value="(+62) 822 54554411"
+                    <label>Nomor Telepon <span style="color: #e74c3c;">*</span></label>
+                    <input type="tel" class="form-input" id="recipientPhone" value="" placeholder="08xxxxxxxxxx"
                         inputmode="numeric" pattern="[0-9+() -]*"
                         oninput="this.value = this.value.replace(/[^0-9+() -]/g, '');">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Provinsi</label>
+                        <label>Provinsi <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="province">
                             <option value="">Pilih Provinsi</option>
-                            <option value="kaltim" selected>Kalimantan Timur</option>
+                            <option value="kaltim">Kalimantan Timur</option>
                             <option value="kalteng">Kalimantan Tengah</option>
                             <option value="kalsel">Kalimantan Selatan</option>
                             <option value="kalbar">Kalimantan Barat</option>
@@ -889,10 +901,10 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Kota/Kabupaten</label>
+                        <label>Kota/Kabupaten <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="city">
                             <option value="">Pilih Kota</option>
-                            <option value="balikpapan" selected>Kota Balikpapan</option>
+                            <option value="balikpapan">Kota Balikpapan</option>
                             <option value="samarinda">Kota Samarinda</option>
                             <option value="bontang">Kota Bontang</option>
                         </select>
@@ -900,10 +912,10 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Kecamatan</label>
+                        <label>Kecamatan <span style="color: #e74c3c;">*</span></label>
                         <select class="form-input form-select" id="district">
                             <option value="">Pilih Kecamatan</option>
-                            <option value="balikpapan_utara" selected>Balikpapan Utara</option>
+                            <option value="balikpapan_utara">Balikpapan Utara</option>
                             <option value="balikpapan_selatan">Balikpapan Selatan</option>
                             <option value="balikpapan_timur">Balikpapan Timur</option>
                             <option value="balikpapan_barat">Balikpapan Barat</option>
@@ -911,13 +923,14 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Kode Pos</label>
-                        <input type="text" class="form-input" id="postalCode" value="76614" maxlength="5">
+                        <label>Kode Pos <span style="color: #e74c3c;">*</span></label>
+                        <input type="text" class="form-input" id="postalCode" value="" placeholder="Masukkan kode pos"
+                            maxlength="5">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Alamat Lengkap</label>
-                    <textarea class="form-textarea" id="fullAddress">Jl. Murakata No.107, Batu Ampar</textarea>
+                    <label>Alamat Lengkap <span style="color: #e74c3c;">*</span></label>
+                    <textarea class="form-textarea" id="fullAddress" placeholder="Masukkan alamat lengkap"></textarea>
                 </div>
                 <div class="form-group">
                     <label>Detail Lainnya <span class="optional-label">(Opsional)</span></label>
@@ -1001,7 +1014,7 @@
             const modal = document.getElementById('errorModal');
             const title = document.getElementById('errorModalTitle');
             const msgEl = document.getElementById('errorModalMessage');
-            
+
             title.textContent = 'Metode Pembayaran Tidak Tersedia';
             msgEl.innerHTML = `
                 <p style="margin-bottom: 15px;">${message}</p>
@@ -1009,14 +1022,14 @@
                     Silahkan pilih metode pembayaran lain di bawah, lalu klik Checkout kembali.
                 </p>
             `;
-            
+
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
-            
+
             // Scroll to payment methods section after modal is closed
             const closeBtn = modal.querySelector('.close-btn') || modal.querySelector('button');
             if (closeBtn) {
-                closeBtn.onclick = function() {
+                closeBtn.onclick = function () {
                     closeErrorModal();
                     // Scroll to payment methods
                     const paymentSection = document.querySelector('.payment-method');
@@ -1084,9 +1097,8 @@
 
             console.log('Selected item IDs:', selectedItemIds);
 
-            // 2. Validate Payment/Delivery Method
+            // 2. Validate Payment Method (required for all order types)
             let paymentMethod = null;
-            let deliveryMethod = null;
 
             // Map order type text to enum value expected by backend
             const orderTypeMap = {
@@ -1102,15 +1114,26 @@
                     showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
                     return;
                 }
-                deliveryMethod = selectedDelivery.value;
-            } else {
-                // Payment method is required - will be passed to DOKU
-                const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
-                if (!selectedPayment) {
-                    showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+                if (!recipientPhone) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
+                    editAddress();
                     return;
                 }
-                paymentMethod = selectedPayment.value;
+                if (!province || !city || !district) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan lengkapi provinsi, kota, dan kecamatan');
+                    editAddress();
+                    return;
+                }
+                if (!postalCode) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi kode pos terlebih dahulu');
+                    editAddress();
+                    return;
+                }
+                if (!fullAddress) {
+                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi alamat lengkap terlebih dahulu');
+                    editAddress();
+                    return;
+                }
             }
 
             // 3. Prepare Payload
@@ -1231,7 +1254,7 @@
                 }
 
                 console.log('Payment initiated:', paymentData);
-                
+
                 // Step 3: Handle DOKU payment
                 checkoutBtn.innerText = originalText;
                 checkoutBtn.disabled = false;
@@ -1246,17 +1269,17 @@
                 }
 
                 // Setup payment success/error callbacks for DOKU
-                window.onPaymentSuccess = function(result) {
+                window.onPaymentSuccess = function (result) {
                     console.log('DOKU Payment success:', result);
                     showSuccessModal(data.data, paymentMethod);
                 };
 
-                window.onPaymentError = function(result) {
+                window.onPaymentError = function (result) {
                     console.error('DOKU Payment error:', result);
                     showErrorModal('Pembayaran Gagal', 'Terjadi kesalahan saat memproses pembayaran. Silahkan coba lagi.');
                 };
 
-                window.onPaymentPending = function(result) {
+                window.onPaymentPending = function (result) {
                     console.log('DOKU Payment pending:', result);
                     showErrorModal('Pembayaran Pending', 'Silahkan selesaikan pembayaran Anda. Status akan diupdate otomatis.');
                     // Redirect to order history after 3 seconds
@@ -1270,10 +1293,10 @@
                     window.dokuPayment.handlePayment(paymentData.data);
                 } catch (paymentHandlerError) {
                     console.error('DOKU Payment handler error:', paymentHandlerError);
-                    showErrorModal('Gagal Memuat Payment', 
+                    showErrorModal('Gagal Memuat Payment',
                         'Gateway pembayaran tidak dapat dimuat. Pesanan Anda tetap tersimpan. ' +
                         'Silahkan coba lagi atau lihat di riwayat pesanan untuk melanjutkan pembayaran.');
-                    
+
                     // Optional: Redirect to order history
                     setTimeout(() => {
                         window.location.href = '/customer/order-history';
@@ -1291,10 +1314,10 @@
         // Show success modal with real order data
         function showSuccessModal(orderData, paymentMethod) {
             console.log('Order data for receipt:', orderData);
-            
+
             // Use real order number from API response
             const orderNumber = orderData.order_number || orderData.id;
-            
+
             // Format date from order created_at or use current time
             const now = orderData.created_at ? new Date(orderData.created_at) : new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -1320,8 +1343,8 @@
             };
 
             // Format order type
-            const orderType = orderData.order_type ? 
-                orderData.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 
+            const orderType = orderData.order_type ?
+                orderData.order_type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) :
                 'Takeaway';
 
             // Update modal content with real data
@@ -1346,12 +1369,12 @@
             // Update order items list with real data
             const itemsList = document.getElementById('receiptItemsList');
             itemsList.innerHTML = ''; // Clear existing items
-            
+
             // Try to get items from order data, otherwise get from page cart
             let items = orderData.items || orderData.order_items || [];
             let totalAmount = orderData.total_amount || orderData.total || 0;
             let calculatedTotal = 0;
-            
+
             // Fallback: get items from page if API doesn't return them
             if (items.length === 0) {
                 const cartItems = document.querySelectorAll('.order-item-card');
@@ -1362,7 +1385,7 @@
                         const nameEl = cartItem.querySelector('.order-item-name');
                         const subtotalEl = cartItem.querySelector('.order-item-subtotal');
                         const qtyEl = cartItem.querySelector('.checkout-qty-value');
-                        
+
                         if (nameEl) {
                             const subtotal = subtotalEl ? parseInt(subtotalEl.textContent.replace(/[^0-9]/g, '')) || 0 : 0;
                             items.push({
@@ -1376,7 +1399,7 @@
                     }
                 });
             }
-            
+
             // Always get total from page as backup if totalAmount is 0
             if (totalAmount === 0) {
                 const totalEl = document.querySelector('.summary-row.total .summary-value');
@@ -1392,14 +1415,14 @@
                     totalAmount = items.reduce((sum, item) => sum + (item.subtotal || item.sub_total || 0), 0);
                 }
             }
-            
+
             if (items.length > 0) {
                 items.forEach(item => {
                     const variant = item.variant || item.options || item.note || '';
                     const itemName = item.menu_name || item.name || item.menu?.name || 'Item';
                     const qty = item.quantity || 1;
                     const subtotal = item.subtotal || item.sub_total || (item.price * qty) || 0;
-                    
+
                     const itemHtml = `
                         <div class="receipt-item">
                             <div class="receipt-item-info">
@@ -1432,7 +1455,7 @@
             document.getElementById('successModal').classList.add('show');
             document.body.style.overflow = 'hidden';
         }
-        
+
         // Helper function to format number to Rupiah format
         function formatRupiah(number) {
             return new Intl.NumberFormat('id-ID').format(number);
@@ -1476,15 +1499,52 @@
 
         // Save address
         function saveAddress() {
-            const name = document.getElementById('recipientName').value;
-            const phone = document.getElementById('recipientPhone').value;
+            const name = document.getElementById('recipientName').value.trim();
+            const phone = document.getElementById('recipientPhone').value.trim();
             const province = document.getElementById('province');
             const city = document.getElementById('city');
             const district = document.getElementById('district');
-            const postalCode = document.getElementById('postalCode').value;
-            const address = document.getElementById('fullAddress').value;
+            const postalCode = document.getElementById('postalCode').value.trim();
+            const address = document.getElementById('fullAddress').value.trim();
             const detail = document.getElementById('addressDetail').value;
             const label = document.getElementById('addressLabel').value;
+
+            // Validate required fields
+            if (!name) {
+                alert('Nama penerima wajib diisi');
+                document.getElementById('recipientName').focus();
+                return;
+            }
+            if (!phone) {
+                alert('Nomor telepon wajib diisi');
+                document.getElementById('recipientPhone').focus();
+                return;
+            }
+            if (!province.value) {
+                alert('Provinsi wajib dipilih');
+                province.focus();
+                return;
+            }
+            if (!city.value) {
+                alert('Kota/Kabupaten wajib dipilih');
+                city.focus();
+                return;
+            }
+            if (!district.value) {
+                alert('Kecamatan wajib dipilih');
+                district.focus();
+                return;
+            }
+            if (!postalCode) {
+                alert('Kode pos wajib diisi');
+                document.getElementById('postalCode').focus();
+                return;
+            }
+            if (!address) {
+                alert('Alamat lengkap wajib diisi');
+                document.getElementById('fullAddress').focus();
+                return;
+            }
 
             // Build full address string
             const provinceName = province.options[province.selectedIndex]?.text || '';
@@ -1497,10 +1557,10 @@
             if (provinceName) fullAddressText += ', ' + provinceName;
             if (postalCode) fullAddressText += ' ' + postalCode;
 
-            // Update display
-            document.querySelector('.recipient-name').textContent = name;
-            document.querySelector('.recipient-phone').textContent = phone;
-            document.querySelector('.address-detail').textContent = fullAddressText;
+            // Update display - using specific IDs
+            document.getElementById('deliveryRecipientName').textContent = name;
+            document.getElementById('deliveryRecipientPhone').textContent = phone;
+            document.getElementById('deliveryAddressDetail').textContent = fullAddressText;
 
             closeAddressModal();
         }
@@ -1508,19 +1568,15 @@
         // Toggle sections based on order type (called from navbar)
         window.toggleDeliverySection = function (isDelivery) {
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
-            const deliveryMethodsSection = document.getElementById('deliveryMethodsSection');
             const paymentMethodsSection = document.getElementById('paymentMethodsSection');
-
             const customerInfoSection = document.getElementById('customerInfoSection');
 
             if (isDelivery) {
                 deliveryAddressSection.style.display = 'block';
-                deliveryMethodsSection.style.display = 'block';
-                paymentMethodsSection.style.display = 'none';
+                paymentMethodsSection.style.display = 'block'; // Metode pembayaran selalu tampil
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
             } else {
                 deliveryAddressSection.style.display = 'none';
-                deliveryMethodsSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
             }
@@ -1565,7 +1621,7 @@
                         <div class="order-item-info">
                             ${item.menu_image ?
                         `<img src="${item.menu_image}" alt="${item.menu_name}" class="order-item-image">` :
-                        '<div class="order-item-image" style="background: rgba(100,80,70,0.3);"></div>'
+                        `<img src="/images/placeholders/placeholder-${item.menu_category === 'food' ? 'food' : item.menu_category === 'coffee_beans' ? 'coffee-beans' : 'drink'}.svg" alt="${item.menu_name}" class="order-item-image" style="object-fit: contain; padding: 8px; background: rgba(100,80,70,0.3);">`
                     }
                             <div class="order-item-details">
                                 <p class="order-item-name">${item.menu_name}</p>

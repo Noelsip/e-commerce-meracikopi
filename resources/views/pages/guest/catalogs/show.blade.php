@@ -67,6 +67,7 @@
                     padding: 12px 16px !important;
                     align-items: center !important;
                     justify-content: flex-start !important;
+                    max-width: 100% !important;
                 }
 
                 .product-image {
@@ -82,14 +83,14 @@
 
                 .product-details {
                     width: 100% !important;
-                    max-width: 280px;
+                    max-width: 320px;
                     text-align: center;
                     order: 2;
                 }
 
                 .product-details h1 {
                     font-size: 20px !important;
-                    margin-bottom: 2px !important;
+                    margin-bottom: 4px !important;
                 }
 
                 .product-details>div:nth-child(2) {
@@ -261,6 +262,8 @@
                         window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1;
                         this.note = '';
+                        // Trigger cart badge update
+                        window.dispatchEvent(new Event('cartUpdated'));
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -274,23 +277,17 @@
             position: relative; 
             width: 100%;
             max-width: 1440px; 
-            min-height: 350px; 
+            min-height: 380px; 
             margin: 0 auto;
             padding-bottom: 40px;
         ">
-            <!-- Background Layer -->
+            <!-- Background Layer - Only for product content area -->
             <div style="
                 position: absolute;
-                inset: 0;
-                background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
-                z-index: 1;
-                pointer-events: none;
-            "></div>
-
-            <!-- Background Layer -->
-            <div style="
-                position: absolute;
-                inset: 0;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 380px;
                 background: linear-gradient(to right, transparent, rgba(72, 45, 27, 0.8) 20%, rgba(72, 45, 27, 1) 50%, rgba(72, 45, 27, 0.8) 80%, transparent);
                 z-index: 1;
                 pointer-events: none;
@@ -301,11 +298,14 @@
                 position: relative;
                 z-index: 2;
                 width: 100%;
-                height: 100%;
-                display: flex;
+                max-width: 1    440px;
+                margin: 0 auto;
+                min-height: 380px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap:70px;
                 align-items: center;
-                justify-content: center;
-                gap: 60px;
+                padding: 0 40px;
             ">
 
                 <script>
@@ -370,7 +370,7 @@
 
                 <!-- Product Image -->
                 <div class="product-image"
-                    style="position: relative; width: 300px; height: 300px; display: flex; align-items: center; justify-content: center;">
+                    style="position: relative; width: 320px; height: 320px; display: flex; align-items: center; justify-content: center; margin-left: auto; margin-right: auto;">
                     <!-- Shadow -->
                     <div
                         style="position: absolute; bottom: 10%; width: 60%; height: 20px; background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, transparent 70%); filter: blur(10px);">
@@ -378,28 +378,36 @@
 
                     @if($menu->image_path)
                         <img src="{{ asset($menu->image_path) }}" alt="{{ $menu->name }}"
-                            style="width: 80%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
+                            style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
                     @else
-                        <div
-                            style="width: 100%; height: 100%; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                            <span style="font-size: 80px;">☕</span>
-                        </div>
+                        @php
+                            $placeholders = [
+                                'drink' => 'placeholder-drink.svg',
+                                'food' => 'placeholder-food.svg',
+                                'coffee_beans' => 'placeholder-coffee-beans.svg',
+                                'bottled_coffee' => 'placeholder-drink.svg',
+                                'sachet_drip' => 'placeholder-coffee-beans.svg',
+                            ];
+                            $placeholderFile = $placeholders[$menu->category] ?? 'placeholder-default.svg';
+                        @endphp
+                        <img src="{{ asset('images/placeholders/' . $placeholderFile) }}" alt="{{ $menu->name }}"
+                            style="width: 100%; height: auto; object-fit: contain; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.5));">
                     @endif
                 </div>
 
                 <!-- Product Details -->
-                <div class="product-details" style="width: 250px;">
+                <div class="product-details" style="flex: 1; min-width: 0; max-width: 350px;">
                     <h1
-                        style="font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 800; color: #F0F2BD; margin: 0 0 4px 0; line-height: 1.2;">
+                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #F0F2BD; margin: 0 0 8px 0; line-height: 1.35;">
                         {{ $menu->name }}
                     </h1>
 
-                    <div style="font-size: 20px; color: #fff; margin-bottom: 2px; font-weight: 500;">
+                    <div style="font-size: 18px; color: #fff; margin-bottom: 2px; font-weight: 500;">
                         Rp {{ number_format($menu->price, 0, ',', '.') }}
                     </div>
 
                     <div
-                        style="color: #aaa; font-size: 12px; margin-bottom: 24px; font-weight: 400; font-style: italic;">
+                        style="color: #aaa; font-size: 12px; margin-bottom: 20px; font-weight: 400; font-style: italic;">
                         Hot/Ice
                     </div>
 
@@ -418,7 +426,7 @@
                     </div>
 
                     <button @click="addToCart" :disabled="loading" style="
-                        width: 100%;
+                        width: 220px;
                         background-color: #000; 
                         color: #fff; 
                         border: none; 
@@ -448,7 +456,7 @@
 
             <!-- Description and Notes Section - inside product-box for Alpine.js scope -->
             <div class="description-section"
-                style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10;">
+                style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 10; background-color: #1a1410;">
                 <div class="description-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px;">
                     <!-- Description -->
                     <div>
@@ -481,8 +489,9 @@
             <!-- Related Menus Section - Now inside product-box, below description -->
             @if(isset($relatedMenus) && $relatedMenus->count() > 0)
                 <div class="related-menus-section"
-                    style="max-width: 1440px; margin: 0 auto; padding: 0 40px 40px 40px; position: relative; z-index: 1; background: transparent;">
-                    <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">Menu
+                    style="max-width: 1440px; margin: 0 auto; padding: 40px; position: relative; z-index: 1; background-color: #1a1410;">
+                    <h3 style="font-size: 24px; color: #fff; font-weight: 600; margin-bottom: 32px; text-align: center;">
+                        Menu
                         Lainnya</h3>
 
 

@@ -651,7 +651,7 @@
                 </a>
 
                 <!-- Category 4: Bottled Coffee -->
-                <a href="{{ url('/customer/catalogs?category=kopi_botolan') }}" class="category-card"
+                <a href="{{ url('/customer/catalogs?category=bottled_coffee') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
@@ -682,7 +682,7 @@
                 </a>
 
                 <!-- Category 5: Sachet Drip -->
-                <a href="{{ url('/customer/catalogs?category=sachet-drip') }}" class="category-card"
+                <a href="{{ url('/customer/catalogs?category=sachet_drip') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
                         background: linear-gradient(to top, #603e2a, #261810);
