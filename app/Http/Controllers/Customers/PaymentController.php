@@ -50,6 +50,10 @@ class PaymentController extends Controller
 
         $methodName = $methodNames[$paymentMethod] ?? $paymentMethod;
 
+        if (str_contains($errorMessage, 'responseCode') || str_contains($errorMessage, '{')) {
+            return "DOKU Error: " . $errorMessage;
+        }
+
         // Parse common DOKU errors
         if (str_contains($errorMessage, 'Unauthorized') || str_contains($errorMessage, 'Unknown Client')) {
             return "Pembayaran {$methodName} tidak tersedia saat ini. Silahkan coba metode pembayaran lain.";

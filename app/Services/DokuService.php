@@ -171,16 +171,11 @@ class DokuService
 
         if (!$response->successful()) {
             $errorBody = $response->body();
-            // Kita log ke error_log agar muncul di Terminal Railway
-            error_log("DOKU Auth Error: " . $errorBody);
+            // Log ke sistem agar bisa dicek di Railway
+            error_log("DOKU_ACCESS_TOKEN_ERROR: " . $errorBody);
             
-            Log::error('DOKU SNAP Access Token Error', [
-                'status' => $response->status(),
-                'body' => $errorBody,
-                'clientId' => $clientId,
-                'timestamp' => $timestamp
-            ]);
-            throw new \Exception('DOKU Auth Failed: ' . ($errorBody ?: 'Unknown Error'));
+            // Lempar error dengan body aslinya agar bisa ditangkap Controller
+            throw new \Exception($errorBody);
         }
 
         $data = $response->json();
