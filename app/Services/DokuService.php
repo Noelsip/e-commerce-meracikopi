@@ -145,7 +145,10 @@ class DokuService
             $errorBody = $response->body();
             Log::error('DOKU Access Token Error', [
                 'status' => $response->status(),
+                'headers' => $response->headers(),
                 'body' => $errorBody,
+                'request_client_id' => $clientId,
+                'request_timestamp' => $timestamp
             ]);
             throw new \Exception('Failed to get DOKU access token: ' . $errorBody);
         }
