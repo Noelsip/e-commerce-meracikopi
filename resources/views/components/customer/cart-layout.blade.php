@@ -302,7 +302,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 24px;
-            border: 1px solid #D9D9D9;
+            border: none;
             border-radius: 8px;
             background: transparent;
         }
@@ -310,12 +310,12 @@
         .cart-summary-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             padding-left: 0;
         }
 
         .cart-summary-left .header-checkbox {
-            width: 50px;
+            width: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -338,6 +338,26 @@
             font-size: 14px;
             cursor: pointer;
         }
+
+        .delete-selected-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            margin-left: 4px;
+            transition: color 0.2s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .delete-selected-btn:hover {
+            color: #ff6b6b;
+        }
+
+
 
         .select-all-label {
             color: rgba(255, 255, 255, 0.85);
@@ -726,7 +746,9 @@
             }
 
             .delete-selected-btn {
-                display: none;
+                font-size: 12px;
+                padding: 2px 6px;
+                margin-left: 2px;
             }
 
             .cart-total-section {

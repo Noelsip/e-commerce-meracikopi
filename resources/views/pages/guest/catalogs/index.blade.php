@@ -14,6 +14,8 @@
             text-decoration: none;
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid #3e302b;
+            display: flex;
+            flex-direction: column;
         }
 
         .catalog-card:hover {
@@ -29,6 +31,9 @@
 
         .catalog-card-content {
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .catalog-card-title {
@@ -36,6 +41,12 @@
             color: #f0f2bd;
             font-size: 18px;
             margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 2.4em;
+            line-height: 1.2;
         }
 
         .catalog-card-desc {
@@ -46,6 +57,8 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            min-height: 2.8em;
+            line-height: 1.4;
         }
 
         .catalog-card-price {
@@ -58,6 +71,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-top: auto;
         }
 
         .catalog-hero-title {
