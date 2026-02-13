@@ -149,21 +149,22 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        $clientId = config('doku.client_id');
+        // Untuk Production, X-CLIENT-KEY biasanya adalah API KEY (bukan Client ID BRN)
+        $clientKey = config('doku.api_key') ?: config('doku.client_id');
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
 
-        // Gunakan format timestamp yang lebih presisi untuk SNAP
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        $stringToSign = $clientId . '|' . $timestamp;
         
-        // Generate HMAC-SHA256 and base64 encode
+        // Coba format SNAP tanpa pipa dulu untuk tes 500 error
+        $stringToSign = $clientKey . $timestamp;
+        
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
         $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientId,
+            'X-CLIENT-KEY' => $clientKey,
             'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => "HMACSHA256=" . $signature, // WAJIB ada prefix ini di SNAP B2B
+            'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
@@ -171,11 +172,9 @@ class DokuService
 
         if (!$response->successful()) {
             $errorBody = $response->body();
-            // Log ke sistem agar bisa dicek di Railway
-            error_log("DOKU_ACCESS_TOKEN_ERROR: " . $errorBody);
+            error_log("DOKU_AUTH_CRASH: " . $errorBody);
             
-            // Lempar error dengan body aslinya agar bisa ditangkap Controller
-            throw new \Exception($errorBody);
+            throw new \Exception($errorBody ?: 'DOKU Server Error 500');
         }
 
         $data = $response->json();
