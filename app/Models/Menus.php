@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\OrderItems;
+use App\Models\CartItem;
 
 class Menus extends Model
 {
@@ -88,5 +89,10 @@ class Menus extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItems::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class, 'menu_id');
     }
 }
