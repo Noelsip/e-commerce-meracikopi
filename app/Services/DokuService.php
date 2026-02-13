@@ -149,26 +149,25 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        // KEMBALI KE STANDAR: Gunakan Client ID (BRN-...)
-        // Jika API Key tadi 401, berarti memang harus pakai Client ID
-        // Error 500 sebelumnya mungkin karena format Signature/Timestamp
-        $clientId = config('doku.client_id'); 
+        // KITA BALIK LAGI KE API KEY KARENA BRN BIKIN 500 ERROR (Server Crash)
+        // Kali ini kita coba kombinasi API Key + Pipa (|) + ISO8601 Timestamp
+        $clientKey = config('doku.api_key'); 
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
 
-        // Gunakan format ISO8601 yang aman dengan offset (+07:00 dll)
+        // Pastikan timestamp ISO8601 lengkap (misal 2026-02-13T09:30:00+00:00)
         $timestamp = date('c'); 
         
-        // Standar SNAP B2B: ClientID + | + Timestamp
-        $stringToSign = $clientId . '|' . $timestamp;
+        // Coba rumus: API Key + | + Timestamp (Kombinasi yang belum dicoba dengan benar)
+        $stringToSign = $clientKey . '|' . $timestamp;
         
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
-        // Debug Log ke sistem (muncul di Railway Terminal)
-        error_log("DOKU_DEBUG_SIGN: ID:$clientId | TS:$timestamp | SIGN:$stringToSign");
+        // Debug Log
+        error_log("DOKU_DEBUG_TRY_APIKEY_PIPE: KEY:$clientKey | TS:$timestamp | SIGN_STR:$stringToSign");
 
         $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientId,
+            'X-CLIENT-KEY' => $clientKey,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json'
