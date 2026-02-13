@@ -145,3 +145,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+// DOKU Test Route
+Route::get('/test-doku', [\App\Http\Controllers\DokuTestController::class, 'testConnection']);
