@@ -215,10 +215,8 @@ class DokuService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-            'X-CLIENT-KEY' => $clientId,
             'Client-Id' => $clientId,
-            'X-REQUEST-ID' => $requestId,
-            'X-EXTERNAL-ID' => $requestId,
+            'Request-Id' => $requestId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
@@ -257,10 +255,8 @@ class DokuService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
-            'X-CLIENT-KEY' => $clientId,
             'Client-Id' => $clientId,
-            'X-REQUEST-ID' => $requestId,
-            'X-EXTERNAL-ID' => $requestId,
+            'Request-Id' => $requestId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
