@@ -99,4 +99,4 @@ Route::prefix('customer')->middleware('guest.token')->group(function () {
 Route::post('/webhooks/doku', [PaymentController::class, 'dokuWebhook']);
 
 // DOKU Token Endpoint (untuk SNAP configuration)
-Route::post('/doku/token', [PaymentController::class, 'generateDokuToken']);
+Route::match(['get', 'post'], '/doku/token', [PaymentController::class, 'generateDokuToken']);

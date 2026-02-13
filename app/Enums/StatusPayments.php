@@ -8,6 +8,7 @@ enum StatusPayments: string
     case PROCESSING = 'processing';
     case PAID = 'paid';
     case FAILED = 'failed';
+    case EXPIRED = 'expired';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
     case EXPIRED = 'expired';
