@@ -16,23 +16,27 @@ class DokuTestController extends Controller
         
         $results = [];
 
-        // 1. SK + UTC + Pipe + HMAC Prefix (Standar Paling Umum)
-        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        $stringToSign = $clientId . '|' . $timestamp;
-        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "STANDARD: SK + UTC + Pipe + Prefix");
+        // KITA SUDAH TAHU: Prefix HMACSHA256= bikin CRASH (500). Jadi kita WAJIB RAW SIGNATURE.
+        // TAPI: Raw Signature + Pipe = 401.
+        // TAPI: Raw Signature + NoPipe = ??? (Belum dites pakai BRN)
 
-        // 2. SK + UTC + NoPipe + HMAC Prefix (Alternatif)
+        // 1. SK + UTC + NoPipe + RAW (Tanpa Separator)
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $stringToSign = $clientId . $timestamp;
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "ALT: SK + UTC + NoPipe + Prefix");
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "NO PIPE: ClientId+Timestamp");
 
-        // 3. SK + Offset + Pipe + HMAC Prefix (Local Time)
-        $timestamp = date('c');
-        $stringToSign = $clientId . '|' . $timestamp;
+        // 2. SK + UTC + Dash + RAW (Separator -)
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $stringToSign = $clientId . '-' . $timestamp;
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "OFFSET: SK + Offset + Pipe + Prefix");
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "DASH: ClientId-Timestamp");
+
+        // 3. SK + UTC + NewLine + RAW (Separator \n)
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $stringToSign = $clientId . "\n" . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "NEWLINE: ClientId\\nTimestamp");
 
         return response()->json($results);
     }
