@@ -10,38 +10,29 @@ class DokuTestController extends Controller
 {
     public function testConnection()
     {
-        $clientId = config('doku.client_id'); // BRN-...
-        $secretKey = config('doku.secret_key'); // SK-...
-        $apiKey = config('doku.api_key'); // doku_key_...
+        $clientId = config('doku.client_id'); // BRN-
+        $secretKey = config('doku.secret_key'); // SK-
         $baseUrl = config('doku.base_url');
         
         $results = [];
 
-        // KITA SUDAH TAHU: Client ID = BRN, Header = Raw (Tanpa Prefix)
-        // VARIABEL YANG DITES: Timestamp Format & Signing Key
-
-        // --- SKENARIO A: Pakai SECRET KEY (SK-...) sebagai Kunci ---
-        
-        // A.1: UTC Time + Pipa
+        // 1. SK + UTC + Pipe + HMAC Prefix (Standar Paling Umum)
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $stringToSign = $clientId . '|' . $timestamp;
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "SK + UTC + Pipe");
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "STANDARD: SK + UTC + Pipe + Prefix");
 
-        // A.2: Offset Time (WIB) + Pipa
+        // 2. SK + UTC + NoPipe + HMAC Prefix (Alternatif)
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        $stringToSign = $clientId . $timestamp;
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "ALT: SK + UTC + NoPipe + Prefix");
+
+        // 3. SK + Offset + Pipe + HMAC Prefix (Local Time)
         $timestamp = date('c');
         $stringToSign = $clientId . '|' . $timestamp;
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "SK + Offset + Pipe");
-
-
-        // --- SKENARIO B: Pakai API KEY (doku_key_...) sebagai Kunci (Siapa tahu ini kuncinya) ---
-
-        // B.1: UTC Time + Pipa
-        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        $stringToSign = $clientId . '|' . $timestamp;
-        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $apiKey, true));
-        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, $signature, "APIKEY + UTC + Pipe");
+        $results[] = $this->tryRequest($baseUrl, $clientId, $timestamp, $signature, "HMACSHA256=" . $signature, "OFFSET: SK + Offset + Pipe + Prefix");
 
         return response()->json($results);
     }
