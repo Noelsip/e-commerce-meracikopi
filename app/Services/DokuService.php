@@ -153,7 +153,8 @@ class DokuService
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
 
-        $timestamp = self::generateTimestamp();
+        // Gunakan format timestamp yang lebih presisi untuk SNAP
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         $stringToSign = $clientId . '|' . $timestamp;
         
         // Generate HMAC-SHA256 and base64 encode
@@ -162,7 +163,7 @@ class DokuService
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => $signature, // Coba kirim tanpa awalan HMACSHA256= dulu
+            'X-SIGNATURE' => "HMACSHA256=" . $signature, // WAJIB ada prefix ini di SNAP B2B
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
@@ -170,14 +171,14 @@ class DokuService
 
         if (!$response->successful()) {
             $errorBody = $response->body();
+            // Kita log ke error_log agar muncul di Terminal Railway
+            error_log("DOKU Auth Error: " . $errorBody);
+            
             Log::error('DOKU SNAP Access Token Error', [
                 'status' => $response->status(),
                 'body' => $errorBody,
-                'request_data' => [
-                    'clientId' => $clientId,
-                    'timestamp' => $timestamp,
-                    'stringToSign' => $stringToSign
-                ]
+                'clientId' => $clientId,
+                'timestamp' => $timestamp
             ]);
             throw new \Exception('DOKU Auth Failed: ' . ($errorBody ?: 'Unknown Error'));
         }

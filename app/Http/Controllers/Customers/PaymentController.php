@@ -405,6 +405,11 @@ class PaymentController extends Controller
 
     public function handleWebhook(Request $request)
     {
+        // Berikan respon sukses untuk request GET (pengecekan URL oleh dashboard DOKU)
+        if ($request->isMethod('get')) {
+            return response()->json(['status' => 'active', 'message' => 'DOKU Webhook Endpoint is ready']);
+        }
+
         $data = $request->all();
 
         Log::info('DOKU WEBHOOK', $data);
