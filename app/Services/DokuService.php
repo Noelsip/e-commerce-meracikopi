@@ -297,7 +297,7 @@ class DokuService
      */
     private static function buildPaymentPayload(string $paymentMethod, array $orderData, array $customerData): array
     {
-        // DOKU Checkout API payload - format paling minimal
+        // DOKU Checkout API payload
         $payload = [
             'order' => [
                 'amount' => (int) round($orderData['amount']),
@@ -312,6 +312,10 @@ class DokuService
                     ? $customerData['phone'] 
                     : '08123456789',
                 'email' => $customerData['email'] ?: 'customer@meracikopi.com',
+            ],
+            'additional_info' => [
+                'callback_url' => rtrim(config('app.url'), '/') . '/checkout/success',
+                'override_notification_url' => rtrim(config('app.url'), '/') . '/api/webhooks/doku',
             ],
         ];
 
