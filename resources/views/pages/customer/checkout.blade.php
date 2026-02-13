@@ -1098,7 +1098,12 @@
             console.log('Selected item IDs:', selectedItemIds);
 
             // 2. Validate Payment Method (required for all order types)
-            let paymentMethod = null;
+            const selectedPayment = document.querySelector('input[name="payment_method"]:checked');
+            if (!selectedPayment) {
+                showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
+                return;
+            }
+            let paymentMethod = selectedPayment.value;
 
             // Map order type text to enum value expected by backend
             const orderTypeMap = {
