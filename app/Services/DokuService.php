@@ -149,27 +149,27 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        // KITA BALIK LAGI KE API KEY KARENA BRN BIKIN 500 ERROR (Server Crash)
-        // Kali ini kita coba kombinasi API Key + Pipa (|) + ISO8601 Timestamp
-        $clientKey = config('doku.api_key'); 
-        $secretKey = config('doku.secret_key');
-        $baseUrl = config('doku.base_url');
+        // AMANKAN CONFIG: Trim untuk membuang spasi/newline tersembunyi
+        $clientId = trim(config('doku.client_id')); 
+        $secretKey = trim(config('doku.secret_key'));
+        $baseUrl = trim(config('doku.base_url'));
 
-        // Pastikan timestamp ISO8601 lengkap (misal 2026-02-13T09:30:00+00:00)
-        $timestamp = date('c'); 
+        // Timestamp ISO8601 UTC
+        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         
-        // Coba rumus: API Key + | + Timestamp (Kombinasi yang belum dicoba dengan benar)
-        $stringToSign = $clientKey . '|' . $timestamp;
+        // Rumus Standar: ClientID + Pipa + Timestamp
+        $stringToSign = $clientId . '|' . $timestamp;
         
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
-        // Debug Log
-        error_log("DOKU_DEBUG_TRY_APIKEY_PIPE: KEY:$clientKey | TS:$timestamp | SIGN_STR:$stringToSign");
+        // Debug Log Lengkap
+        error_log("DOKU_AUTH_TRIMMED: CL:$clientId | TS:$timestamp | SIGN:$stringToSign");
 
         $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientKey,
+            'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => "HMACSHA256=" . $signature,
+            // RAW Signature: Tanpa prefix HMACSHA256= karena server DOKU crash jika ada prefix
+            'X-SIGNATURE' => $signature, 
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
