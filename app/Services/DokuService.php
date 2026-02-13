@@ -94,25 +94,23 @@ class DokuService
     }
     private static function generateSignature(string $httpMethod, string $endpointUrl, string $accessToken, string $requestBody, string $timestamp): string
     {
-        $clientId = config('doku.client_id');
-        $merchantPrivateKey = config('doku.merchant_private_key');
+        $secretKey = trim(config('doku.secret_key'));
 
-        // Create string to sign
+        // Digest body menggunakan SHA-256
+        $bodyHash = strtolower(hash('sha256', $requestBody));
+
+        // String to Sign untuk SNAP Transaction (Symmetric)
+        // Format: HTTPMethod + "\n" + EndpointUrl + "\n" + AccessToken + "\n" + Lowercase(HexEncode(SHA-256(RequestBody))) + "\n" + Timestamp
         $stringToSign = $httpMethod . "\n" .
             $endpointUrl . "\n" .
             $accessToken . "\n" .
-            hash('sha256', $requestBody) . "\n" .
+            $bodyHash . "\n" .
             $timestamp;
 
-        // Fallback ke HMAC jika merchant key belum dikonfigurasi (untuk development)
-        if (!$merchantPrivateKey) {
-            Log::warning('Merchant private key not configured, using HMAC fallback');
-            $secretKey = config('doku.secret_key');
-            return 'HMACSHA256=' . base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        }
-
-        // Generate signature menggunakan merchant private key
-        return 'RSA-SHA256=' . self::generateMerchantSignature($stringToSign);
+        // SNAP Transaction Signature = HMAC-SHA512 dengan Secret Key
+        $signature = base64_encode(hash_hmac('sha512', $stringToSign, $secretKey, true));
+        
+        return $signature;
     }
 
     private static function getAccessToken(): string
@@ -213,13 +211,16 @@ class DokuService
 
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
+        $requestId = uniqid();
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
             'X-CLIENT-KEY' => $clientId,
-            'Request-Id' => uniqid(),
+            'Client-Id' => $clientId,
+            'X-REQUEST-ID' => $requestId,
+            'X-EXTERNAL-ID' => $requestId,
             'X-TIMESTAMP' => $timestamp,
-            'Signature' => $signature,
+            'X-SIGNATURE' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
         if (!$response->successful()) {
@@ -252,13 +253,16 @@ class DokuService
 
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
+        $requestId = uniqid();
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
             'X-CLIENT-KEY' => $clientId,
-            'Request-Id' => uniqid(),
+            'Client-Id' => $clientId,
+            'X-REQUEST-ID' => $requestId,
+            'X-EXTERNAL-ID' => $requestId,
             'X-TIMESTAMP' => $timestamp,
-            'Signature' => $signature,
+            'X-SIGNATURE' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
         if (!$response->successful()) {
