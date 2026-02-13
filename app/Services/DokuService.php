@@ -149,20 +149,26 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        // SNAP Production WAJIB pakai API Key (doku_key_...) sebagai Client Key
-        $clientKey = config('doku.api_key');
+        // KEMBALI KE STANDAR: Gunakan Client ID (BRN-...)
+        // Jika API Key tadi 401, berarti memang harus pakai Client ID
+        // Error 500 sebelumnya mungkin karena format Signature/Timestamp
+        $clientId = config('doku.client_id'); 
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
 
-        $timestamp = gmdate('Y-m-d\TH:i:s\Z');
+        // Gunakan format ISO8601 yang aman dengan offset (+07:00 dll)
+        $timestamp = date('c'); 
         
-        // Rumus SNAP B2B: ClientKey + | + Timestamp
-        $stringToSign = $clientKey . '|' . $timestamp;
+        // Standar SNAP B2B: ClientID + | + Timestamp
+        $stringToSign = $clientId . '|' . $timestamp;
         
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
+        // Debug Log ke sistem (muncul di Railway Terminal)
+        error_log("DOKU_DEBUG_SIGN: ID:$clientId | TS:$timestamp | SIGN:$stringToSign");
+
         $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientKey,
+            'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json'
@@ -174,7 +180,7 @@ class DokuService
             $errorBody = $response->body();
             error_log("DOKU_AUTH_FAIL: " . $errorBody);
             
-            throw new \Exception($errorBody ?: 'DOKU Server Error ' . $response->status());
+            throw new \Exception($errorBody);
         }
 
         $data = $response->json();
