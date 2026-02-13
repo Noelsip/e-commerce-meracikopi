@@ -149,27 +149,37 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        // AMANKAN CONFIG: Trim untuk membuang spasi/newline tersembunyi
         $clientId = trim(config('doku.client_id')); 
-        $secretKey = trim(config('doku.secret_key'));
         $baseUrl = trim(config('doku.base_url'));
+        
+        // MERCHANT_PRIVATE_KEY digunakan untuk RSA Signing (Asymmetric)
+        $privateKeyPem = config('doku.merchant_private_key');
 
         // Timestamp ISO8601 UTC
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         
-        // Rumus Standar: ClientID + Pipa + Timestamp
+        // Rumus SNAP B2B: ClientID + "|" + Timestamp
         $stringToSign = $clientId . '|' . $timestamp;
         
-        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
+        // ===== ASYMMETRIC SIGNATURE: SHA256withRSA =====
+        // DOKU SNAP B2B Access Token WAJIB pakai RSA, BUKAN HMAC!
+        $privateKey = openssl_pkey_get_private($privateKeyPem);
+        if (!$privateKey) {
+            $opensslError = openssl_error_string();
+            error_log("DOKU_RSA_KEY_ERROR: " . $opensslError);
+            throw new \Exception('Invalid Merchant Private Key: ' . $opensslError);
+        }
+        
+        openssl_sign($stringToSign, $signatureBinary, $privateKey, OPENSSL_ALGO_SHA256);
+        $signature = base64_encode($signatureBinary);
 
-        // Debug Log Lengkap
-        error_log("DOKU_AUTH_TRIMMED: CL:$clientId | TS:$timestamp | SIGN:$stringToSign");
+        // Debug Log
+        error_log("DOKU_AUTH_RSA: CL:$clientId | TS:$timestamp");
 
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
-            // RAW Signature: Tanpa prefix HMACSHA256= karena server DOKU crash jika ada prefix
-            'X-SIGNATURE' => $signature, 
+            'X-SIGNATURE' => $signature,
             'Content-Type' => 'application/json'
         ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
             'grantType' => 'client_credentials'
@@ -186,7 +196,7 @@ class DokuService
 
         return [
             'accessToken' => $data['accessToken'],
-            'expiresIn' => $data['expiresIn'] ?? 900, // Default 15 menit
+            'expiresIn' => $data['expiresIn'] ?? 900,
             'tokenType' => 'Bearer'
         ];
     }
