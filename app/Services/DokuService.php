@@ -149,20 +149,20 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        // Merchant ID (BRN-...)
-        $clientId = config('doku.client_id');
+        // SNAP Production WAJIB pakai API Key (doku_key_...) sebagai Client Key
+        $clientKey = config('doku.api_key');
         $secretKey = config('doku.secret_key');
         $baseUrl = config('doku.base_url');
 
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
         
-        // Standar SNAP B2B: ClientID + | + Timestamp
-        $stringToSign = $clientId . '|' . $timestamp;
+        // Rumus SNAP B2B: ClientKey + | + Timestamp
+        $stringToSign = $clientKey . '|' . $timestamp;
         
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
 
         $response = Http::withHeaders([
-            'X-CLIENT-KEY' => $clientId,
+            'X-CLIENT-KEY' => $clientKey,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => "HMACSHA256=" . $signature,
             'Content-Type' => 'application/json'
@@ -172,9 +172,9 @@ class DokuService
 
         if (!$response->successful()) {
             $errorBody = $response->body();
-            error_log("DOKU_AUTH_ERROR: " . $errorBody);
+            error_log("DOKU_AUTH_FAIL: " . $errorBody);
             
-            throw new \Exception($errorBody);
+            throw new \Exception($errorBody ?: 'DOKU Server Error ' . $response->status());
         }
 
         $data = $response->json();
