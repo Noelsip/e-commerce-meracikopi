@@ -94,24 +94,32 @@ class DokuService
     }
     private static function generateSignature(string $httpMethod, string $endpointUrl, string $accessToken, string $requestBody, string $timestamp): string
     {
+        $clientId = trim(config('doku.client_id'));
         $secretKey = trim(config('doku.secret_key'));
 
-        // Digest body menggunakan SHA-256
-        $bodyHash = strtolower(hash('sha256', $requestBody));
+        // Digest = Base64(SHA-256(RequestBody)) - untuk POST request
+        $digest = base64_encode(hash('sha256', $requestBody, true));
 
-        // String to Sign untuk SNAP Transaction (Symmetric)
-        // Format: HTTPMethod + "\n" + EndpointUrl + "\n" + AccessToken + "\n" + Lowercase(HexEncode(SHA-256(RequestBody))) + "\n" + Timestamp
-        $stringToSign = $httpMethod . "\n" .
-            $endpointUrl . "\n" .
-            $accessToken . "\n" .
-            $bodyHash . "\n" .
-            $timestamp;
+        // Request-Id dihasilkan di luar, tapi kita perlu menyertakannya
+        // Kita generate di sini dan simpan untuk dipakai di header
+        $requestId = self::$lastRequestId ?? uniqid();
 
-        // SNAP Transaction Signature = HMAC-SHA512 dengan Secret Key
-        $signature = base64_encode(hash_hmac('sha512', $stringToSign, $secretKey, true));
+        // String to Sign untuk DOKU Checkout API
+        // Format: ComponentName:Value dipisahkan dengan \n
+        $stringToSign = "Client-Id:" . $clientId . "\n" .
+            "Request-Id:" . $requestId . "\n" .
+            "Request-Timestamp:" . $timestamp . "\n" .
+            "Request-Target:" . $endpointUrl . "\n" .
+            "Digest:" . $digest;
+
+        // HMAC-SHA256 dengan Secret Key
+        $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
         
-        return $signature;
+        return "HMACSHA256=" . $signature;
     }
+
+    // Simpan Request-Id agar bisa dipakai di generateSignature dan di header
+    private static ?string $lastRequestId = null;
 
     private static function getAccessToken(): string
     {
@@ -209,9 +217,12 @@ class DokuService
         $requestBody = json_encode($payload);
         $endpointUrl = '/checkout/v1/payment';
 
+        // Request-Id HARUS sama antara header dan signature
+        $requestId = uniqid();
+        self::$lastRequestId = $requestId;
+
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
-        $requestId = uniqid();
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -249,9 +260,12 @@ class DokuService
         $requestBody = json_encode($payload);
         $endpointUrl = '/checkout/v1/payment';
 
+        // Request-Id HARUS sama antara header dan signature
+        $requestId = uniqid();
+        self::$lastRequestId = $requestId;
+
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
-        $requestId = uniqid();
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
