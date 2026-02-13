@@ -301,21 +301,20 @@ class DokuService
         $payload = [
             'order' => [
                 'amount' => (int) $orderData['amount'],
-                'invoiceNumber' => $orderData['invoice_number'],
+                'invoice_number' => $orderData['invoice_number'],
                 'currency' => 'IDR',
             ],
             'payment' => [
-                'paymentDueDate' => now()->addHours(24)->toISOString(),
-                'paymentMethod' => $dokuPaymentMethod,
+                'payment_due_date' => (int) (24 * 60), // dalam menit
+                'payment_method_types' => [$dokuPaymentMethod],
             ],
             'customer' => [
-                'name' => $customerData['name'],
-                'phone' => $customerData['phone'] ?? '',
-                'email' => $customerData['email'] ?? 'customer@meracikopi.com',
+                'name' => $customerData['name'] ?: 'Customer',
+                'phone' => (!empty($customerData['phone']) && strlen($customerData['phone']) >= 5) 
+                    ? $customerData['phone'] 
+                    : '08123456789',
+                'email' => $customerData['email'] ?: 'customer@meracikopi.com',
             ],
-            'additionalInfo' => [
-                'merchantOrderId' => $orderData['merchant_order_id'],
-            ]
         ];
 
         // Add specific configurations for different payment methods
