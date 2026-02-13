@@ -11,8 +11,7 @@ enum StatusPayments: string
     case EXPIRED = 'expired';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
-    case EXPIRED = 'expired';
-
+    
     public function label(): string
     {
         return match ($this) {
