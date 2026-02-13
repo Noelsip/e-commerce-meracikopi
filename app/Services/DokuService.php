@@ -276,6 +276,7 @@ class DokuService
         ])->post($baseUrl . $endpointUrl, $payload);
 
         if (!$response->successful()) {
+            error_log('DOKU_PAYMENT_FAIL: STATUS=' . $response->status() . ' BODY=' . $response->body() . ' PAYLOAD=' . $requestBody);
             Log::error('DOKU Create Specific Payment Error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
@@ -296,16 +297,14 @@ class DokuService
      */
     private static function buildPaymentPayload(string $paymentMethod, array $orderData, array $customerData): array
     {
-        $dokuPaymentMethod = self::mapPaymentMethod($paymentMethod);
-
-        // DOKU Checkout API payload - format minimal
+        // DOKU Checkout API payload - format paling minimal
         $payload = [
             'order' => [
-                'amount' => (int) $orderData['amount'],
+                'amount' => (int) round($orderData['amount']),
                 'invoice_number' => $orderData['invoice_number'],
             ],
             'payment' => [
-                'payment_due_date' => 60, // menit
+                'payment_due_date' => 60,
             ],
             'customer' => [
                 'name' => $customerData['name'] ?: 'Customer',
@@ -316,10 +315,8 @@ class DokuService
             ],
         ];
 
-        // Hanya tambahkan payment_method_types jika ada mapping
-        if ($dokuPaymentMethod) {
-            $payload['payment']['payment_method_types'] = [$dokuPaymentMethod];
-        }
+        // Log payload untuk debugging
+        error_log('DOKU_PAYLOAD: ' . json_encode($payload));
 
         return $payload;
     }
