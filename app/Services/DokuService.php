@@ -217,8 +217,8 @@ class DokuService
             'Authorization' => 'Bearer ' . $accessToken,
             'Client-Id' => $clientId,
             'Request-Id' => $requestId,
-            'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => $signature,
+            'Request-Timestamp' => $timestamp,
+            'Signature' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
         if (!$response->successful()) {
@@ -257,8 +257,8 @@ class DokuService
             'Authorization' => 'Bearer ' . $accessToken,
             'Client-Id' => $clientId,
             'Request-Id' => $requestId,
-            'X-TIMESTAMP' => $timestamp,
-            'X-SIGNATURE' => $signature,
+            'Request-Timestamp' => $timestamp,
+            'Signature' => $signature,
         ])->post($baseUrl . $endpointUrl, $payload);
 
         if (!$response->successful()) {
