@@ -114,7 +114,7 @@ class DokuService
 
         // HMAC-SHA256 dengan Secret Key
         $signature = base64_encode(hash_hmac('sha256', $stringToSign, $secretKey, true));
-        
+
         return "HMACSHA256=" . $signature;
     }
 
@@ -155,50 +155,71 @@ class DokuService
      */
     private static function generateAccessTokenFromAPI(): array
     {
-        $clientId = trim(config('doku.client_id')); 
+        $clientId = trim(config('doku.client_id'));
         $baseUrl = trim(config('doku.base_url'));
-        
+
         // MERCHANT_PRIVATE_KEY digunakan untuk RSA Signing (Asymmetric)
         $privateKeyPem = config('doku.merchant_private_key');
 
+        if (!$privateKeyPem) {
+            throw new \Exception('MERCHANT_PRIVATE_KEY is not configured in environment');
+        }
+
+        // Normalize line endings (Railway env might use different line endings)
+        $privateKeyPem = str_replace(["\r\n", "\r"], "\n", $privateKeyPem);
+
         // Timestamp ISO8601 UTC
         $timestamp = gmdate('Y-m-d\TH:i:s\Z');
-        
+
         // Rumus SNAP B2B: ClientID + "|" + Timestamp
         $stringToSign = $clientId . '|' . $timestamp;
-        
+
         // ===== ASYMMETRIC SIGNATURE: SHA256withRSA =====
         // DOKU SNAP B2B Access Token WAJIB pakai RSA, BUKAN HMAC!
         $privateKey = openssl_pkey_get_private($privateKeyPem);
         if (!$privateKey) {
             $opensslError = openssl_error_string();
-            error_log("DOKU_RSA_KEY_ERROR: " . $opensslError);
+            Log::error('DOKU_RSA_KEY_ERROR', [
+                'error' => $opensslError,
+                'key_length' => strlen($privateKeyPem),
+                'key_starts_with' => substr($privateKeyPem, 0, 30),
+            ]);
             throw new \Exception('Invalid Merchant Private Key: ' . $opensslError);
         }
-        
+
         openssl_sign($stringToSign, $signatureBinary, $privateKey, OPENSSL_ALGO_SHA256);
         $signature = base64_encode($signatureBinary);
 
-        // Debug Log
-        error_log("DOKU_AUTH_RSA: CL:$clientId | TS:$timestamp");
+        Log::info('DOKU_AUTH_RSA', ['client_id' => $clientId, 'timestamp' => $timestamp]);
+
+        // additionalInfo HARUS object {} bukan array [] di JSON
+        $requestBody = [
+            'grantType' => 'client_credentials',
+            'additionalInfo' => new \stdClass(),
+        ];
 
         $response = Http::withHeaders([
             'X-CLIENT-KEY' => $clientId,
             'X-TIMESTAMP' => $timestamp,
             'X-SIGNATURE' => $signature,
             'Content-Type' => 'application/json'
-        ])->post($baseUrl . '/authorization/v1/access-token/b2b', [
-            'grantType' => 'client_credentials'
-        ]);
+        ])->post($baseUrl . '/authorization/v1/access-token/b2b', $requestBody);
 
         if (!$response->successful()) {
             $errorBody = $response->body();
-            error_log("DOKU_AUTH_FAIL: " . $errorBody);
-            
-            throw new \Exception($errorBody);
+            Log::error('DOKU_AUTH_FAIL', [
+                'status' => $response->status(),
+                'body' => $errorBody,
+                'base_url' => $baseUrl,
+                'client_id' => $clientId,
+            ]);
+
+            throw new \Exception('DOKU Auth Failed (' . $response->status() . '): ' . $errorBody);
         }
 
         $data = $response->json();
+
+        Log::info('DOKU_AUTH_SUCCESS', ['expires_in' => $data['expiresIn'] ?? 900]);
 
         return [
             'accessToken' => $data['accessToken'],
@@ -214,15 +235,16 @@ class DokuService
 
         $accessToken = self::getAccessToken();
         $timestamp = self::generateTimestamp();
-        $requestBody = json_encode($payload);
+        $requestBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
         $endpointUrl = '/checkout/v1/payment';
 
         // Request-Id HARUS sama antara header dan signature
-        $requestId = uniqid();
+        $requestId = (string) Str::uuid();
         self::$lastRequestId = $requestId;
 
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
+        // Gunakan withBody agar JSON yang dikirim PERSIS sama dengan yang digunakan untuk signature
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -230,7 +252,8 @@ class DokuService
             'Request-Id' => $requestId,
             'Request-Timestamp' => $timestamp,
             'Signature' => $signature,
-        ])->post($baseUrl . $endpointUrl, $payload);
+        ])->withBody($requestBody, 'application/json')
+            ->post($baseUrl . $endpointUrl);
 
         if (!$response->successful()) {
             Log::error('DOKU Create Payment Error', [
@@ -257,15 +280,23 @@ class DokuService
 
         $accessToken = self::getAccessToken();
         $timestamp = self::generateTimestamp();
-        $requestBody = json_encode($payload);
+        $requestBody = json_encode($payload, JSON_UNESCAPED_SLASHES);
         $endpointUrl = '/checkout/v1/payment';
 
         // Request-Id HARUS sama antara header dan signature
-        $requestId = uniqid();
+        $requestId = (string) Str::uuid();
         self::$lastRequestId = $requestId;
 
         $signature = self::generateSignature('POST', $endpointUrl, $accessToken, $requestBody, $timestamp);
 
+        Log::info('DOKU_PAYMENT_REQUEST', [
+            'endpoint' => $baseUrl . $endpointUrl,
+            'request_id' => $requestId,
+            'payment_method' => $paymentMethod,
+            'payload' => $payload,
+        ]);
+
+        // Gunakan withBody agar JSON yang dikirim PERSIS sama dengan yang digunakan untuk signature
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $accessToken,
@@ -273,15 +304,16 @@ class DokuService
             'Request-Id' => $requestId,
             'Request-Timestamp' => $timestamp,
             'Signature' => $signature,
-        ])->post($baseUrl . $endpointUrl, $payload);
+        ])->withBody($requestBody, 'application/json')
+            ->post($baseUrl . $endpointUrl);
 
         if (!$response->successful()) {
-            error_log('DOKU_PAYMENT_FAIL: STATUS=' . $response->status() . ' BODY=' . $response->body() . ' PAYLOAD=' . $requestBody);
             Log::error('DOKU Create Specific Payment Error', [
                 'status' => $response->status(),
                 'body' => $response->body(),
                 'payload' => $payload,
                 'payment_method' => $paymentMethod,
+                'request_id' => $requestId,
             ]);
             throw new \Exception('DOKU Payment Error: ' . $response->body());
         }
@@ -308,8 +340,8 @@ class DokuService
             ],
             'customer' => [
                 'name' => $customerData['name'] ?: 'Customer',
-                'phone' => (!empty($customerData['phone']) && strlen($customerData['phone']) >= 5) 
-                    ? $customerData['phone'] 
+                'phone' => (!empty($customerData['phone']) && strlen($customerData['phone']) >= 5)
+                    ? $customerData['phone']
                     : '08123456789',
                 'email' => $customerData['email'] ?: 'customer@meracikopi.com',
             ],
