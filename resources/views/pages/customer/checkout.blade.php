@@ -700,8 +700,7 @@
                         <span class="recipient-divider">|</span>
                         <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail">Jl. Murakata No.107, Batu Ampar, Kec. Balikpapan Utara, Kota Balikpapan,
-                        Kalimantan Timur 76614</p>
+                    <p class="address-detail" id="deliveryAddressDetail">Belum ada alamat pengiriman. Klik "Ubah" untuk mengisi.</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
             </div>
@@ -778,73 +777,15 @@
                 <div class="payment-methods-section" id="paymentMethodsSection" style="margin-top: 40px;">
                     <p class="section-title">Metode Pembayaran</p>
 
-                    <!-- DANA -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'dana')"
-                        style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="dana" class="payment-radio">
-                            <span class="payment-method-name" style="color: #FFFFFF;">DANA</span>
-                        </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Logo_dana_blue.svg" alt="DANA"
-                            class="payment-logo" style="height: 22px; width: auto;">
-                    </label>
-
                     <!-- QRIS -->
                     <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')"
                         style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="qris" class="payment-radio">
+                            <input type="radio" name="payment_method" value="qris" class="payment-radio" checked>
                             <span class="payment-method-name" style="color: #FFFFFF;">QRIS</span>
                         </div>
                         <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"
                             class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
-                    </label>
-
-                    <!-- Transfer Bank -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'transfer_bank')"
-                        style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="transfer_bank" class="payment-radio">
-                            <span class="payment-method-name" style="color: #FFFFFF;">Transfer Bank</span>
-                        </div>
-                        <svg class="payment-logo" style="height: 22px; width: 28px;" viewBox="0 0 24 24" fill="none"
-                            stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                            <line x1="1" y1="10" x2="23" y2="10"></line>
-                        </svg>
-                    </label>
-
-                    <!-- GoPay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'gopay')"
-                        style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="gopay" class="payment-radio">
-                            <span class="payment-method-name" style="color: #FFFFFF;">GoPay</span>
-                        </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/8/86/Gopay_logo.svg" alt="GoPay"
-                            class="payment-logo" style="height: 22px; width: auto;">
-                    </label>
-
-                    <!-- ShopeePay -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'shopeepay')"
-                        style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
-                            <span class="payment-method-name" style="color: #FFFFFF;">ShopeePay</span>
-                        </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"
-                            class="payment-logo" style="height: 22px; width: auto;">
-                    </label>
-
-                    <!-- OVO -->
-                    <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'ovo')"
-                        style="display: flex; align-items: center; justify-content: space-between;">
-                        <div style="display: flex; align-items: center;">
-                            <input type="radio" name="payment_method" value="ovo" class="payment-radio">
-                            <span class="payment-method-name" style="color: #FFFFFF;">OVO</span>
-                        </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Logo_ovo_purple.svg" alt="OVO"
-                            class="payment-logo" style="height: 22px; width: auto;">
                     </label>
                 </div>
             </div>
@@ -1114,11 +1055,6 @@
             const backendOrderType = orderTypeMap[orderType] || 'take_away';
 
             if (orderType === 'delivery') {
-                const selectedDelivery = document.querySelector('input[name="delivery_method"]:checked');
-                if (!selectedDelivery) {
-                    showErrorModal('Metode Pengiriman Belum Dipilih', 'Silahkan pilih metode pengiriman terlebih dahulu');
-                    return;
-                }
                 if (!recipientPhone) {
                     showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
                     editAddress();
@@ -1486,8 +1422,64 @@
             window.location.href = '/';
         }
 
+        // Restore draft alamat dari localStorage saat page load
+        function restoreAddressDraft() {
+            const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || 'null');
+            if (!draft) return;
+
+            // Set form fields
+            if (draft.name) document.getElementById('recipientName').value = draft.name;
+            if (draft.phone) document.getElementById('recipientPhone').value = draft.phone;
+            if (draft.province) document.getElementById('province').value = draft.province;
+            if (draft.city) document.getElementById('city').value = draft.city;
+            if (draft.district) document.getElementById('district').value = draft.district;
+            if (draft.postalCode) document.getElementById('postalCode').value = draft.postalCode;
+            if (draft.address) document.getElementById('fullAddress').value = draft.address;
+            if (draft.detail) document.getElementById('addressDetail').value = draft.detail;
+            if (draft.label) {
+                document.getElementById('addressLabel').value = draft.label;
+                document.querySelectorAll('.label-btn').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim().toLowerCase() === draft.label);
+                });
+            }
+
+            // Rebuild display text
+            const province = document.getElementById('province');
+            const city = document.getElementById('city');
+            const district = document.getElementById('district');
+            const provinceName = province.options[province.selectedIndex]?.text || '';
+            const cityName = city.options[city.selectedIndex]?.text || '';
+            const districtName = district.options[district.selectedIndex]?.text || '';
+
+            let fullAddressText = draft.address || '';
+            if (districtName) fullAddressText += ', Kec. ' + districtName;
+            if (cityName) fullAddressText += ', ' + cityName;
+            if (provinceName) fullAddressText += ', ' + provinceName;
+            if (draft.postalCode) fullAddressText += ' ' + draft.postalCode;
+
+            document.getElementById('deliveryRecipientName').textContent = draft.name;
+            document.getElementById('deliveryRecipientPhone').textContent = draft.phone;
+            document.getElementById('deliveryAddressDetail').textContent = fullAddressText;
+        }
+
         // Edit address
         function editAddress() {
+            // Load draft ke form sebelum buka modal
+            const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || '{}');
+            if (draft.name) document.getElementById('recipientName').value = draft.name;
+            if (draft.phone) document.getElementById('recipientPhone').value = draft.phone;
+            if (draft.province) document.getElementById('province').value = draft.province;
+            if (draft.city) document.getElementById('city').value = draft.city;
+            if (draft.district) document.getElementById('district').value = draft.district;
+            if (draft.postalCode) document.getElementById('postalCode').value = draft.postalCode;
+            if (draft.address) document.getElementById('fullAddress').value = draft.address;
+            if (draft.detail) document.getElementById('addressDetail').value = draft.detail;
+            if (draft.label) {
+                document.getElementById('addressLabel').value = draft.label;
+                document.querySelectorAll('.label-btn').forEach(b => {
+                    b.classList.toggle('active', b.textContent.trim().toLowerCase() === draft.label);
+                });
+            }
             document.getElementById('addressModal').style.display = 'flex';
         }
 
@@ -1565,6 +1557,15 @@
             if (cityName) fullAddressText += ', ' + cityName;
             if (provinceName) fullAddressText += ', ' + provinceName;
             if (postalCode) fullAddressText += ' ' + postalCode;
+
+            // Simpan draft ke localStorage
+            localStorage.setItem('delivery_address_draft', JSON.stringify({
+                name, phone,
+                province: province.value,
+                city: city.value,
+                district: district.value,
+                postalCode, address, detail, label
+            }));
 
             // Update display - using specific IDs
             document.getElementById('deliveryRecipientName').textContent = name;
@@ -1674,10 +1675,8 @@
             console.log('Calling updateOrderTotal');
             updateOrderTotal();
 
-            // Collect notes: count variants + custom notes
-            let hotCount = 0;
-            let iceCount = 0;
-            const customParts = [];
+            // Collect notes per item: variant + custom note linked together
+            const noteParts = [];
 
             items.forEach(item => {
                 if (!item.note) return;
@@ -1686,27 +1685,20 @@
                 const iceMatch = note.match(/^\[Ice\]\s*(.*)/);
 
                 if (hotMatch) {
-                    hotCount++;
-                    if (hotMatch[1].trim()) customParts.push(hotMatch[1].trim());
+                    const custom = hotMatch[1].trim();
+                    noteParts.push(custom ? `Hot - ${custom}` : 'Hot');
                 } else if (iceMatch) {
-                    iceCount++;
-                    if (iceMatch[1].trim()) customParts.push(iceMatch[1].trim());
+                    const custom = iceMatch[1].trim();
+                    noteParts.push(custom ? `Ice - ${custom}` : 'Ice');
                 } else if (note) {
-                    customParts.push(note);
+                    noteParts.push(note);
                 }
             });
 
-            const finalNotes = [];
-            const variantSummary = [];
-            if (hotCount > 0) variantSummary.push(`${hotCount}x Hot`);
-            if (iceCount > 0) variantSummary.push(`${iceCount}x Ice`);
-            if (variantSummary.length > 0) finalNotes.push(variantSummary.join(', '));
-            if (customParts.length > 0) finalNotes.push(...customParts);
-
             const orderNotesField = document.getElementById('orderNotes');
-            if (orderNotesField && finalNotes.length > 0) {
-                orderNotesField.value = finalNotes.join('\n');
-                console.log('Filled orderNotes:', finalNotes.join('\n'));
+            if (orderNotesField && noteParts.length > 0) {
+                orderNotesField.value = noteParts.join('\n');
+                console.log('Filled orderNotes:', noteParts.join('\n'));
             }
 
             console.log('renderCheckoutItems completed');
@@ -2024,6 +2016,9 @@
 
             // Setup mobile input handlers
             setupMobileInputHandlers();
+
+            // Restore draft alamat pengiriman dari localStorage
+            restoreAddressDraft();
 
             // Listen for table selection changes
             window.addEventListener('tableSelected', function (event) {
