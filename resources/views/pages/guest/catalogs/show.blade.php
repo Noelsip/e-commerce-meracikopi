@@ -43,7 +43,9 @@
                 }
 
                 .product-header span {
-                    display: none;
+                    display: inline !important;
+                    font-size: 12px !important;
+                    margin-left: 16px !important;
                 }
 
                 .product-header a {

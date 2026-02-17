@@ -690,6 +690,21 @@
             <p class="bottom-sheet-desc" id="bottomSheetDesc"></p>
             <p class="bottom-sheet-price" id="bottomSheetPrice"></p>
 
+            <!-- Variant Hot/Ice (only for drink & bottled_coffee) -->
+            <div class="bottom-sheet-variant-wrapper" id="bottomSheetVariant" style="display: none; margin-bottom: 12px;">
+                <div style="position: relative; width: 100%; max-width: 100%;">
+                    <label style="position: absolute; top: -8px; left: 12px; background: #fff; padding: 0 6px; font-size: 11px; color: #888; font-family: 'Inter', sans-serif; z-index: 1;">Variant</label>
+                    <select id="bottomSheetVariantSelect"
+                        style="width: 100%; padding: 12px 40px 12px 14px; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #333; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                        <option value="hot">Hot</option>
+                        <option value="ice">Ice</option>
+                    </select>
+                    <svg style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+
             <!-- Notes/Catatan -->
             <div class="bottom-sheet-note-wrapper">
                 <label class="bottom-sheet-note-label">Catatan</label>
@@ -761,6 +776,7 @@
             document.getElementById('bottomSheetQtyValue').textContent = '1';
             document.getElementById('bottomSheetNote').value = '';
             document.getElementById('bottomSheetQtyMinus').disabled = true;
+            document.getElementById('bottomSheetVariantSelect').value = 'hot';
 
             // Set data
             const menuId = card.dataset.menuId;
@@ -769,6 +785,15 @@
             const menuPrice = card.dataset.menuPrice;
             const menuImage = card.dataset.menuImage;
             const menuAvailable = card.dataset.menuAvailable === '1';
+            const menuCategory = card.dataset.menuCategory || '';
+
+            // Show/hide variant based on category
+            const variantWrapper = document.getElementById('bottomSheetVariant');
+            if (menuCategory === 'drink' || menuCategory === 'bottled_coffee') {
+                variantWrapper.style.display = 'block';
+            } else {
+                variantWrapper.style.display = 'none';
+            }
 
             // Store current menu ID and price
             document.getElementById('currentMenuId').value = menuId;
@@ -832,8 +857,17 @@
         function addToCart() {
             const menuId = document.getElementById('currentMenuId').value;
             const quantity = currentQuantity;
-            const note = document.getElementById('bottomSheetNote').value;
+            let note = document.getElementById('bottomSheetNote').value;
             const addBtn = document.getElementById('bottomSheetAddBtn');
+
+            // Add variant prefix for drink/bottled_coffee
+            const variantWrapper = document.getElementById('bottomSheetVariant');
+            if (variantWrapper.style.display !== 'none') {
+                const variant = document.getElementById('bottomSheetVariantSelect').value;
+                const label = variant === 'hot' ? 'Hot' : 'Ice';
+                note = '[' + label + '] ' + (note || '').trim();
+                note = note.trim();
+            }
 
             // Disable button while processing
             addBtn.disabled = true;

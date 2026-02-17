@@ -1416,7 +1416,11 @@
 
             if (items.length > 0) {
                 items.forEach(item => {
-                    const variant = item.variant || item.options || item.note || '';
+                    const note = item.note || '';
+                    let variantLabel = '';
+                    if (note.startsWith('[Hot]')) variantLabel = 'Hot';
+                    else if (note.startsWith('[Ice]')) variantLabel = 'Ice';
+                    else variantLabel = item.variant || item.options || note;
                     const itemName = item.menu_name || item.name || item.menu?.name || 'Item';
                     const qty = item.quantity || 1;
                     const subtotal = item.subtotal || item.sub_total || (item.price * qty) || 0;
@@ -1425,7 +1429,7 @@
                         <div class="receipt-item">
                             <div class="receipt-item-info">
                                 <span class="receipt-item-name">${itemName}</span>
-                                <span class="receipt-item-variant">${variant ? variant + ' | ' : ''}Qty: ${qty}</span>
+                                <span class="receipt-item-variant">${variantLabel ? variantLabel + ' | ' : ''}Qty: ${qty}</span>
                             </div>
                             <span class="receipt-item-price">RP ${formatRupiah(subtotal)}</span>
                         </div>
@@ -1605,10 +1609,22 @@
 
             console.log('Building HTML for', items.length, 'items');
 
+            // Helper: extract variant from note
+            function getVariantFromNote(note) {
+                if (!note) return null;
+                if (note.startsWith('[Hot]')) return 'Hot';
+                if (note.startsWith('[Ice]')) return 'Ice';
+                return null;
+            }
+
             // Build HTML
             let html = '';
             items.forEach((item, index) => {
                 console.log(`  - Item ${index + 1}:`, item.menu_name, 'x', item.quantity, '= Rp', item.subtotal);
+                const variant = getVariantFromNote(item.note);
+                const variantBadge = variant
+                    ? `<span class="checkout-variant-badge ${variant === 'Hot' ? 'variant-hot' : 'variant-ice'}">${variant}</span>`
+                    : '';
                 html += `
                     <div class="order-item-card">
                         <input type="checkbox" class="order-item-checkbox" checked
@@ -1623,6 +1639,7 @@
                     }
                             <div class="order-item-details">
                                 <p class="order-item-name">${item.menu_name}</p>
+                                ${variantBadge}
                                 <p class="order-item-price">Rp ${new Intl.NumberFormat('id-ID').format(item.price)}</p>
                             </div>
                         </div>
@@ -1650,16 +1667,39 @@
             console.log('Calling updateOrderTotal');
             updateOrderTotal();
 
-            // Collect notes from all items and fill the orderNotes field
-            const allNotes = items
-                .filter(item => item.note && item.note.trim() !== '')
-                .map(item => item.note.trim())
-                .join('\n');
+            // Collect notes: count variants + custom notes
+            let hotCount = 0;
+            let iceCount = 0;
+            const customParts = [];
+
+            items.forEach(item => {
+                if (!item.note) return;
+                const note = item.note.trim();
+                const hotMatch = note.match(/^\[Hot\]\s*(.*)/);
+                const iceMatch = note.match(/^\[Ice\]\s*(.*)/);
+
+                if (hotMatch) {
+                    hotCount++;
+                    if (hotMatch[1].trim()) customParts.push(hotMatch[1].trim());
+                } else if (iceMatch) {
+                    iceCount++;
+                    if (iceMatch[1].trim()) customParts.push(iceMatch[1].trim());
+                } else if (note) {
+                    customParts.push(note);
+                }
+            });
+
+            const finalNotes = [];
+            const variantSummary = [];
+            if (hotCount > 0) variantSummary.push(`${hotCount}x Hot`);
+            if (iceCount > 0) variantSummary.push(`${iceCount}x Ice`);
+            if (variantSummary.length > 0) finalNotes.push(variantSummary.join(', '));
+            if (customParts.length > 0) finalNotes.push(...customParts);
 
             const orderNotesField = document.getElementById('orderNotes');
-            if (orderNotesField && allNotes) {
-                orderNotesField.value = allNotes;
-                console.log('Filled orderNotes with item notes:', allNotes);
+            if (orderNotesField && finalNotes.length > 0) {
+                orderNotesField.value = finalNotes.join('\n');
+                console.log('Filled orderNotes:', finalNotes.join('\n'));
             }
 
             console.log('renderCheckoutItems completed');

@@ -80,7 +80,14 @@
                                 <template x-if="!item.menu_image">
                                     <img :src="getPlaceholder(item.menu_category)" alt="Product" class="product-image" draggable="false">
                                 </template>
-                                <span class="product-name" x-text="item.menu_name"></span>
+                                <div class="product-name-wrapper">
+                                    <span class="product-name" x-text="item.menu_name"></span>
+                                    <template x-if="item.note && (item.note.startsWith('[Hot]') || item.note.startsWith('[Ice]'))">
+                                        <span class="variant-badge"
+                                            :class="item.note.startsWith('[Hot]') ? 'variant-hot' : 'variant-ice'"
+                                            x-text="item.note.startsWith('[Hot]') ? 'Hot' : 'Ice'"></span>
+                                    </template>
+                                </div>
                             </div>
 
                             <!-- Price -->

@@ -558,6 +558,31 @@
             font-weight: 500;
         }
 
+        /* Variant badge (Hot/Ice) */
+        .checkout-variant-badge {
+            display: inline-block;
+            width: fit-content;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .checkout-variant-badge.variant-hot {
+            background: rgba(220, 80, 40, 0.2);
+            color: #ff8c5a;
+            border: 1px solid rgba(220, 80, 40, 0.35);
+        }
+
+        .checkout-variant-badge.variant-ice {
+            background: rgba(56, 152, 236, 0.2);
+            color: #6bb8f0;
+            border: 1px solid rgba(56, 152, 236, 0.35);
+        }
+
         /* Hide individual price in details, show in actions */
         .order-item-details .order-item-price {
             display: none;
