@@ -444,13 +444,22 @@ class PaymentController extends Controller
 
                 // Update status pesanan terkait
                 if ($payment->order) {
-                    $payment->order->update(['status' => OrderStatus::PAID]);
+                    $payment->order->update([
+                        'status' => OrderStatus::PAID,
+                        'payment_status' => StatusPayments::PAID,
+                    ]);
                     $this->clearCartForOrder($payment->order);
                 }
             } elseif ($status === 'FAILED') {
                 $payment->status = StatusPayments::FAILED;
+                if ($payment->order) {
+                    $payment->order->update(['payment_status' => StatusPayments::FAILED]);
+                }
             } elseif ($status === 'EXPIRED') {
                 $payment->status = StatusPayments::EXPIRED;
+                if ($payment->order) {
+                    $payment->order->update(['payment_status' => StatusPayments::EXPIRED]);
+                }
             }
 
             // Simpan payload tambahan untuk logging
@@ -563,6 +572,7 @@ class PaymentController extends Controller
 
                 $payment->order->update([
                     'status' => OrderStatus::PAID,
+                    'payment_status' => StatusPayments::PAID,
                 ]);
 
                 return response()->json([
