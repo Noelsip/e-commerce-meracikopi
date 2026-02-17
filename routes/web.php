@@ -106,7 +106,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');
 
-        Route::resource('menus', MenuAdminController::class);
+        Route::resource('menus', MenuAdminController::class)->except(['show']);
         Route::resource('tables', TableAdminController::class);
         Route::patch('/menus/{menu}/toggle-visibility', [MenuAdminController::class, 'toggleVisibility'])
             ->name('menus.toggleVisibility');
@@ -145,3 +145,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+// DOKU Test Route
+Route::get('/test-doku', [\App\Http\Controllers\DokuTestController::class, 'testConnection']);

@@ -113,7 +113,7 @@ class MenuAdminController extends Controller
 
         // Check if menu has been ordered
         $hasOrders = $menu->orderItems()->exists();
-        
+
         if ($hasOrders) {
             return redirect()->route('admin.menus.index')
                 ->with('error', "Menu '{$menuName}' tidak dapat dihapus karena sudah pernah dipesan. Anda bisa menyembunyikan menu ini dengan mengubah status availability.");
@@ -121,16 +121,19 @@ class MenuAdminController extends Controller
 
         // Check if menu is in any active cart
         $inCart = $menu->cartItems()->exists();
-        
+
         if ($inCart) {
             return redirect()->route('admin.menus.index')
                 ->with('error', "Menu '{$menuName}' tidak dapat dihapus karena masih ada di cart customer. Silakan coba lagi nanti atau sembunyikan menu.");
         }
 
-        // Delete image if exists
-        if ($menu->image_path) {
-            $oldPath = str_replace('storage/', '', $menu->image_path);
-            Storage::disk('public')->delete($oldPath);
+        try {
+            if ($menu->image_path && $menu->image_path !== '') {
+                $oldPath = str_replace('storage/', '', $menu->image_path);
+                Storage::disk('public')->delete($oldPath);
+            }
+        } catch (\Exception $e) {
+            // Ignore storage errors (file may not exist on server)
         }
 
         try {
@@ -141,7 +144,7 @@ class MenuAdminController extends Controller
                 'menu_id' => $menu->id,
                 'menu_name' => $menuName,
             ]);
-            
+
             return redirect()->route('admin.menus.index')
                 ->with('error', "Gagal menghapus menu '{$menuName}'. Menu mungkin masih digunakan oleh sistem.");
         }
