@@ -356,6 +356,7 @@ class PaymentController extends Controller
                 'payment_id' => $payment->id,
                 'payment_method' => $selectedPaymentMethod,
                 'invoice_number' => $transactionId,
+                'amount' => $payment->amount,
                 'display_type' => $dokuResponse['display_type'] ?? 'popup', // Default to popup if missing
             ];
 
@@ -583,9 +584,10 @@ class PaymentController extends Controller
             ->with('order')
             ->firstOrFail();
 
-        $order = $payment->order;
+        // SELALU cek DB dulu (fresh) — webhook mungkin sudah update statusnya
+        $payment->refresh();
 
-        // Jika sudah paid, return status
+        // Jika sudah paid (diupdate oleh webhook atau proses lain), langsung return
         if ($payment->status === StatusPayments::PAID) {
             return response()->json([
                 'message' => 'Payment completed',
@@ -594,17 +596,28 @@ class PaymentController extends Controller
             ]);
         }
 
-        // Check status dari DOKU jika masih pending
+        // Jika sudah failed/expired, return juga
+        if (in_array($payment->status, [StatusPayments::FAILED, StatusPayments::EXPIRED, StatusPayments::CANCELLED])) {
+            return response()->json([
+                'message' => 'Payment ' . $payment->status->value,
+                'status' => 'failed',
+                'payment_id' => $payment->id
+            ]);
+        }
+
+        // Check status dari DOKU API jika masih pending
         try {
             $statusResponse = DokuService::getPaymentStatus($payment->transaction_id);
 
             // Update status jika ada perubahan
             $transactionStatus = $statusResponse['transaction']['status'] ?? 'PENDING';
-            if (in_array($transactionStatus, ['SUCCESS', 'COMPLETE'])) {
+            $successStatuses = ['SUCCESS', 'COMPLETE', 'SETTLED', 'COMPLETED', 'PAID'];
+
+            if (in_array(strtoupper($transactionStatus), $successStatuses)) {
                 $payment->update([
                     'status' => StatusPayments::PAID,
                     'paid_at' => now(),
-                    'payload' => array_merge($payment->payload, ['status_check' => $statusResponse]),
+                    'payload' => array_merge($payment->payload ?? [], ['status_check' => $statusResponse]),
                 ]);
 
                 $payment->order->update([
@@ -632,21 +645,22 @@ class PaymentController extends Controller
                 'payment_id' => $payment->id,
             ]);
 
-            // For fallback mode, return pending status instead of error
-            if (isset($payment->payload['doku_response']['fallback_mode'])) {
+            // DOKU API gagal — cek lagi DB (mungkin webhook sudah update sementara kita tunggu)
+            $payment->refresh();
+            if ($payment->status === StatusPayments::PAID) {
                 return response()->json([
-                    'message' => 'Payment still pending (fallback mode)',
-                    'status' => 'pending',
-                    'payment_id' => $payment->id,
-                    'fallback_mode' => true
+                    'message' => 'Payment completed',
+                    'status' => 'paid',
+                    'payment_id' => $payment->id
                 ]);
             }
 
+            // Masih pending — return pending (bukan error 500)
             return response()->json([
-                'message' => 'Payment status check failed',
-                'status' => 'unknown',
-                'payment_id' => $payment->id
-            ], 500);
+                'message' => 'Payment still pending',
+                'status' => 'pending',
+                'payment_id' => $payment->id,
+            ]);
         }
     }
 

@@ -437,7 +437,7 @@
                     <img src="{{ asset('meracik-logo1.png') }}" alt="Meracikopi Logo" class="navbar-logo-icon"
                         style="width: 40px; height: 40px; object-fit: contain;">
                     <span class="navbar-logo-text"
-                        style="color: white; font-weight: 600; font-size: 18px; font-family: 'Figtree', sans-serif;">Meracikopi</span>
+                        style="color: white; font-weight: 600; font-size: 18px; font-family: 'Figtree', Poppins;">Meracikopi</span>
                 </a>
 
                 <!-- Center: Search Bar -->

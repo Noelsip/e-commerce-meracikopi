@@ -96,6 +96,28 @@
             @endif
         </div>
 
+        <!-- Delivery Address -->
+        @if($order->order_type === 'delivery' && $order->order_addresses && $order->order_addresses->count() > 0)
+        @php $address = $order->order_addresses->first(); @endphp
+        <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
+            <div class="px-6 py-4" style="background-color: #3e302b;">
+                <h3 class="font-semibold" style="color: #f0f2bd;">Alamat Pengiriman</h3>
+            </div>
+            <div class="px-6 py-4 space-y-2">
+                <div class="flex gap-2 text-sm" style="color: #f0f2bd;">
+                    <span class="font-medium">{{ $address->receiver_name }}</span>
+                    <span style="opacity: 0.5;">|</span>
+                    <span>{{ $address->phone }}</span>
+                </div>
+                <p class="text-sm" style="color: #f0f2bd; opacity: 0.85;">{{ $address->full_address }}</p>
+                <p class="text-sm" style="color: #f0f2bd; opacity: 0.7;">{{ $address->city }}@if($address->province), {{ $address->province }}@endif {{ $address->postal_code }}</p>
+                @if($address->notes)
+                <p class="text-sm" style="color: #f0f2bd; opacity: 0.6;"><em>Catatan: {{ $address->notes }}</em></p>
+                @endif
+            </div>
+        </div>
+        @endif
+
         <!-- Order Notes -->
         @if($order->notes)
         <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">

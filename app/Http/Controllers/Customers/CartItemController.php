@@ -42,23 +42,23 @@ class CartItemController extends Controller
             'guest_token' => $guestToken
         ]);
 
-        // pengecekan apakah item sudah ada atau belum
+        // pengecekan apakah item sudah ada atau belum (menu + note yang sama = item yang sama)
         $item = CartItem::where('cart_id', $cart->id)
             ->where('menu_id', $menu->id)
+            ->where('note', $request->note ?? '')
             ->first();
 
         if ($item) {
-            // menambah qty
+            // menambah qty untuk item dengan menu dan note yang sama
             $item->quantity += $request->quantity;
-            $item->note = $request->note; // Update note if provided
             $item->save();
         } else {
-            // Membuat item baru
+            // Membuat item baru (menu beda, atau menu sama tapi note/variant beda)
             CartItem::create([
                 'cart_id' => $cart->id,
                 'menu_id' => $menu->id,
                 'quantity' => $request->quantity,
-                'note' => $request->note
+                'note' => $request->note ?? ''
             ]);
         }
 

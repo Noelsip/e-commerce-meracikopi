@@ -114,19 +114,20 @@
                         <div style="text-align: center; padding: 40px;">
                             <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
                             <h3>Menunggu Pembayaran</h3>
-                            <p class="payment-instructions">${data.instructions || 'Selesaikan pembayaran di jendela popup yang muncul.'}</p>
+                            <p class="payment-instructions">Scan QR Code yang muncul di jendela pembayaran.</p>
                             
                             <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                                 <p style="margin-bottom: 10px; font-size: 0.9em; opacity: 0.8;">Jendela pembayaran tertutup/terblokir?</p>
                                 <button onclick="window.open('${data.payment_url}', 'DOKU Payment', 'width=600,height=700,scrollbars=yes,resizable=yes')" 
-                                        class="action-btn" style="padding: 8px 16px; font-size: 0.9em;">
+                                        style="padding: 10px 24px; font-size: 0.9em; background: #D4A574; color: #1e1715; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: opacity 0.2s;"
+                                        onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                                     Buka Ulang Jendela Pembayaran
                                 </button>
                             </div>
 
                             <div class="payment-details" style="margin-top: 30px;">
                                 <p><strong>Invoice:</strong> ${data.invoice_number}</p>
-                                <p><strong>Total:</strong> ${this.formatCurrency(data.amount || 0)}</p>
+                                <p style="font-size: 1.2em; margin-top: 8px;"><strong>Total:</strong> ${this.formatCurrency(data.amount || 0)}</p>
                             </div>
                         </div>
                     </div>
@@ -306,7 +307,7 @@
                     </div>
                 `;
                 document.getElementById('paymentModalContent').innerHTML = successContent;
-                
+
                 // Hide footer status if it exists
                 const statusEl = document.getElementById('paymentStatus');
                 if (statusEl) statusEl.style.display = 'none';
@@ -691,6 +692,31 @@
             color: white;
             font-size: 14px;
             font-weight: 500;
+        }
+
+        /* Variant badge (Hot/Ice) */
+        .checkout-variant-badge {
+            display: inline-block;
+            width: fit-content;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .checkout-variant-badge.variant-hot {
+            background: rgba(220, 80, 40, 0.2);
+            color: #ff8c5a;
+            border: 1px solid rgba(220, 80, 40, 0.35);
+        }
+
+        .checkout-variant-badge.variant-ice {
+            background: rgba(56, 152, 236, 0.2);
+            color: #6bb8f0;
+            border: 1px solid rgba(56, 152, 236, 0.35);
         }
 
         /* Hide individual price in details, show in actions */

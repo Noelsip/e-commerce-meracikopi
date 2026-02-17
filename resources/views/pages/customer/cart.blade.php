@@ -80,7 +80,14 @@
                                 <template x-if="!item.menu_image">
                                     <img :src="getPlaceholder(item.menu_category)" alt="Product" class="product-image" draggable="false">
                                 </template>
-                                <span class="product-name" x-text="item.menu_name"></span>
+                                <div class="product-name-wrapper">
+                                    <span class="product-name" x-text="item.menu_name"></span>
+                                    <template x-if="item.note && (item.note.startsWith('[Hot]') || item.note.startsWith('[Ice]'))">
+                                        <span class="variant-badge"
+                                            :class="item.note.startsWith('[Hot]') ? 'variant-hot' : 'variant-ice'"
+                                            x-text="item.note.startsWith('[Hot]') ? 'Hot' : 'Ice'"></span>
+                                    </template>
+                                </div>
                             </div>
 
                             <!-- Price -->
@@ -137,13 +144,14 @@
             style="display: flex !important; align-items: center !important; justify-content: center !important; min-height: 80px !important; z-index: 99999 !important; bottom: 0 !important; position: fixed !important; left: 0 !important; right: 0 !important; width: 100% !important; background-color: #2A1B14 !important; border-top: 1px solid rgba(255,255,255,0.1) !important;">
             <div class="cart-summary-container">
                 <div class="cart-summary">
-                    <!-- Left side: Checkbox + Pilih Semua -->
+                    <!-- Left side: Checkbox + Pilih Semua + Hapus -->
                     <div class="cart-summary-left">
                         <div class="header-checkbox">
                             <input type="checkbox" class="cart-checkbox select-all-checkbox" :checked="allSelected"
                                 @change="toggleSelectAll">
                         </div>
                         <span class="select-all-text">Pilih Semua</span>
+                        <button class="delete-selected-btn" @click="removeSelectedItems()">Hapus</button>
                     </div>
 
                     <!-- Right side: Total + Checkout -->
@@ -191,6 +199,7 @@
                 loading: false,
                 totalPrice: 0,
                 token: localStorage.getItem('guest_token') || '',
+                bulkDelete: false,
 
                 init() {
                     // Load dari localStorage cache dulu untuk instant display
@@ -328,17 +337,86 @@
 
                 removeItem(itemId) {
                     this.itemToDelete = itemId;
+                    this.bulkDelete = false;
                     const modal = document.getElementById('deleteConfirmModal');
+                    const msg = document.querySelector('#deleteConfirmModal .error-modal-message');
+                    if (msg) msg.textContent = 'Apakah Anda yakin ingin menghapus produk ini dari pesanan?';
                     if (modal) modal.classList.add('show');
+                },
+
+                removeSelectedItems() {
+                    if (this.selectedCount === 0) {
+                        this.showCartToast('Mohon pilih produk', 'error');
+                        return;
+                    }
+                    this.bulkDelete = true;
+                    const modal = document.getElementById('deleteConfirmModal');
+                    const msg = document.querySelector('#deleteConfirmModal .error-modal-message');
+                    if (msg) msg.textContent = `Apakah Anda yakin ingin menghapus ${this.selectedCount} produk yang dipilih?`;
+                    if (modal) modal.classList.add('show');
+                },
+
+                showCartToast(message, type = 'success') {
+                    let toast = document.getElementById('cart-toast');
+                    if (!toast) {
+                        toast = document.createElement('div');
+                        toast.id = 'cart-toast';
+                        Object.assign(toast.style, {
+                            position: 'fixed',
+                            top: '130px',
+                            right: '20px',
+                            zIndex: '99999',
+                            minWidth: '280px',
+                            maxWidth: '400px',
+                            backgroundColor: '#2b211e',
+                            borderRadius: '6px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                            padding: '14px 16px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            transform: 'translateX(120%)',
+                            transition: 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s ease',
+                            opacity: '0',
+                            fontFamily: "'Poppins', sans-serif"
+                        });
+                        toast.onclick = function () {
+                            toast.style.transform = 'translateX(120%)';
+                            toast.style.opacity = '0';
+                        };
+                        document.body.appendChild(toast);
+                    }
+                    const borderColor = type === 'error' ? '#ef4444' : '#CA7842';
+                    toast.style.borderLeft = `4px solid ${borderColor}`;
+                    toast.innerHTML = `
+                        <p style="margin:0; font-size:14px; font-weight:500; color:#f0f2bd; flex-grow:1;">${message}</p>
+                        <span style="cursor:pointer; color:#f0f2bd; opacity:0.7;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </span>
+                    `;
+                    requestAnimationFrame(() => {
+                        toast.style.transform = 'translateX(0)';
+                        toast.style.opacity = '1';
+                    });
+                    if (window.cartToastTimeout) clearTimeout(window.cartToastTimeout);
+                    window.cartToastTimeout = setTimeout(() => {
+                        toast.style.transform = 'translateX(120%)';
+                        toast.style.opacity = '0';
+                    }, 3000);
                 },
 
                 closeDeleteConfirm() {
                     this.itemToDelete = null;
+                    this.bulkDelete = false;
                     const modal = document.getElementById('deleteConfirmModal');
                     if (modal) modal.classList.remove('show');
                 },
 
                 async confirmDelete() {
+                    if (this.bulkDelete) {
+                        await this.confirmDeleteSelected();
+                        return;
+                    }
                     if (!this.itemToDelete) return;
                     const itemId = this.itemToDelete;
 
@@ -357,6 +435,30 @@
                         }
                     } catch (error) {
                         console.error('Error removing item:', error);
+                        this.closeDeleteConfirm();
+                    }
+                },
+
+                async confirmDeleteSelected() {
+                    const selectedItems = this.items.filter(item => item.selected);
+                    if (selectedItems.length === 0) return;
+
+                    try {
+                        const deletePromises = selectedItems.map(item =>
+                            fetch(`/api/customer/cart/items/${item.id}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'X-GUEST-TOKEN': this.token,
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                                }
+                            })
+                        );
+
+                        await Promise.all(deletePromises);
+                        await this.fetchCart();
+                        this.closeDeleteConfirm();
+                    } catch (error) {
+                        console.error('Error removing selected items:', error);
                         this.closeDeleteConfirm();
                     }
                 },

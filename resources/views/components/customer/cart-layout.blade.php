@@ -171,6 +171,36 @@
             font-weight: 500;
         }
 
+        .product-name-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .variant-badge {
+            display: inline-block;
+            width: fit-content;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        .variant-hot {
+            background: rgba(220, 80, 40, 0.2);
+            color: #ff8c5a;
+            border: 1px solid rgba(220, 80, 40, 0.35);
+        }
+
+        .variant-ice {
+            background: rgba(56, 152, 236, 0.2);
+            color: #6bb8f0;
+            border: 1px solid rgba(56, 152, 236, 0.35);
+        }
+
         /* Price */
         .product-price {
             color: rgba(255, 255, 255, 0.85);
@@ -302,7 +332,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 16px 24px;
-            border: 1px solid #D9D9D9;
+            border: none;
             border-radius: 8px;
             background: transparent;
         }
@@ -310,12 +340,12 @@
         .cart-summary-left {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             padding-left: 0;
         }
 
         .cart-summary-left .header-checkbox {
-            width: 50px;
+            width: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -338,6 +368,26 @@
             font-size: 14px;
             cursor: pointer;
         }
+
+        .delete-selected-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            margin-left: 4px;
+            transition: color 0.2s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .delete-selected-btn:hover {
+            color: #ff6b6b;
+        }
+
+
 
         .select-all-label {
             color: rgba(255, 255, 255, 0.85);
@@ -499,9 +549,17 @@
             }
 
             /* Name - Column 3, Row 1 (di atas) */
-            .product-name {
+            .product-name-wrapper {
                 grid-column: 3 / span 2;
                 grid-row: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                align-self: start;
+                overflow: hidden;
+            }
+
+            .product-name {
                 font-size: 13px;
                 font-weight: 400;
                 line-height: 1.4;
@@ -511,8 +569,12 @@
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 width: 100%;
-                align-self: start;
-                margin-bottom: 4px;
+                margin-bottom: 0;
+            }
+
+            .variant-badge {
+                font-size: 10px;
+                padding: 1px 8px;
             }
 
             /* Quantity controls dan price wrapper - Column 3, Row 2 */
@@ -726,7 +788,9 @@
             }
 
             .delete-selected-btn {
-                display: none;
+                font-size: 12px;
+                padding: 2px 6px;
+                margin-left: 2px;
             }
 
             .cart-total-section {
