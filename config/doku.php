@@ -5,6 +5,7 @@ return [
     'secret_key' => env('DOKU_SECRET_KEY', ''),
     'api_key' => env('DOKU_API_KEY', ''),
     'public_key' => env('DOKU_PUBLIC_KEY', ''),
+    'merchant_id' => env('DOKU_MERCHANT_ID', ''), // Numeric Mall ID from DOKU Dashboard
     'merchant_private_key' => env('MERCHANT_PRIVATE_KEY'),
     'merchant_public_key' => env('MERCHANT_PUBLIC_KEY'),
     'is_production' => env('DOKU_IS_PRODUCTION', false),

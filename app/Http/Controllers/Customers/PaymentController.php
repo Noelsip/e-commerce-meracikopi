@@ -72,41 +72,21 @@ class PaymentController extends Controller
 
     /**
      * Validate DOKU response has required data for the payment method
+     * 
+     * All payment methods use Checkout v1 which returns a payment_url.
+     * The user is directed to DOKU's hosted page (in a popup) where they
+     * see only the selected payment method.
      */
     private function validateDokuResponse(array $response, string $paymentMethod): array
     {
-        // Check for QRIS - must have QR code data
-        if ($paymentMethod === 'qris') {
-            $qrData = $response['qr_code_data'] ?? null;
-            if (!$qrData || (!isset($qrData['qr_image']) && !isset($qrData['qr_string']))) {
-                return [
-                    'valid' => false,
-                    'error' => 'QR Code tidak dapat di-generate oleh payment gateway. Silahkan coba metode pembayaran lain.'
-                ];
-            }
-        }
+        $paymentUrl = $response['payment_url'] ?? null;
+        $isFallback = $response['fallback_mode'] ?? false;
 
-        // Check for Virtual Account - must have VA number
-        if (in_array($paymentMethod, ['bca_va', 'bni_va', 'bri_va', 'mandiri_va'])) {
-            $vaInfo = $response['virtual_account_info'] ?? null;
-            if (!$vaInfo || !isset($vaInfo['va_number'])) {
-                return [
-                    'valid' => false,
-                    'error' => 'Nomor Virtual Account tidak dapat di-generate. Silahkan coba metode pembayaran lain.'
-                ];
-            }
-        }
-
-        // Check for E-Wallet - must have payment URL or deep link
-        if (in_array($paymentMethod, ['dana', 'gopay', 'shopeepay', 'ovo'])) {
-            $ewalletInfo = $response['ewallet_info'] ?? null;
-            $paymentUrl = $response['payment_url'] ?? null;
-            if (!$ewalletInfo && !$paymentUrl) {
-                return [
-                    'valid' => false,
-                    'error' => 'Link pembayaran e-wallet tidak tersedia. Silahkan coba metode pembayaran lain.'
-                ];
-            }
+        if (!$paymentUrl && !$isFallback) {
+            return [
+                'valid' => false,
+                'error' => 'Link pembayaran tidak tersedia dari payment gateway. Silahkan coba lagi atau gunakan metode pembayaran lain.'
+            ];
         }
 
         return ['valid' => true, 'error' => null];
@@ -161,16 +141,20 @@ class PaymentController extends Controller
             'amount' => $orderData['amount'],
             'status' => 'PENDING',
             'fallback_mode' => true,
+            'display_type' => 'popup', // Default fallback UX
+            // Default URL creates a mock payment page (or reuse success page for dev)
+            'payment_url' => url('/checkout/success?payment_id=' . $payment->id . '&simulated=true'),
         ];
 
         switch ($paymentMethod) {
             case 'qris':
                 $response['qr_code_data'] = [
                     'qr_string' => 'QRIS-' . $transactionId,
-                    'qr_image' => $this->generatePaymentQRCode($transactionId, $orderData['amount']),
-                    'expired_at' => now()->addHours(1)->toISOString()
+                    'qr_image' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock', // Mock QR
+                    'qr_url' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock',
+                    'expired_at' => now()->addHours(1)->toIso8601String()
                 ];
-                $response['instructions'] = 'Scan QR Code menggunakan aplikasi e-wallet atau mobile banking Anda';
+                $response['instructions'] = 'Scan QR Code Mock di jendela popup.';
                 break;
 
             case 'bca_va':
@@ -294,7 +278,7 @@ class PaymentController extends Controller
             // Prepare customer data for DOKU
             $customerData = [
                 'name' => $order->customer_name,
-                'phone' => $order->customer_phone ?? '',
+                'phone' => $order->customer_phone ?: '081211111111',
                 'email' => $order->customer_email ?? 'customer@meracikopi.com',
             ];
 
@@ -372,19 +356,23 @@ class PaymentController extends Controller
                 'payment_id' => $payment->id,
                 'payment_method' => $selectedPaymentMethod,
                 'invoice_number' => $transactionId,
+                'display_type' => $dokuResponse['display_type'] ?? 'popup', // Default to popup if missing
             ];
 
             // Add specific data based on payment method
             if (isset($dokuResponse['qr_code_data']) && $dokuResponse['qr_code_data']) {
-                $responseData['qr_code'] = $dokuResponse['qr_code_data'];
+                $responseData['qr_code'] = $dokuResponse['qr_code_data']; // Legacy
+                $responseData['qr_code_data'] = $dokuResponse['qr_code_data']; // Consistent key
             }
 
             if (isset($dokuResponse['virtual_account_info']) && $dokuResponse['virtual_account_info']) {
-                $responseData['virtual_account'] = $dokuResponse['virtual_account_info'];
+                $responseData['virtual_account'] = $dokuResponse['virtual_account_info']; // Legacy
+                $responseData['virtual_account_info'] = $dokuResponse['virtual_account_info']; // Consistent key
             }
 
             if (isset($dokuResponse['ewallet_info']) && $dokuResponse['ewallet_info']) {
-                $responseData['ewallet'] = $dokuResponse['ewallet_info'];
+                $responseData['ewallet'] = $dokuResponse['ewallet_info']; // Legacy
+                $responseData['ewallet_info'] = $dokuResponse['ewallet_info']; // Consistent key
             }
 
             if (isset($dokuResponse['payment_url']) && $dokuResponse['payment_url']) {
@@ -453,7 +441,7 @@ class PaymentController extends Controller
             if ($status === 'SUCCESS' || $status === 'SETTLED') {
                 $payment->status = StatusPayments::PAID;
                 $payment->paid_at = now();
-                
+
                 // Update status pesanan terkait
                 if ($payment->order) {
                     $payment->order->update(['status' => OrderStatus::PAID]);
@@ -469,7 +457,7 @@ class PaymentController extends Controller
             $payload = $payment->payload ?? [];
             $payload['webhook_data'] = $data;
             $payment->payload = $payload;
-            
+
             $payment->save();
 
             Log::info('DOKU WEBHOOK - Status updated', [
