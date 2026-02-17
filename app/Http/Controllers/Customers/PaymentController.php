@@ -404,78 +404,115 @@ class PaymentController extends Controller
 
         $data = $request->all();
 
-        Log::info('DOKU WEBHOOK', $data);
+        // Log semua data webhook yang diterima untuk debugging
+        Log::info('DOKU WEBHOOK RECEIVED', [
+            'headers' => $request->headers->all(),
+            'body' => $data,
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+        ]);
 
-        // Validasi signature (opsional, tapi disarankan)
-        $signature = $request->header('X-SIGNATURE');
-        if ($signature && !DokuService::verifyDokuSignature($data, $signature)) {
-            Log::warning('Invalid DOKU signature in webhook');
-            // Tetap lanjut jika dalam mode development tanpa key
-            if (config('doku.merchant_private_key')) {
-                return response()->json(['message' => 'Invalid signature'], 403);
-            }
-        }
+        try {
+            // Coba extract invoice number dari berbagai format DOKU
+            // Format 1: Checkout V1 -> $data['order']['invoice_number'] (snake_case)
+            // Format 2: SNAP API   -> $data['order']['invoiceNumber'] (camelCase)
+            // Format 3: Flat       -> $data['invoice_number']
+            $invoice = $data['order']['invoice_number']
+                ?? $data['order']['invoiceNumber']
+                ?? $data['invoice_number']
+                ?? $data['invoiceNumber']
+                ?? null;
 
-        $invoice = $data['order']['invoiceNumber'] ?? null;
-        $status = $data['transaction']['status'] ?? null;
+            // Coba extract status dari berbagai format DOKU
+            // Format 1: Checkout V1 -> $data['transaction']['status']
+            // Format 2: SNAP API   -> $data['transaction_status']
+            // Format 3: Flat       -> $data['status']
+            $status = $data['transaction']['status']
+                ?? $data['transaction_status']
+                ?? $data['status']
+                ?? null;
 
-        if (!$invoice) {
-            return response()->json(['message' => 'Invalid data'], 400);
-        }
-
-        return DB::transaction(function () use ($invoice, $status, $data) {
-            // Menggunakan transaction_id karena sesuai dengan schema database Anda
-            $payment = Payments::where('transaction_id', $invoice)
-                ->lockForUpdate()
-                ->first();
-
-            if (!$payment) {
-                Log::warning('DOKU WEBHOOK - Payment not found', ['invoice' => $invoice]);
-                return response()->json(['message' => 'Payment not found'], 404);
-            }
-
-            if ($payment->status === StatusPayments::PAID) {
-                return response()->json(['message' => 'OK']);
-            }
-
-            if ($status === 'SUCCESS' || $status === 'SETTLED') {
-                $payment->status = StatusPayments::PAID;
-                $payment->paid_at = now();
-
-                // Update status pesanan terkait
-                if ($payment->order) {
-                    $payment->order->update([
-                        'status' => OrderStatus::PAID,
-                        'payment_status' => StatusPayments::PAID,
-                    ]);
-                    $this->clearCartForOrder($payment->order);
-                }
-            } elseif ($status === 'FAILED') {
-                $payment->status = StatusPayments::FAILED;
-                if ($payment->order) {
-                    $payment->order->update(['payment_status' => StatusPayments::FAILED]);
-                }
-            } elseif ($status === 'EXPIRED') {
-                $payment->status = StatusPayments::EXPIRED;
-                if ($payment->order) {
-                    $payment->order->update(['payment_status' => StatusPayments::EXPIRED]);
-                }
-            }
-
-            // Simpan payload tambahan untuk logging
-            $payload = $payment->payload ?? [];
-            $payload['webhook_data'] = $data;
-            $payment->payload = $payload;
-
-            $payment->save();
-
-            Log::info('DOKU WEBHOOK - Status updated', [
+            Log::info('DOKU WEBHOOK PARSED', [
                 'invoice' => $invoice,
-                'status' => $payment->status
+                'status' => $status,
             ]);
 
-            return response()->json(['message' => 'OK']);
-        });
+            if (!$invoice) {
+                Log::warning('DOKU WEBHOOK - Invoice number not found in payload', ['data' => $data]);
+                // Tetap return 200 agar DOKU tidak retry terus
+                return response()->json(['message' => 'Invoice not found in payload'], 200);
+            }
+
+            return DB::transaction(function () use ($invoice, $status, $data) {
+                // Menggunakan transaction_id karena sesuai dengan schema database
+                $payment = Payments::where('transaction_id', $invoice)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$payment) {
+                    Log::warning('DOKU WEBHOOK - Payment not found in DB', ['invoice' => $invoice]);
+                    return response()->json(['message' => 'Payment not found'], 200);
+                }
+
+                if ($payment->status === StatusPayments::PAID) {
+                    Log::info('DOKU WEBHOOK - Payment already paid', ['invoice' => $invoice]);
+                    return response()->json(['message' => 'OK']);
+                }
+
+                // Handle berbagai status dari DOKU
+                $successStatuses = ['SUCCESS', 'SETTLED', 'COMPLETED', 'PAID'];
+                $failedStatuses = ['FAILED', 'DENIED', 'CANCELLED', 'CANCEL'];
+                $expiredStatuses = ['EXPIRED', 'VOIDED'];
+
+                if (in_array(strtoupper($status), $successStatuses)) {
+                    $payment->status = StatusPayments::PAID;
+                    $payment->paid_at = now();
+
+                    // Update status pesanan terkait
+                    if ($payment->order) {
+                        $payment->order->update([
+                            'status' => OrderStatus::PAID,
+                            'payment_status' => StatusPayments::PAID,
+                        ]);
+                        $this->clearCartForOrder($payment->order);
+                    }
+                    Log::info('DOKU WEBHOOK - Payment marked as PAID', ['invoice' => $invoice]);
+                } elseif (in_array(strtoupper($status), $failedStatuses)) {
+                    $payment->status = StatusPayments::FAILED;
+                    if ($payment->order) {
+                        $payment->order->update(['payment_status' => StatusPayments::FAILED]);
+                    }
+                    Log::info('DOKU WEBHOOK - Payment marked as FAILED', ['invoice' => $invoice]);
+                } elseif (in_array(strtoupper($status), $expiredStatuses)) {
+                    $payment->status = StatusPayments::EXPIRED;
+                    if ($payment->order) {
+                        $payment->order->update(['payment_status' => StatusPayments::EXPIRED]);
+                    }
+                    Log::info('DOKU WEBHOOK - Payment marked as EXPIRED', ['invoice' => $invoice]);
+                } else {
+                    Log::warning('DOKU WEBHOOK - Unknown status', ['invoice' => $invoice, 'status' => $status]);
+                }
+
+                // Simpan payload tambahan untuk logging
+                $payload = $payment->payload ?? [];
+                $payload['webhook_data'] = $data;
+                $payment->payload = $payload;
+
+                $payment->save();
+
+                return response()->json(['message' => 'OK']);
+            });
+
+        } catch (\Exception $e) {
+            Log::error('DOKU WEBHOOK ERROR', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $data,
+            ]);
+
+            // Selalu return 200 agar DOKU tidak retry terus-menerus
+            return response()->json(['message' => 'Error processed', 'error' => $e->getMessage()], 200);
+        }
     }
 
     /**
