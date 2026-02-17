@@ -832,7 +832,7 @@
                             <input type="radio" name="payment_method" value="shopeepay" class="payment-radio">
                             <span class="payment-method-name" style="color: #FFFFFF;">ShopeePay</span>
                         </div>
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg" alt="ShopeePay"
+                        <img src="{{ asset('images/payment-icons/ShopeePay-Horizontal_O.png') }}" alt="ShopeePay"
                             class="payment-logo" style="height: 22px; width: auto;">
                     </label>
 

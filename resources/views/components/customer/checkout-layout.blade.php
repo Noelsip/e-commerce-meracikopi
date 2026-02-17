@@ -55,29 +55,93 @@
                         if (button) button.disabled = false;
                     });
             },
-            handlePayment: function (paymentData) {
-                console.log('DOKU Payment Data:', paymentData);
+            handlePayment: function (data) {
+                console.log('Handling DOKU Payment:', data);
 
-                const paymentMethod = paymentData.payment_method;
+                // Set current invoice for status checking
+                this.currentInvoiceNumber = data.invoice_number;
 
-                // Hide checkout modal and show payment modal
-                this.showPaymentModal(paymentData);
+                // Show modal
+                this.showPaymentModal(data);
 
-                // Handle different payment types
-                if (paymentData.qr_code) {
-                    this.handleQRPayment(paymentData.qr_code, paymentData.instructions, paymentData.invoice_number);
-                } else if (paymentData.virtual_account) {
-                    this.handleVAPayment(paymentData.virtual_account, paymentData.instructions);
-                } else if (paymentData.ewallet) {
-                    this.handleEWalletPayment(paymentData.ewallet, paymentData.instructions);
-                } else if (paymentData.payment_url) {
-                    this.handleURLPayment(paymentData.payment_url);
+                // Dispatch based on display_type
+                if (data.display_type === 'popup') {
+                    this.handlePopupPayment(data);
+                } else if (data.display_type === 'on_page' && data.payment_method === 'qris') {
+                    this.handleQRPayment(data.qr_code_data, data.instructions, data.invoice_number);
+                } else {
+                    // Fallback to legacy handling
+                    if (data.payment_method === 'qris' && data.qr_code_data) {
+                        this.handleQRPayment(data.qr_code_data, data.instructions, data.invoice_number);
+                    } else if (data.virtual_account_info) {
+                        this.handleVAPayment(data.virtual_account_info, data.instructions);
+                    } else if (data.ewallet_info) {
+                        this.handleEWalletPayment(data.ewallet_info, data.instructions);
+                    } else if (data.payment_url) {
+                        this.handlePopupPayment(data); // Default to popup if URL exists
+                    } else {
+                        console.error('Unknown payment data structure:', data);
+                        alert('Format data pembayaran tidak dikenakan.');
+                    }
                 }
 
-                // Start payment status checking
-                this.startPaymentStatusCheck(paymentData.invoice_number);
+                // Start polling status
+                if (data.invoice_number) {
+                    this.startPaymentStatusCheck(data.invoice_number);
+                }
             },
 
+            handlePopupPayment: function (data) {
+                if (!data.payment_url) {
+                    alert('Maaf, URL pembayaran tidak ditemukan. Silakan coba metode lain.');
+                    console.error('Missing payment_url for popup', data);
+                    return;
+                }
+
+                const width = 600;
+                const height = 700;
+                const left = (window.screen.width / 2) - (width / 2);
+                const top = (window.screen.height / 2) - (height / 2);
+
+                const popup = window.open(
+                    data.payment_url,
+                    'DOKU Payment',
+                    `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
+                );
+
+                const content = `
+                    <div class="popup-payment-waiting">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
+                            <h3>Menunggu Pembayaran</h3>
+                            <p class="payment-instructions">${data.instructions || 'Selesaikan pembayaran di jendela popup yang muncul.'}</p>
+                            
+                            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                                <p style="margin-bottom: 10px; font-size: 0.9em; opacity: 0.8;">Jendela pembayaran tertutup/terblokir?</p>
+                                <button onclick="window.open('${data.payment_url}', 'DOKU Payment', 'width=600,height=700,scrollbars=yes,resizable=yes')" 
+                                        class="action-btn" style="padding: 8px 16px; font-size: 0.9em;">
+                                    Buka Ulang Jendela Pembayaran
+                                </button>
+                            </div>
+
+                            <div class="payment-details" style="margin-top: 30px;">
+                                <p><strong>Invoice:</strong> ${data.invoice_number}</p>
+                                <p><strong>Total:</strong> ${this.formatCurrency(data.amount || 0)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('paymentModalContent').innerHTML = content;
+
+                // Check if popup closed by user before payment
+                const timer = setInterval(() => {
+                    if (popup && popup.closed) {
+                        clearInterval(timer);
+                        console.log('Payment popup closed by user');
+                        // We continue polling status in background via startPaymentStatusCheck
+                    }
+                }, 1000);
+            },
             showPaymentModal: function (paymentData) {
                 // Create and show payment modal
                 const modalHtml = `
@@ -100,20 +164,32 @@
             },
 
             handleQRPayment: function (qrData, instructions, invoiceNumber) {
-                const qrImage = qrData.qr_image || qrData.qr_code || '';
-                console.log('QR Image data length:', qrImage ? qrImage.length : 0);
+                // Support both URL-based QR (from Direct API) and base64 QR (from fallback)
+                const qrUrl = qrData.qr_url || qrData.qr_image || qrData.qr_code || '';
+                const qrString = qrData.qr_string || '';
+                console.log('QR data:', { qrUrl: qrUrl ? qrUrl.substring(0, 80) + '...' : 'none', qrString: qrString ? 'present' : 'none' });
+
+                // Determine image src: if it starts with http, use directly; otherwise assume base64
+                let imgSrc = '';
+                if (qrUrl) {
+                    if (qrUrl.startsWith('http')) {
+                        imgSrc = qrUrl; // Direct URL from DOKU API
+                    } else {
+                        imgSrc = `data:image/png;base64,${qrUrl}`; // Base64 from fallback
+                    }
+                }
 
                 const content = `
                     <div class="qr-payment">
                         <div class="qr-code-container">
-                            ${qrImage ?
-                        `<img src="data:image/png;base64,${qrImage}" 
-                                     alt="QR Code" class="qr-code-image" 
-                                     style="max-width: 250px; background: white; padding: 10px; border-radius: 8px;"
+                            ${imgSrc ?
+                        `<img src="${imgSrc}" 
+                                     alt="QR Code QRIS" class="qr-code-image" 
+                                     style="max-width: 280px; background: white; padding: 16px; border-radius: 12px;"
                                      onload="console.log('QR image loaded successfully')"
                                      onerror="console.error('QR image load error'); this.style.display='none'; this.parentNode.innerHTML='<div style=\\'padding: 40px; text-align: center; border: 2px dashed #ccc;\\'>QR Code Error<br><small>Gagal memuat gambar</small></div>';" />` :
                         `<div style="padding: 40px; text-align: center; border: 2px dashed #ccc;">
-                                    QR Code Placeholder<br><small>Mock payment mode</small>
+                                    QR Code tidak tersedia<br><small>Silahkan coba lagi</small>
                                  </div>`
                     }
                         </div>
@@ -216,8 +292,25 @@
             },
 
             onPaymentSuccess: function (data) {
-                document.getElementById('paymentStatus').innerHTML =
-                    '<span style="color: green;">✓ Pembayaran Berhasil!</span>';
+                // Update main content to show success animation
+                const successContent = `
+                    <div class="payment-success-animation" style="padding: 40px; text-align: center;">
+                        <div style="width: 80px; height: 80px; background: #28a745; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <h3 style="color: #28a745; margin-bottom: 10px; font-size: 24px;">Pembayaran Berhasil!</h3>
+                        <p style="color: #666; font-size: 16px;">Terima kasih, pesanan Anda telah kami terima.</p>
+                        <p style="margin-top: 20px; font-size: 14px; color: #888;">Mengalihkan ke struk...</p>
+                    </div>
+                `;
+                document.getElementById('paymentModalContent').innerHTML = successContent;
+                
+                // Hide footer status if it exists
+                const statusEl = document.getElementById('paymentStatus');
+                if (statusEl) statusEl.style.display = 'none';
+
                 setTimeout(() => {
                     this.closePaymentModal();
                     if (typeof window.onPaymentSuccess === 'function') {

@@ -23,11 +23,11 @@
                     <label for="status" class="block text-sm font-medium mb-2" style="color: #f0f2bd;">
                         Status <span class="text-red-400">*</span>
                     </label>
-                    <select name="status" id="status"
+                    <select name="order_status" id="order_status"
                         class="w-full px-4 py-3 rounded-lg border-none focus:ring-2 focus:ring-amber-500"
                         style="background-color: #3e302b; color: #f0f2bd;" required>
-                        @foreach($statuses as $status)
-                            <option value="{{ $status->value }}" {{ old('status', $order->status->value) == $status->value ? 'selected' : '' }}>
+                        @foreach($orderStatuses as $status)
+                            <option value="{{ $status->value }}" {{ old('order_status', $order->order_status->value) == $status->value ? 'selected' : '' }}>
                                 {{ ucfirst($status->value) }}
                             </option>
                         @endforeach
@@ -87,7 +87,8 @@
                         <div>
                             <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Total</p>
                             <p class="text-sm font-bold" style="color: #22c55e;">Rp
-                                {{ number_format($order->total_price, 0, ',', '.') }}</p>
+                                {{ number_format($order->total_price, 0, ',', '.') }}
+                            </p>
                         </div>
                     </div>
                 </div>
