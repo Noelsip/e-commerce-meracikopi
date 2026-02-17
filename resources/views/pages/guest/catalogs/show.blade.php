@@ -33,6 +33,7 @@
 
             /* Mobile Responsive */
             @media (max-width: 768px) {
+
                 .product-container {
                     padding: 0 16px !important;
                 }
@@ -42,7 +43,9 @@
                 }
 
                 .product-header span {
-                    display: none;
+                    display: inline !important;
+                    font-size: 12px !important;
+                    margin-left: 16px !important;
                 }
 
                 .product-header a {
@@ -52,86 +55,113 @@
                 .product-box {
                     height: auto !important;
                     min-height: auto !important;
-                    padding: 20px 0 24px 0;
-                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.9) 0%, transparent 70%) !important;
+                    padding: 0 !important;
                 }
 
-                .product-box>div:first-child,
-                .product-box>div:nth-child(2) {
-                    background: radial-gradient(ellipse at center, rgba(72, 45, 27, 0.6) 0%, transparent 60%) !important;
+                .product-box > div:first-child {
+                    height: 100% !important;
+                    background: radial-gradient(ellipse at center top, rgba(72, 45, 27, 0.95) 0%, rgba(72, 45, 27, 0.4) 60%, transparent 100%) !important;
+                }
+
+                .product-box > div:nth-child(2) {
+                    background: none !important;
                 }
 
                 .product-content {
+                    display: flex !important;
                     flex-direction: column !important;
-                    gap: 16px !important;
-                    padding: 12px 16px !important;
+                    gap: 0 !important;
+                    padding: 0 !important;
                     align-items: center !important;
-                    justify-content: flex-start !important;
                     max-width: 100% !important;
+                    min-height: auto !important;
                 }
 
                 .product-image {
-                    width: 140px !important;
-                    height: 140px !important;
+                    width: 200px !important;
+                    height: 200px !important;
                     order: 1;
+                    margin-bottom: 8px !important;
                 }
 
                 .product-image img {
-                    width: 90% !important;
-                    max-width: 130px !important;
+                    width: 100% !important;
+                    max-width: 190px !important;
                 }
 
                 .product-details {
                     width: 100% !important;
-                    max-width: 320px;
-                    text-align: center;
+                    max-width: 100% !important;
+                    text-align: center !important;
                     order: 2;
+                    padding: 0 24px !important;
+                    box-sizing: border-box;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
                 }
 
                 .product-details h1 {
-                    font-size: 20px !important;
-                    margin-bottom: 4px !important;
+                    font-size: 18px !important;
+                    margin-bottom: 8px !important;
+                    line-height: 1.3 !important;
+                    max-width: 280px;
+                    text-align: center !important;
+                    word-break: break-word;
                 }
 
-                .product-details>div:nth-child(2) {
-                    font-size: 14px !important;
-                    margin-bottom: 0px !important;
+                .product-details > div:nth-child(2) {
+                    font-size: 16px !important;
+                    margin-bottom: 16px !important;
+                    text-align: center !important;
                 }
 
-                .product-details>div:nth-child(3) {
+                /* Variant select wrapper */
+                .product-details > div:nth-child(3) {
+                    margin: 0 auto 20px auto !important;
+                    max-width: 180px !important;
+                    width: 180px !important;
+                }
+
+                .product-details > div:nth-child(3) select {
+                    font-size: 13px !important;
+                    padding: 10px 36px 10px 12px !important;
+                }
+
+                .product-details > div:nth-child(3) label {
                     font-size: 10px !important;
-                    margin-bottom: 14px !important;
                 }
 
                 .product-quantity {
                     justify-content: center !important;
-                    margin-bottom: 12px !important;
-                    gap: 12px !important;
+                    margin-bottom: 20px !important;
+                    gap: 14px !important;
                 }
 
                 .product-quantity button {
-                    width: 32px !important;
-                    height: 32px !important;
-                    font-size: 16px !important;
+                    width: 34px !important;
+                    height: 34px !important;
+                    font-size: 18px !important;
                 }
 
                 .product-quantity input {
-                    font-size: 14px !important;
-                    width: 35px !important;
+                    font-size: 16px !important;
+                    width: 40px !important;
                 }
 
-                .product-details button[type="button"],
                 .product-details button:not(.product-quantity button) {
-                    width: 100% !important;
-                    max-width: 280px;
-                    margin: 0 auto;
-                    padding: 10px 0 !important;
+                    width: 200px !important;
+                    max-width: 200px;
+                    margin: 0 auto !important;
+                    padding: 11px 0 !important;
                     font-size: 14px !important;
                     border-radius: 30px !important;
+                    display: flex !important;
                 }
 
                 .description-section {
-                    padding: 20px 16px 40px 16px !important;
+                    padding: 24px 20px 32px 20px !important;
+                    margin-top: 20px !important;
                 }
 
                 .description-grid {
@@ -172,29 +202,42 @@
             /* Small Mobile (< 400px) */
             @media (max-width: 400px) {
                 .product-image {
-                    width: 150px !important;
-                    height: 150px !important;
+                    width: 170px !important;
+                    height: 170px !important;
                 }
 
                 .product-image img {
-                    max-width: 140px !important;
+                    max-width: 160px !important;
                 }
 
                 .product-details {
-                    max-width: 260px;
+                    padding: 0 20px !important;
                 }
 
                 .product-details h1 {
-                    font-size: 22px !important;
+                    font-size: 16px !important;
+                    max-width: 240px;
                 }
 
-                .product-details>div:nth-child(2) {
-                    font-size: 16px !important;
+                .product-details > div:nth-child(2) {
+                    font-size: 14px !important;
                 }
 
                 .product-quantity button {
-                    width: 32px !important;
-                    height: 32px !important;
+                    width: 30px !important;
+                    height: 30px !important;
+                    font-size: 16px !important;
+                }
+
+                .product-quantity input {
+                    font-size: 14px !important;
+                    width: 36px !important;
+                }
+
+                .product-details button:not(.product-quantity button) {
+                    width: 180px !important;
+                    max-width: 180px;
+                    font-size: 13px !important;
                 }
             }
         </style>
@@ -224,6 +267,7 @@
                 quantity: 1,
                 note: '',
                 loading: false,
+                iceType: 'hot',
                 init() {
                     this.$watch('quantity', (value) => {
                         if (value < 1 || value === '') {
@@ -237,6 +281,14 @@
 
                     this.loading = true;
                     const token = localStorage.getItem('guest_token');
+
+                    // Build note with ice type prefix for drink categories
+                    let fullNote = this.note;
+                    @if(in_array($menu->category, ['drink', 'bottled_coffee']))
+                    const typeLabel = this.iceType === 'hot' ? 'Hot' : 'Ice';
+                    fullNote = '[' + typeLabel + '] ' + (this.note || '').trim();
+                    fullNote = fullNote.trim();
+                    @endif
                     
                     fetch('/api/customer/cart/items', {
                         method: 'POST',
@@ -248,7 +300,7 @@
                         body: JSON.stringify({
                              menu_id: {{ $menu->id }},
                              quantity: this.quantity,
-                             note: this.note
+                             note: fullNote
                         })
                     })
                     .then(response => {
@@ -262,6 +314,7 @@
                         window.showCustomerToast('Berhasil menambahkan ke keranjang!', 'success');
                         this.quantity = 1;
                         this.note = '';
+                        this.iceType = 'hot';
                         // Trigger cart badge update
                         window.dispatchEvent(new Event('cartUpdated'));
                     })
@@ -398,21 +451,32 @@
                 <!-- Product Details -->
                 <div class="product-details" style="flex: 1; min-width: 0; max-width: 350px;">
                     <h1
-                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #F0F2BD; margin: 0 0 8px 0; line-height: 1.35;">
+                        style="font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 700; color: #F0F2BD; margin: 0 0 16px 0; line-height: 1.35;">
                         {{ $menu->name }}
                     </h1>
 
-                    <div style="font-size: 18px; color: #fff; margin-bottom: 2px; font-weight: 500;">
+                    <div style="font-size: 18px; color: #fff; margin-bottom: 24px; font-weight: 500;">
                         Rp {{ number_format($menu->price, 0, ',', '.') }}
                     </div>
 
-                    <div
-                        style="color: #aaa; font-size: 12px; margin-bottom: 20px; font-weight: 400; font-style: italic;">
-                        Hot/Ice
+                    @if(in_array($menu->category, ['drink', 'bottled_coffee']))
+                    <div style="position: relative; margin-bottom: 28px; width: 100%; max-width: 220px;">
+                        <label style="position: absolute; top: -8px; left: 12px; background: #2a1b14; padding: 0 6px; font-size: 11px; color: #a89890; font-family: 'Inter', sans-serif;">Variant</label>
+                        <select x-model="iceType"
+                            style="width: 100%; padding: 12px 40px 12px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; background: transparent; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
+                            <option value="hot" style="background: #2a1b14; color: #fff;">Hot</option>
+                            <option value="ice" style="background: #2a1b14; color: #fff;">Ice</option>
+                        </select>
+                        <svg style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); pointer-events: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a89890" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
                     </div>
+                    @else
+                    <div style="margin-bottom: 28px;"></div>
+                    @endif
 
                     <div class="product-quantity"
-                        style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        style="display: flex; align-items: center; gap: 16px; margin-bottom: 28px;">
                         <button @click="quantity > 1 ? quantity-- : null"
                             style="width: 32px; height: 32px; border-radius: 50%; background: #F0F2BD; border: none; font-size: 20px; font-weight: 600; color: #2a1b14; cursor: pointer; display: flex; align-items: center; justify-content: center;">-</button>
 
