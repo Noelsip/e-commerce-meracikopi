@@ -155,10 +155,8 @@
                 destination: {
                     address: draft.address + (draft.detail ? ' ' + draft.detail : ''),
                     postal_code: draft.postalCode,
-                    // Hardcoded coordinate for demo if not available (Biteship needs specific format)
-                    // In production, use Geocoding API to get lat/long from address
-                    latitude: -6.914744,
-                    longitude: 107.609810
+                    latitude: draft.latitude || null,
+                    longitude: draft.longitude || null
                 }
             };
 
