@@ -41,12 +41,14 @@
                 <div>
                     <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Tanggal Pesanan</p>
                     <p class="text-sm font-medium" style="color: #f0f2bd;">
-                        {{ $order->created_at->format('d M Y, H:i') }}</p>
+                        {{ $order->created_at->format('d M Y, H:i') }}
+                    </p>
                 </div>
                 <div>
                     <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Total</p>
                     <p class="text-lg font-bold" style="color: #22c55e;">Rp
-                        {{ number_format($order->total_price, 0, ',', '.') }}</p>
+                        {{ number_format($order->total_price, 0, ',', '.') }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -71,12 +73,15 @@
                         @foreach($order->order_items as $item)
                             <tr style="border-bottom: 1px solid #3e302b;">
                                 <td class="px-6 py-3 text-sm" style="color: #f0f2bd;">
-                                    {{ $item->menu?->name ?? 'Menu tidak ditemukan' }}</td>
+                                    {{ $item->menu?->name ?? 'Menu tidak ditemukan' }}
+                                </td>
                                 <td class="px-6 py-3 text-sm text-center" style="color: #f0f2bd;">{{ $item->quantity }}</td>
                                 <td class="px-6 py-3 text-sm text-right" style="color: #f0f2bd;">Rp
-                                    {{ number_format($item->price, 0, ',', '.') }}</td>
+                                    {{ number_format($item->price, 0, ',', '.') }}
+                                </td>
                                 <td class="px-6 py-3 text-sm text-right font-medium" style="color: #22c55e;">Rp
-                                    {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
+                                    {{ number_format($item->price * $item->quantity, 0, ',', '.') }}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -85,7 +90,8 @@
                             <td colspan="3" class="px-6 py-3 text-right text-sm font-medium" style="color: #f0f2bd;">Total
                             </td>
                             <td class="px-6 py-3 text-right text-lg font-bold" style="color: #22c55e;">Rp
-                                {{ number_format($order->total_price, 0, ',', '.') }}</td>
+                                {{ number_format($order->total_price, 0, ',', '.') }}
+                            </td>
                         </tr>
                     </tfoot>
                 </table>
@@ -98,53 +104,90 @@
 
         <!-- Delivery Address -->
         @if($order->order_type === 'delivery' && $order->order_addresses && $order->order_addresses->count() > 0)
-        @php $address = $order->order_addresses->first(); @endphp
-        <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
-            <div class="px-6 py-4" style="background-color: #3e302b;">
-                <h3 class="font-semibold" style="color: #f0f2bd;">Alamat Pengiriman</h3>
-            </div>
-            <div class="px-6 py-4 space-y-2">
-                <div class="flex gap-2 text-sm" style="color: #f0f2bd;">
-                    <span class="font-medium">{{ $address->receiver_name }}</span>
-                    <span style="opacity: 0.5;">|</span>
-                    <span>{{ $address->phone }}</span>
+            @php $address = $order->order_addresses->first(); @endphp
+            <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
+                <div class="px-6 py-4" style="background-color: #3e302b;">
+                    <h3 class="font-semibold" style="color: #f0f2bd;">Alamat Pengiriman</h3>
                 </div>
-                <p class="text-sm" style="color: #f0f2bd; opacity: 0.85;">{{ $address->full_address }}</p>
-                <p class="text-sm" style="color: #f0f2bd; opacity: 0.7;">{{ $address->city }}@if($address->province), {{ $address->province }}@endif {{ $address->postal_code }}</p>
-                @if($address->notes)
-                <p class="text-sm" style="color: #f0f2bd; opacity: 0.6;"><em>Catatan: {{ $address->notes }}</em></p>
-                @endif
+                <div class="px-6 py-4 space-y-2">
+                    <div class="flex gap-2 text-sm" style="color: #f0f2bd;">
+                        <span class="font-medium">{{ $address->receiver_name }}</span>
+                        <span style="opacity: 0.5;">|</span>
+                        <span>{{ $address->phone }}</span>
+                    </div>
+                    <p class="text-sm" style="color: #f0f2bd; opacity: 0.85;">{{ $address->full_address }}</p>
+                    <p class="text-sm" style="color: #f0f2bd; opacity: 0.7;">{{ $address->city }}@if($address->province),
+                    {{ $address->province }}@endif {{ $address->postal_code }}</p>
+                    @if($address->notes)
+                        <p class="text-sm" style="color: #f0f2bd; opacity: 0.6;"><em>Catatan: {{ $address->notes }}</em></p>
+                    @endif
+                </div>
             </div>
-        </div>
+        @endif
+
+        @if($order->deliveries->count() > 0)
+            @php $delivery = $order->deliveries->first(); @endphp
+            <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
+                <div class="px-6 py-4"
+                    style="background-color: #3e302b; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 class="font-semibold" style="color: #f0f2bd;">Informasi Pengiriman</h3>
+                    <span class="px-3 py-1 rounded-full text-xs font-medium"
+                        style="background-color: rgba(59, 130, 246, 0.2); color: #3b82f6;">
+                        {{ strtoupper($delivery->status ?? 'PENDING') }}
+                    </span>
+                </div>
+                <div class="px-6 py-4 space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Kurir</p>
+                            <p class="text-sm font-medium" style="color: #f0f2bd;">
+                                {{ strtoupper($delivery->courier_name ?? '-') }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Nomor Resi (Waybill)</p>
+                            <p class="text-sm font-bold" style="color: #22c55e;">
+                                {{ $delivery->waybill_id ?? '-' }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Biteship Order ID</p>
+                            <p class="text-sm font-mono" style="color: #f0f2bd; opacity: 0.8;">
+                                {{ $delivery->courier_order_id ?? '-' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         @endif
 
         <!-- Order Notes -->
         @if($order->notes)
-        <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
-            <div class="px-6 py-4" style="background-color: #3e302b;">
-                <h3 class="font-semibold" style="color: #f0f2bd;">Catatan Pesanan</h3>
+            <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
+                <div class="px-6 py-4" style="background-color: #3e302b;">
+                    <h3 class="font-semibold" style="color: #f0f2bd;">Catatan Pesanan</h3>
+                </div>
+                <div class="px-6 py-4">
+                    <p class="text-sm" style="color: #f0f2bd; white-space: pre-line;">{{ $order->notes }}</p>
+                </div>
             </div>
-            <div class="px-6 py-4">
-                <p class="text-sm" style="color: #f0f2bd; white-space: pre-line;">{{ $order->notes }}</p>
-            </div>
-        </div>
         @endif
 
         <!-- Actions -->
         <div class="flex gap-3 mt-6">
             @if(
-                $order->order_type->value === 'delivery' && 
-                ($order->status->value === 'paid' || $order->status->value === 'ready') &&
-                (!$order->deliveries()->exists() || !$order->deliveries->first()->courier_order_id)
-            )
-            <form action="{{ route('admin.orders.requestPickup', $order->id) }}" method="POST"
-                onsubmit="return confirm('Panggil kurir sekarang? Pastikan saldo Biteship cukup.');">
-                @csrf
-                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium"
-                    style="background-color: #8b5cf6; color: white;">
-                    Request Pickup (Biteship)
-                </button>
-            </form>
+                    $order->order_type->value === 'delivery' &&
+                    ($order->status->value === 'paid' || $order->status->value === 'ready') &&
+                    (!$order->deliveries()->exists() || !$order->deliveries->first()->courier_order_id)
+                )
+                <form action="{{ route('admin.orders.requestPickup', $order->id) }}" method="POST"
+                    onsubmit="return confirm('Panggil kurir sekarang? Pastikan saldo Biteship cukup.');">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium"
+                        style="background-color: #8b5cf6; color: white;">
+                        Request Pickup (Biteship)
+                    </button>
+                </form>
             @endif
 
             <a href="{{ route('admin.orders.edit', $order->id) }}" class="px-4 py-2 rounded-lg text-sm font-medium"
