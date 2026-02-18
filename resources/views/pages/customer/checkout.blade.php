@@ -132,6 +132,173 @@
         </div>
     </div>
 
+    <!-- Script for Shipping Logic -->
+    <script>
+        async function checkShippingRates() {
+            const container = document.getElementById('shippingOptionsContainer');
+            const section = document.getElementById('shippingOptionsSection');
+
+            // Cek apakah alamat sudah lengkap
+            const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || '{}');
+            if (!draft.address || !draft.postalCode) {
+                if (section) section.style.display = 'none';
+                return;
+            }
+
+            // Tampilkan section & loading
+            if (section) section.style.display = 'block';
+            container.innerHTML = '<div class="shipping-loading"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin-anim"><path d="M21 12a9 9 0 1 1-6.219-8.56"></path></svg><br>Memuat ongkir...</div>';
+
+            // Build payload
+            const payload = {
+                channel: 'courier',
+                destination: {
+                    address: draft.address + (draft.detail ? ' ' + draft.detail : ''),
+                    postal_code: draft.postalCode,
+                    // Hardcoded coordinate for demo if not available (Biteship needs specific format)
+                    // In production, use Geocoding API to get lat/long from address
+                    latitude: -6.914744,
+                    longitude: 107.609810
+                }
+            };
+
+            console.log('Checking shipping rates...', payload);
+
+            try {
+                const response = await fetch('/api/customer/shipping/quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.message || 'Gagal cek ongkir');
+
+                console.log('Shipping rates:', data);
+
+                // Save quote ID
+                localStorage.setItem('shipping_quote_id', data.data.quote_id);
+
+                // Render options
+                renderShippingOptions(data.data.options);
+
+            } catch (error) {
+                console.error('Error checking rates:', error);
+                container.innerHTML = `<div class="shipping-loading" style="color: #e74c3c;">Gagal memuat ongkir: ${error.message}</div>`;
+            }
+        }
+
+        function renderShippingOptions(options) {
+            const container = document.getElementById('shippingOptionsContainer');
+
+            if (!options || options.length === 0) {
+                container.innerHTML = '<div class="shipping-loading">Tidak ada kurir tersedia untuk lokasi ini.</div>';
+                return;
+            }
+
+            let html = '';
+            let foundSelected = false;
+
+            options.forEach(opt => {
+                // Skip if error or logic failure
+                if (!opt.price && opt.price !== 0) return;
+
+                // FIX: Use 'id' from backend, fallback to 'option_id' just in case
+                const optionId = opt.id || opt.option_id;
+                const isSelected = localStorage.getItem('shipping_option_id') == optionId;
+
+                if (isSelected) {
+                    selectedShippingCost = opt.price;
+                    foundSelected = true;
+                }
+
+                // FIX: Use 'service' (e.g. "JNE Reguler") and 'etd' (e.g. "2-3 hari")
+                const serviceName = opt.service || opt.courier_service_name || '-';
+                let etdDisplay = opt.etd || opt.shipment_duration_range || '';
+
+                if (etdDisplay && !etdDisplay.toLowerCase().includes('estimasi')) {
+                    etdDisplay = 'Estimasi ' + etdDisplay;
+                }
+
+                html += `
+                    <div class="shipping-option-card ${isSelected ? 'selected' : ''}" 
+                         onclick="selectShippingOption('${optionId}', ${opt.price}, this)">
+                        <div class="shipping-option-header">
+                            <span class="shipping-courier-name">${opt.courier_name}</span>
+                            <span class="shipping-price">Rp ${new Intl.NumberFormat('id-ID').format(opt.price)}</span>
+                        </div>
+                        <div class="shipping-detail">
+                            <span class="shipping-service">${serviceName}</span>
+                            <span class="shipping-etd">${etdDisplay}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Check for stale selection
+            if (!foundSelected && localStorage.getItem('shipping_option_id')) {
+                selectedShippingCost = 0;
+                localStorage.removeItem('shipping_option_id');
+                // Don't remove quote_id as it's fresh
+            }
+
+            container.innerHTML = html;
+
+            if (typeof updateOrderTotal === 'function') {
+                updateOrderTotal();
+            }
+        }
+
+        function selectShippingOption(optionId, price, cardParams) {
+            // Update selected ID
+            localStorage.setItem('shipping_option_id', optionId);
+
+            // Visual selection
+            document.querySelectorAll('.shipping-option-card').forEach(c => c.classList.remove('selected'));
+            // If calling from onclick, cardParams is element. If re-render, we might not have it.
+            if (cardParams) cardParams.classList.add('selected');
+
+            // Update global price variable and UI
+            selectedShippingCost = price;
+            updateOrderTotal();
+
+            console.log('Selected shipping:', optionId, 'Price:', price);
+
+            // Add or update shipping row in summary
+            let shippingRow = document.getElementById('shippingCostRow');
+            const summaryCard = document.querySelector('.order-summary-card');
+            const totalRow = document.querySelector('.summary-total-row');
+
+            if (!shippingRow) {
+                shippingRow = document.createElement('div');
+                shippingRow.id = 'shippingCostRow';
+                shippingRow.className = 'summary-row';
+                shippingRow.innerHTML = `
+                    <span class="summary-label">Ongkos Kirim</span>
+                    <span class="summary-value" id="shippingCostValue">Rp 0</span>
+                `;
+                // Insert before divider or total row
+                if (totalRow) {
+                    // Check for divider
+                    const divider = document.querySelector('.summary-divider');
+                    if (divider) {
+                        summaryCard.insertBefore(shippingRow, divider);
+                    } else {
+                        summaryCard.insertBefore(shippingRow, totalRow);
+                    }
+                }
+            }
+
+            // Update text
+            document.getElementById('shippingCostValue').textContent = 'Rp ' + formatRupiah(price);
+        }
+    </script>
+
     <style>
         /* Error Modal Styles */
         .error-modal-overlay {
@@ -675,6 +842,77 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Shipping Options Styles */
+        .shipping-options-section {
+            margin-top: 24px;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .shipping-option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 244, 214, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .shipping-option-card:hover {
+            border-color: rgba(202, 120, 66, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .shipping-option-card.selected {
+            border-color: #CA7842;
+            background: rgba(202, 120, 66, 0.15);
+        }
+
+        .shipping-option-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .shipping-courier-name {
+            color: #FFF4D6;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .shipping-price {
+            color: #FFF4D6;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .shipping-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .shipping-service {
+            color: rgba(255, 244, 214, 0.7);
+            font-size: 12px;
+        }
+
+        .shipping-etd {
+            color: rgba(255, 244, 214, 0.5);
+            font-size: 11px;
+        }
+
+        .shipping-loading {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 244, 214, 0.7);
+            font-size: 13px;
+        }
     </style>
 
     <div class="checkout-page-container">
@@ -700,9 +938,26 @@
                         <span class="recipient-divider">|</span>
                         <span class="recipient-phone" id="deliveryRecipientPhone">-</span>
                     </div>
-                    <p class="address-detail" id="deliveryAddressDetail">Belum ada alamat pengiriman. Klik "Ubah" untuk mengisi.</p>
+                    <p class="address-detail" id="deliveryAddressDetail">Belum ada alamat pengiriman. Klik "Ubah" untuk
+                        mengisi.</p>
                 </div>
                 <button class="address-edit-btn" onclick="editAddress()">Ubah</button>
+            </div>
+        </div>
+
+        <!-- Shipping Options Section (Hidden by default, shown after address set) -->
+        <div class="shipping-options-section" id="shippingOptionsSection">
+            <div class="address-header" style="margin-bottom: 12px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CA7842" stroke-width="2">
+                    <rect x="1" y="3" width="15" height="13"></rect>
+                    <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                    <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                    <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                </svg>
+                <span class="address-title">Opsi Pengiriman</span>
+            </div>
+            <div id="shippingOptionsContainer">
+                <!-- Shipping options will be rendered here -->
             </div>
         </div>
 
@@ -798,6 +1053,10 @@
                     <div class="summary-row">
                         <span class="summary-label" id="summarySubtotalLabel">Subtotal (0 Produk)</span>
                         <span class="summary-value" id="summarySubtotalValue">Rp 0</span>
+                    </div>
+                    <div class="summary-row" id="shippingCostRow" style="display: none;">
+                        <span class="summary-label">Ongkos Kirim</span>
+                        <span class="summary-value" id="shippingCostValue">Rp 0</span>
                     </div>
                     <div class="summary-divider"></div>
                     <div class="summary-total-row">
@@ -1020,7 +1279,8 @@
 
         // Proceed to payment
         async function proceedToPayment() {
-            const orderType = document.getElementById('orderTypeDisplay').textContent.toLowerCase().replace(' ', '_'); // dine_in, take_away
+            const orderTypeDisplay = document.getElementById('orderTypeDisplay').textContent || '';
+            const rawOrderType = orderTypeDisplay.toLowerCase().trim();
             const token = localStorage.getItem('guest_token');
 
             // 1. Get Selected Item IDs
@@ -1044,94 +1304,93 @@
                 showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                 return;
             }
-            let paymentMethod = selectedPayment.value;
 
-            // Map order type text to enum value expected by backend
-            const orderTypeMap = {
-                'dine_in': 'dine_in',
-                'take_away': 'take_away',
-                'delivery': 'delivery'
-            };
-            const backendOrderType = orderTypeMap[orderType] || 'take_away';
+            // Map order type
+            let backendOrderType = 'take_away';
+            if (rawOrderType.includes('dine')) backendOrderType = 'dine_in';
+            else if (rawOrderType.includes('delivery')) backendOrderType = 'delivery';
 
-            if (orderType === 'delivery') {
-                if (!recipientPhone) {
-                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi nomor telepon penerima terlebih dahulu');
-                    editAddress();
-                    return;
-                }
-                if (!province || !city || !district) {
-                    showErrorModal('Alamat Belum Lengkap', 'Silahkan lengkapi provinsi, kota, dan kecamatan');
-                    editAddress();
-                    return;
-                }
-                if (!postalCode) {
-                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi kode pos terlebih dahulu');
-                    editAddress();
-                    return;
-                }
-                if (!fullAddress) {
-                    showErrorModal('Alamat Belum Lengkap', 'Silahkan isi alamat lengkap terlebih dahulu');
-                    editAddress();
-                    return;
-                }
-            }
+            console.log('Processing order type:', backendOrderType);
 
             // 3. Prepare Payload
-            let customerName, customerPhone;
-
-            if (orderType === 'delivery') {
-                // For delivery, use the address modal inputs (or display values)
-                customerName = document.getElementById('recipientName').value || 'Guest';
-                customerPhone = document.getElementById('recipientPhone').value || '-';
-            } else {
-                // For dine in / takeaway, use the new inputs
-                customerName = document.getElementById('dineInName').value;
-                customerPhone = document.getElementById('dineInPhone').value;
-
-                if (!customerName || customerName.trim() === '') {
-                    showErrorModal('Nama Pemesan Kosong', 'Silahkan isi nama pemesan terlebih dahulu');
-                    // Focus on the input
-                    document.getElementById('dineInName').focus();
-
-                    // Reset button state
-                    const checkoutBtn = document.querySelector('.checkout-btn');
-                    checkoutBtn.innerText = 'Checkout';
-                    checkoutBtn.disabled = false;
-                    return;
-                }
-            }
-
-            const tableId = localStorage.getItem('table_id') || 1; // Fallback to 1 for testing if not set
-
             const payload = {
                 order_type: backendOrderType,
-                customer_name: customerName,
-                customer_phone: customerPhone || null,
-                notes: document.getElementById('orderNotes')?.value || '',
                 selected_item_ids: selectedItemIds,
-                // Delivery specific fields (only for delivery order type)
-                ...(orderType === 'delivery' ? {
-                    address: {
-                        receiver_name: customerName,
-                        phone: customerPhone,
-                        full_address: document.getElementById('fullAddress').value,
-                        city: document.getElementById('city').value,
-                        postal_code: document.getElementById('postalCode').value,
-                        notes: document.getElementById('addressDetail').value || ''
-                    },
-                    shipping_quote_id: localStorage.getItem('shipping_quote_id') || '',
-                    shipping_option_id: localStorage.getItem('shipping_option_id') || ''
-                } : {}),
-                // Table ID only for dine_in
-                ...(orderType === 'dine_in' && tableId ? { table_id: tableId } : {})
+                notes: document.getElementById('orderNotes')?.value || '',
             };
+
+            if (backendOrderType === 'delivery') {
+                // VALIDATE & USE DATA FROM LOCALSTORAGE (DRAFT)
+                const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || '{}');
+
+                if (!draft.name || !draft.phone || !draft.address || !draft.district || !draft.city || !draft.province) {
+                    showErrorModal('Alamat Belum Lengkap', 'Mohon lengkapi data penerima dan alamat pengiriman.');
+                    editAddress();
+                    return;
+                }
+
+                // Validate Shipping
+                const quoteId = localStorage.getItem('shipping_quote_id');
+                const optionId = localStorage.getItem('shipping_option_id');
+
+                if (!quoteId || !optionId) {
+                    showErrorModal('Pengiriman Belum Dipilih', 'Silahkan pilih kurir / layanan pengiriman.');
+                    const shippingSection = document.getElementById('shippingOptionsSection');
+                    if (shippingSection) shippingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                payload.customer_name = draft.name;
+                payload.customer_phone = draft.phone;
+
+                payload.address = {
+                    receiver_name: draft.name,
+                    phone: draft.phone,
+                    full_address: draft.address,
+                    city: draft.city,
+                    district: draft.district, // Add district
+                    province: draft.province, // Add province
+                    postal_code: draft.postalCode,
+                    notes: draft.detail || ''
+                };
+
+                payload.shipping_quote_id = quoteId;
+                payload.shipping_option_id = optionId;
+
+            } else {
+                // Dine In / Take Away -> Get from inputs
+                const nameInput = document.getElementById('dineInName');
+                const phoneInput = document.getElementById('dineInPhone');
+                const nameVal = nameInput?.value?.trim();
+                const phoneVal = phoneInput?.value?.trim();
+
+                if (!nameVal) {
+                    showErrorModal('Nama Pemesan Kosong', 'Silahkan isi nama pemesan terlebih dahulu');
+                    if (nameInput) nameInput.focus();
+                    return;
+                }
+
+                payload.customer_name = nameVal;
+                payload.customer_phone = phoneVal;
+
+                if (backendOrderType === 'dine_in') {
+                    const tableId = localStorage.getItem('selected_table_id') || localStorage.getItem('table_id');
+                    if (!tableId) {
+                        // Should be handled by validateCheckoutButton but double check
+                        showErrorModal('Meja Belum Dipilih', 'Silahkan scan QR meja atau pilih meja.');
+                        return;
+                    }
+                    payload.table_id = tableId;
+                }
+            }
 
             // 4. Submit Order
             const checkoutBtn = document.querySelector('.checkout-btn');
-            const originalText = checkoutBtn.innerText;
-            checkoutBtn.innerText = 'Memproses...';
-            checkoutBtn.disabled = true;
+            // const originalText = checkoutBtn ? checkoutBtn.innerText : 'Checkout'; // Define inside try/catch or higher scope if needed to restore
+            if (checkoutBtn) {
+                checkoutBtn.innerText = 'Memproses...';
+                checkoutBtn.disabled = true;
+            }
 
             console.log('Sending order payload:', payload);
 
@@ -1457,9 +1716,14 @@
             if (provinceName) fullAddressText += ', ' + provinceName;
             if (draft.postalCode) fullAddressText += ' ' + draft.postalCode;
 
-            document.getElementById('deliveryRecipientName').textContent = draft.name;
             document.getElementById('deliveryRecipientPhone').textContent = draft.phone;
             document.getElementById('deliveryAddressDetail').textContent = fullAddressText;
+
+            // Trigger calc shipping if address exists and order type is delivery
+            const orderType = document.getElementById('orderTypeDisplay')?.textContent.toLowerCase();
+            if (orderType === 'delivery') {
+                setTimeout(checkShippingRates, 500);
+            }
         }
 
         // Edit address
@@ -1568,13 +1832,15 @@
             }));
 
             // Update display - using specific IDs
-            document.getElementById('deliveryRecipientName').textContent = name;
-            document.getElementById('deliveryRecipientPhone').textContent = phone;
             document.getElementById('deliveryAddressDetail').textContent = fullAddressText;
 
             closeAddressModal();
+
+            // Calculate shipping rates
+            checkShippingRates();
         }
 
+        // Toggle sections based on order type (called from navbar)
         // Toggle sections based on order type (called from navbar)
         window.toggleDeliverySection = function (isDelivery) {
             const deliveryAddressSection = document.getElementById('deliveryAddressSection');
@@ -1585,10 +1851,33 @@
                 deliveryAddressSection.style.display = 'block';
                 paymentMethodsSection.style.display = 'block'; // Metode pembayaran selalu tampil
                 if (customerInfoSection) customerInfoSection.style.display = 'none';
+
+                // Show shipping section if valid address exists
+                const shippingSection = document.getElementById('shippingOptionsSection');
+                const draft = localStorage.getItem('delivery_address_draft');
+                if (draft && shippingSection) {
+                    shippingSection.style.display = 'block';
+                    checkShippingRates();
+                }
             } else {
                 deliveryAddressSection.style.display = 'none';
                 paymentMethodsSection.style.display = 'block';
                 if (customerInfoSection) customerInfoSection.style.display = 'block';
+
+                // Hide shipping section
+                const shippingSection = document.getElementById('shippingOptionsSection');
+                if (shippingSection) shippingSection.style.display = 'none';
+
+                // Reset shipping cost
+                selectedShippingCost = 0;
+                localStorage.removeItem('shipping_option_id');
+                localStorage.removeItem('shipping_quote_id');
+
+                // Remove shipping row from summary
+                const shippingRow = document.getElementById('shippingCostRow');
+                if (shippingRow) shippingRow.remove();
+
+                updateOrderTotal();
             }
         }
 
@@ -1882,6 +2171,7 @@
 
         // Global variable for service fee from backend
         let checkoutServiceFee = 0;
+        let selectedShippingCost = 0;
 
         // Fetch checkout settings from backend (service fee, etc.)
         async function loadCheckoutSettings() {
@@ -1927,11 +2217,25 @@
             const subtotalValue = document.getElementById('summarySubtotalValue');
             const totalElement = document.querySelector('.summary-total-value');
 
+            // Calculate Grand Total
+            const grandTotal = subtotal + checkoutServiceFee + (selectedShippingCost || 0);
+
             if (subtotalLabel) subtotalLabel.textContent = `Subtotal (${totalQty} Produk)`;
             if (subtotalValue) subtotalValue.textContent = 'Rp ' + formatRupiah(subtotal);
 
+            // Hide/Show shipping cost row if exists
+            const shippingRow = document.getElementById('shippingCostRow');
+            if (shippingRow) {
+                if (selectedShippingCost > 0) {
+                    shippingRow.style.display = 'flex';
+                    document.getElementById('shippingCostValue').textContent = 'Rp ' + formatRupiah(selectedShippingCost);
+                } else {
+                    shippingRow.style.display = 'none';
+                }
+            }
+
             if (totalElement) {
-                totalElement.textContent = 'Rp ' + formatRupiah(subtotal);
+                totalElement.textContent = 'Rp ' + formatRupiah(grandTotal);
             }
         }
 

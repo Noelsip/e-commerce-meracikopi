@@ -12,6 +12,7 @@ class ShippingQuoteService
         private readonly RajaOngkirClient $rajaOngkir,
         private readonly GrabExpressClient $grabExpress,
         private readonly GoSendClient $goSend,
+        private readonly BiteshipClient $biteship,
         private readonly DeliveryService $distanceCalculator,
     ) {
     }
@@ -23,6 +24,11 @@ class ShippingQuoteService
                 'id' => 'rajaongkir',
                 'type' => 'courier',
                 'available' => $this->rajaOngkir->isConfigured() && !empty($this->getRajaOngkirOriginId()),
+            ],
+            [
+                'id' => 'biteship',
+                'type' => 'courier',
+                'available' => $this->biteship->isConfigured(),
             ],
             [
                 'id' => 'grabexpress',
@@ -110,6 +116,100 @@ class ShippingQuoteService
 
     private function quoteCourier(array $origin, array $destination, array $input, array &$meta): array
     {
+        $options = [];
+
+        // === Biteship (prioritas utama) ===
+        if ($this->biteship->isConfigured()) {
+            $biteshipOptions = $this->quoteBiteship($origin, $destination, $input, $meta);
+            $options = array_merge($options, $biteshipOptions);
+        }
+
+        // === RajaOngkir (fallback jika Biteship tidak dikonfigurasi atau gagal) ===
+        if (empty($options)) {
+            $rajaOngkirOptions = $this->quoteRajaOngkir($origin, $destination, $input, $meta);
+            $options = array_merge($options, $rajaOngkirOptions);
+        }
+
+        return $options;
+    }
+
+    /**
+     * Quote via Biteship API
+     */
+    private function quoteBiteship(array $origin, array $destination, array $input, array &$meta): array
+    {
+        $items = [];
+        if (!empty($input['items'])) {
+            $items = $input['items'];
+        } else {
+            $items = [
+                [
+                    'name' => 'Package',
+                    'quantity' => 1,
+                    'weight' => (int) ($input['weight_grams'] ?? $this->defaultWeightGrams()),
+                    'value' => (int) ($input['total_value'] ?? 0),
+                ]
+            ];
+        }
+
+        $couriers = [];
+        if (!empty($input['couriers'])) {
+            // Konversi dari format colon-separated ke array
+            $couriers = is_array($input['couriers'])
+                ? $input['couriers']
+                : explode(',', str_replace(':', ',', $input['couriers']));
+        }
+
+        $result = $this->biteship->getRates($origin, $destination, $items, $couriers);
+
+        $meta['biteship'] = [
+            'origin' => $origin,
+            'destination' => $destination,
+        ];
+
+        if (!($result['success'] ?? false) || empty($result['data'])) {
+            $meta['biteship_error'] = $result['message'] ?? 'Failed to fetch Biteship rates';
+            return [];
+        }
+
+        $options = [];
+        foreach ($result['data'] as $pricing) {
+            $courierCode = (string) ($pricing['courier_code'] ?? '');
+            $courierService = (string) ($pricing['courier_service_code'] ?? '');
+            $courierName = (string) ($pricing['courier_name'] ?? '');
+            $serviceName = (string) ($pricing['courier_service_name'] ?? '');
+            $price = $pricing['price'] ?? null;
+            $type = (string) ($pricing['type'] ?? '');
+
+            if ($courierCode === '' || !is_numeric($price)) {
+                continue;
+            }
+
+            $optionId = 'biteship:' . $courierCode . ':' . Str::slug($courierService ?: $serviceName, '_');
+
+            $options[] = [
+                'id' => $optionId,
+                'provider' => 'biteship',
+                'service' => $serviceName ?: $courierService,
+                'courier_code' => $courierCode,
+                'courier_name' => $courierName,
+                'courier_service_code' => $courierService,
+                'price' => (int) $price,
+                'currency' => 'IDR',
+                'etd' => (string) ($pricing['shipment_duration_range'] ?? $pricing['duration'] ?? ''),
+                'type' => $type,
+                'raw' => $pricing,
+            ];
+        }
+
+        return $options;
+    }
+
+    /**
+     * Quote via RajaOngkir API
+     */
+    private function quoteRajaOngkir(array $origin, array $destination, array $input, array &$meta): array
+    {
         $originId = $this->getRajaOngkirOriginId();
         $destinationId = (int) ($destination['rajaongkir_destination_id'] ?? 0);
         $weightGrams = (int) ($input['weight_grams'] ?? $this->defaultWeightGrams());
@@ -147,7 +247,7 @@ class ShippingQuoteService
                 continue;
             }
 
-            $optionId = 'rajaongkir:'.$courierCode.':'.Str::slug($service, '_');
+            $optionId = 'rajaongkir:' . $courierCode . ':' . Str::slug($service, '_');
 
             $options[] = [
                 'id' => $optionId,
@@ -191,7 +291,7 @@ class ShippingQuoteService
             $quote = $this->grabExpress->quote($origin, $destination, $payload);
             if ($quote->success && $quote->price !== null) {
                 $options[] = [
-                    'id' => 'grabexpress:'.Str::uuid(),
+                    'id' => 'grabexpress:' . Str::uuid(),
                     'provider' => 'grabexpress',
                     'service' => $quote->serviceName ?? 'GrabExpress',
                     'price' => (int) $quote->price,
@@ -208,7 +308,7 @@ class ShippingQuoteService
             $quote = $this->goSend->quote($origin, $destination, $payload);
             if ($quote->success && $quote->price !== null) {
                 $options[] = [
-                    'id' => 'gosend:'.Str::uuid(),
+                    'id' => 'gosend:' . Str::uuid(),
                     'provider' => 'gosend',
                     'service' => $quote->serviceName ?? 'GoSend',
                     'price' => (int) $quote->price,
@@ -265,12 +365,12 @@ class ShippingQuoteService
         $travelTime = ($distanceKm / $averageSpeed) * 60;
         $totalTime = (int) ceil($travelTime + $preparationTime);
 
-        return $totalTime.' minutes';
+        return $totalTime . ' minutes';
     }
 
     private function cacheKey(string $quoteId): string
     {
-        return 'shipping_quote:'.$quoteId;
+        return 'shipping_quote:' . $quoteId;
     }
 }
 
