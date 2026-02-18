@@ -1089,35 +1089,22 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Provinsi <span style="color: #e74c3c;">*</span></label>
-                        <select class="form-input form-select" id="province">
+                        <select class="form-input form-select" id="province" onchange="loadCities()">
                             <option value="">Pilih Provinsi</option>
-                            <option value="kaltim">Kalimantan Timur</option>
-                            <option value="kalteng">Kalimantan Tengah</option>
-                            <option value="kalsel">Kalimantan Selatan</option>
-                            <option value="kalbar">Kalimantan Barat</option>
-                            <option value="kaltara">Kalimantan Utara</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Kota/Kabupaten <span style="color: #e74c3c;">*</span></label>
-                        <select class="form-input form-select" id="city">
+                        <select class="form-input form-select" id="city" onchange="loadDistricts()" disabled>
                             <option value="">Pilih Kota</option>
-                            <option value="balikpapan">Kota Balikpapan</option>
-                            <option value="samarinda">Kota Samarinda</option>
-                            <option value="bontang">Kota Bontang</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Kecamatan <span style="color: #e74c3c;">*</span></label>
-                        <select class="form-input form-select" id="district">
+                        <select class="form-input form-select" id="district" disabled>
                             <option value="">Pilih Kecamatan</option>
-                            <option value="balikpapan_utara">Balikpapan Utara</option>
-                            <option value="balikpapan_selatan">Balikpapan Selatan</option>
-                            <option value="balikpapan_timur">Balikpapan Timur</option>
-                            <option value="balikpapan_barat">Balikpapan Barat</option>
-                            <option value="balikpapan_tengah">Balikpapan Tengah</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -1165,6 +1152,99 @@
     </div>
 
     <script>
+        // --- Region Data Strategy ---
+        const regionData = {
+            'dki_jakarta': {
+                name: 'DKI Jakarta',
+                cities: {
+                    'jakarta_pusat': {
+                        name: 'Jakarta Pusat',
+                        districts: ['Gambir', 'Tanah Abang', 'Menteng', 'Senen', 'Cempaka Putih', 'Johar Baru', 'Kemayoran', 'Sawah Besar']
+                    },
+                    'jakarta_selatan': {
+                        name: 'Jakarta Selatan',
+                        districts: ['Kebayoran Baru', 'Kebayoran Lama', 'Pesanggrahan', 'Cilandak', 'Pasar Minggu', 'Jagakarsa', 'Mampang Prapatan', 'Pancoran', 'Tebet', 'Setiabudi']
+                    }
+                }
+            },
+            'kaltim': {
+                name: 'Kalimantan Timur',
+                cities: {
+                    'balikpapan': {
+                        name: 'Kota Balikpapan',
+                        districts: ['Balikpapan Utara', 'Balikpapan Selatan', 'Balikpapan Timur', 'Balikpapan Barat', 'Balikpapan Tengah', 'Balikpapan Kota']
+                    },
+                    'samarinda': {
+                        name: 'Kota Samarinda',
+                        districts: ['Samarinda Ilir', 'Samarinda Kota', 'Samarinda Seberang', 'Samarinda Ulu', 'Samarinda Utara', 'Sungai Kunjang', 'Palaran', 'Sambutan', 'Loa Janan Ilir', 'Sungai Pinang']
+                    },
+                    'bontang': {
+                        name: 'Kota Bontang',
+                        districts: ['Bontang Barat', 'Bontang Selatan', 'Bontang Utara']
+                    }
+                }
+            }
+        };
+
+        // Initialize Regions
+        document.addEventListener('DOMContentLoaded', () => {
+            const provSelect = document.getElementById('province');
+            // Populate Provinces
+            Object.keys(regionData).forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = regionData[key].name;
+                provSelect.appendChild(option);
+            });
+        });
+
+        function loadCities() {
+            const provSelect = document.getElementById('province');
+            const citySelect = document.getElementById('city');
+            const distSelect = document.getElementById('district');
+
+            citySelect.innerHTML = '<option value="">Pilih Kota</option>';
+            distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            citySelect.disabled = true;
+            distSelect.disabled = true;
+
+            const selectedProv = provSelect.value;
+            if (selectedProv && regionData[selectedProv]) {
+                const cities = regionData[selectedProv].cities;
+                Object.keys(cities).forEach(key => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = cities[key].name;
+                    citySelect.appendChild(option);
+                });
+                citySelect.disabled = false;
+            }
+        }
+
+        function loadDistricts() {
+            const provSelect = document.getElementById('province');
+            const citySelect = document.getElementById('city');
+            const distSelect = document.getElementById('district');
+
+            distSelect.innerHTML = '<option value="">Pilih Kecamatan</option>';
+            distSelect.disabled = true;
+
+            const selectedProv = provSelect.value;
+            const selectedCity = citySelect.value;
+
+            if (selectedProv && selectedCity && regionData[selectedProv] && regionData[selectedProv].cities[selectedCity]) {
+                const districts = regionData[selectedProv].cities[selectedCity].districts;
+                districts.forEach(distName => {
+                    const option = document.createElement('option');
+                    // Simple slug for value, or use name directly
+                    option.value = distName;
+                    option.textContent = distName;
+                    distSelect.appendChild(option);
+                });
+                distSelect.disabled = false;
+            }
+        }
+
         // Track last selected values for toggle functionality
         let lastSelectedPayment = null;
         let lastSelectedDelivery = null;
@@ -1688,8 +1768,14 @@
             // Set form fields
             if (draft.name) document.getElementById('recipientName').value = draft.name;
             if (draft.phone) document.getElementById('recipientPhone').value = draft.phone;
-            if (draft.province) document.getElementById('province').value = draft.province;
-            if (draft.city) document.getElementById('city').value = draft.city;
+            if (draft.province) {
+                document.getElementById('province').value = draft.province;
+                loadCities(); // Trigger load cities
+            }
+            if (draft.city) {
+                document.getElementById('city').value = draft.city;
+                loadDistricts(); // Trigger load districts
+            }
             if (draft.district) document.getElementById('district').value = draft.district;
             if (draft.postalCode) document.getElementById('postalCode').value = draft.postalCode;
             if (draft.address) document.getElementById('fullAddress').value = draft.address;
@@ -1731,8 +1817,14 @@
             const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || '{}');
             if (draft.name) document.getElementById('recipientName').value = draft.name;
             if (draft.phone) document.getElementById('recipientPhone').value = draft.phone;
-            if (draft.province) document.getElementById('province').value = draft.province;
-            if (draft.city) document.getElementById('city').value = draft.city;
+            if (draft.province) {
+                document.getElementById('province').value = draft.province;
+                loadCities();
+            }
+            if (draft.city) {
+                document.getElementById('city').value = draft.city;
+                loadDistricts();
+            }
             if (draft.district) document.getElementById('district').value = draft.district;
             if (draft.postalCode) document.getElementById('postalCode').value = draft.postalCode;
             if (draft.address) document.getElementById('fullAddress').value = draft.address;
