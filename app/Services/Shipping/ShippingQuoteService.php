@@ -181,7 +181,25 @@ class ShippingQuoteService
 
         if (!($result['success'] ?? false) || empty($result['data'])) {
             $meta['biteship_error'] = $result['message'] ?? 'Failed to fetch Biteship rates';
-            return [];
+
+            // DEBUG: Return error as visual feedback
+            return [
+                [
+                    'id' => 'error_debug',
+                    'provider' => 'biteship',
+                    'service' => 'ERROR',
+                    'courier_code' => 'biteship',
+                    'courier_name' => 'Biteship Error',
+                    'courier_service_code' => 'error',
+                    'price' => 0,
+                    'currency' => 'IDR',
+                    'etd' => '-',
+                    'type' => 'error',
+                    'description' => $result['error'] ?? $result['message'] ?? 'Unknown Error',
+                    // Add raw message to service name so it appears in bold
+                    'service' => 'ERR: ' . substr($result['message'] ?? 'Unknown', 0, 30),
+                ]
+            ];
         }
 
         $options = [];
