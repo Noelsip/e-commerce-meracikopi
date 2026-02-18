@@ -160,7 +160,16 @@ class ShippingQuoteService
                 : explode(',', str_replace(':', ',', $input['couriers']));
         }
 
-        $result = $this->biteship->getRates($origin, $destination, $items, $couriers);
+        // Enhance origin with specific Biteship config if present
+        $biteshipOrigin = $origin;
+        if (config('services.biteship.store_address')) {
+            $biteshipOrigin['address'] = config('services.biteship.store_address');
+        }
+        if (config('services.biteship.store_postal_code')) {
+            $biteshipOrigin['postal_code'] = (string) config('services.biteship.store_postal_code');
+        }
+
+        $result = $this->biteship->getRates($biteshipOrigin, $destination, $items, $couriers);
 
         $meta['biteship'] = [
             'origin' => $origin,
