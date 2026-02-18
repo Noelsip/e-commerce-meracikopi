@@ -194,7 +194,7 @@ class ShippingQuoteService
                 'courier_code' => $courierCode,
                 'courier_name' => $courierName,
                 'courier_service_code' => $courierService,
-                'price' => $this->biteship->isMockMode() ? 1 : (int) $price,
+                'price' => $this->biteship->isMockMode() ? 0 : (int) $price,
                 'currency' => 'IDR',
                 'etd' => (string) ($pricing['shipment_duration_range'] ?? $pricing['duration'] ?? ''),
                 'type' => $type,
