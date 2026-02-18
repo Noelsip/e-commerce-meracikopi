@@ -1302,6 +1302,7 @@
                 showErrorModal('Metode Pembayaran Belum Dipilih', 'Silahkan pilih metode pembayaran terlebih dahulu');
                 return;
             }
+            const paymentMethod = selectedPayment.value;
 
             // Map order type
             let backendOrderType = 'take_away';
@@ -1384,7 +1385,7 @@
 
             // 4. Submit Order
             const checkoutBtn = document.querySelector('.checkout-btn');
-            // const originalText = checkoutBtn ? checkoutBtn.innerText : 'Checkout'; // Define inside try/catch or higher scope if needed to restore
+            const originalText = checkoutBtn ? checkoutBtn.innerText : 'Checkout';
             if (checkoutBtn) {
                 checkoutBtn.innerText = 'Memproses...';
                 checkoutBtn.disabled = true;
