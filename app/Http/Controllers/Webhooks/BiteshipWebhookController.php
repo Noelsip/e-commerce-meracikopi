@@ -48,7 +48,9 @@ class BiteshipWebhookController extends Controller
         $event = $payload['event'] ?? null;
 
         if (!$event) {
-            return response()->json(['message' => 'No event provided'], 400);
+            // Return 200 OK to pass Biteship's webhook URL validation check
+            Log::info('Biteship Webhook verification received (no event provided)');
+            return response()->json(['message' => 'Webhook validation successful'], 200);
         }
 
         try {
