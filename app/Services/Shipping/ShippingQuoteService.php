@@ -167,6 +167,9 @@ class ShippingQuoteService
         }
         if (config('services.biteship.store_postal_code')) {
             $biteshipOrigin['postal_code'] = (string) config('services.biteship.store_postal_code');
+            // Remove coordinates to prevent conflict/mismatch with postal code
+            unset($biteshipOrigin['latitude']);
+            unset($biteshipOrigin['longitude']);
         }
 
         $result = $this->biteship->getRates($biteshipOrigin, $destination, $items, $couriers);
