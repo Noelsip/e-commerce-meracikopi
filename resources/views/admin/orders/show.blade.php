@@ -132,6 +132,21 @@
 
         <!-- Actions -->
         <div class="flex gap-3 mt-6">
+            @if(
+                $order->order_type->value === 'delivery' && 
+                ($order->status->value === 'paid' || $order->status->value === 'ready') &&
+                (!$order->deliveries()->exists() || !$order->deliveries->first()->courier_order_id)
+            )
+            <form action="{{ route('admin.orders.requestPickup', $order->id) }}" method="POST"
+                onsubmit="return confirm('Panggil kurir sekarang? Pastikan saldo Biteship cukup.');">
+                @csrf
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium"
+                    style="background-color: #8b5cf6; color: white;">
+                    Request Pickup (Biteship)
+                </button>
+            </form>
+            @endif
+
             <a href="{{ route('admin.orders.edit', $order->id) }}" class="px-4 py-2 rounded-lg text-sm font-medium"
                 style="background-color: #3b82f6; color: white;">
                 Edit Pesanan
