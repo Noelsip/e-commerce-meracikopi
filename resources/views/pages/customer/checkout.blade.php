@@ -80,7 +80,7 @@
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
                                 <line x1="1" y1="10" x2="23" y2="10"></line>
                             </svg>
-                            <span id="paymentMethodName">Credit Card</span>
+                            <span id="paymentMethodName">QRIS</span>
                         </p>
                     </div>
                 </div>
@@ -1269,18 +1269,7 @@
 
             // Payment method display names
             const paymentNames = {
-                'dana': 'DANA',
                 'qris': 'QRIS',
-                'transfer_bank': 'Transfer Bank',
-                'gopay': 'GoPay',
-                'shopeepay': 'ShopeePay',
-                'jnt': 'J&T Express',
-                'jne': 'JNE',
-                'grab_express': 'Grab Express',
-                'gosend': 'Go Send',
-                'sicepat': 'SiCepat Express',
-                'credit_card': 'Credit Card',
-                'bank_transfer': 'Bank Transfer'
             };
 
             // Format order type

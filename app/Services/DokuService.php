@@ -257,22 +257,21 @@ class DokuService
     {
         Log::info('Creating DOKU Payment', ['method' => $paymentMethod]);
 
-        // Strategy:
-        // 1. Try Direct API for QRIS (if Mall ID configured) -> Embeds QR
-        // 2. Fallback to Checkout v1 for everything else -> Popup URL
-
-        if ($paymentMethod === 'qris') {
-            // Attempt Direct API first
-            try {
-                return self::createQrisDirectPayment($orderData);
-            } catch (\Exception $e) {
-                Log::warning('QRIS Direct failed (likely missing Mall ID), falling back to Checkout v1', ['error' => $e->getMessage()]);
-                // Fallthrough to checkout v1
-            }
+        // Only QRIS payment is supported
+        if ($paymentMethod !== 'qris') {
+            throw new \Exception('Hanya metode pembayaran QRIS yang tersedia.');
         }
 
-        // For all others (VA, E-Wallet, Credit Card), use Checkout v1 with restricted method
-        return self::createCheckoutPayment($paymentMethod, $orderData, $customerData);
+        // Strategy:
+        // 1. Try Direct API for QRIS (if Mall ID configured) -> Embeds QR
+        // 2. Fallback to Checkout v1 -> Popup URL
+        try {
+            return self::createQrisDirectPayment($orderData);
+        } catch (\Exception $e) {
+            Log::warning('QRIS Direct failed (likely missing Mall ID), falling back to Checkout v1', ['error' => $e->getMessage()]);
+        }
+
+        return self::createCheckoutPayment('qris', $orderData, $customerData);
     }
 
     /**
@@ -378,46 +377,20 @@ class DokuService
 
     private static function getInstructions(string $paymentMethod): string
     {
-        $instructions = [
-            'qris' => 'Scan QR Code yang muncul di jendela pembayaran.',
-            'dana' => 'Selesaikan pembayaran di jendela DANA yang muncul.',
-            'bca_va' => 'Selesaikan pembayaran via Virtual Account BCA di jendela yang muncul.',
-            // ... add others
-        ];
-        return $instructions[$paymentMethod] ?? 'Selesaikan pembayaran di jendela yang muncul.';
+        return 'Scan QR Code yang muncul di jendela pembayaran menggunakan aplikasi e-wallet atau mobile banking Anda.';
     }
 
     private static function getDokuPaymentMethodType(string $paymentMethod): array
     {
-        $mapping = [
-            'qris' => ['QRIS'],
-            'dana' => ['EMONEY_DANA'],
-            'ovo' => ['EMONEY_OVO'],
-            'shopeepay' => ['EMONEY_SHOPEE_PAY'],
-            'gopay' => ['QRIS'],
-            'bca_va' => ['VIRTUAL_ACCOUNT_BCA'],
-            'bni_va' => ['VIRTUAL_ACCOUNT_BNI'],
-            'bri_va' => ['VIRTUAL_ACCOUNT_BRI'],
-            'mandiri_va' => ['VIRTUAL_ACCOUNT_BANK_MANDIRI'],
-            'credit_card' => ['CREDIT_CARD'],
-        ];
-        return $mapping[$paymentMethod] ?? [];
+        return ['QRIS'];
     }
 
     public static function mapPaymentMethod(?string $paymentMethod): ?string
     {
-        $mapping = [
-            'qris' => 'QRIS',
-            'dana' => 'DANA',
-            'gopay' => 'GOPAY',
-            'shopeepay' => 'SHOPEEPAY',
-            'ovo' => 'OVO',
-            'bca_va' => 'VIRTUAL_ACCOUNT_BCA',
-            'bni_va' => 'VIRTUAL_ACCOUNT_BNI',
-            'bri_va' => 'VIRTUAL_ACCOUNT_BRI',
-            'mandiri_va' => 'VIRTUAL_ACCOUNT_MANDIRI',
-        ];
-        return $mapping[$paymentMethod] ?? null;
+        if ($paymentMethod === 'qris') {
+            return 'QRIS';
+        }
+        return null;
     }
 
     // Status Check

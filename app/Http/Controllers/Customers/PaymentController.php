@@ -36,38 +36,23 @@ class PaymentController extends Controller
      */
     private function getReadableError(string $errorMessage, string $paymentMethod): string
     {
-        $methodNames = [
-            'qris' => 'QRIS',
-            'dana' => 'DANA',
-            'gopay' => 'GoPay',
-            'shopeepay' => 'ShopeePay',
-            'ovo' => 'OVO',
-            'bca_va' => 'Virtual Account BCA',
-            'bni_va' => 'Virtual Account BNI',
-            'bri_va' => 'Virtual Account BRI',
-            'mandiri_va' => 'Virtual Account Mandiri',
-        ];
-
-        $methodName = $methodNames[$paymentMethod] ?? $paymentMethod;
-
         if (str_contains($errorMessage, 'responseCode') || str_contains($errorMessage, '{')) {
             return "DOKU Error: " . $errorMessage;
         }
 
-        // Parse common DOKU errors
         if (str_contains($errorMessage, 'Unauthorized') || str_contains($errorMessage, 'Unknown Client')) {
-            return "Pembayaran {$methodName} tidak tersedia saat ini. Silahkan coba metode pembayaran lain.";
+            return "Pembayaran QRIS tidak tersedia saat ini. Silahkan coba beberapa saat lagi.";
         }
 
         if (str_contains($errorMessage, 'access token') || str_contains($errorMessage, 'Access Token')) {
-            return "Koneksi ke payment gateway bermasalah. Silahkan coba beberapa saat lagi atau gunakan metode pembayaran lain.";
+            return "Koneksi ke payment gateway bermasalah. Silahkan coba beberapa saat lagi.";
         }
 
         if (str_contains($errorMessage, 'timeout') || str_contains($errorMessage, 'Connection')) {
-            return "Koneksi ke payment gateway timeout. Silahkan coba lagi atau gunakan metode pembayaran lain.";
+            return "Koneksi ke payment gateway timeout. Silahkan coba lagi.";
         }
 
-        return "Tidak dapat memproses pembayaran dengan {$methodName}. Silahkan coba metode pembayaran lain.";
+        return "Tidak dapat memproses pembayaran QRIS. Silahkan coba beberapa saat lagi.";
     }
 
     /**
@@ -135,64 +120,22 @@ class PaymentController extends Controller
      */
     private function generateFallbackResponse(string $paymentMethod, string $transactionId, array $orderData, Payments $payment): array
     {
-        $response = [
-            'payment_method' => $paymentMethod,
+        return [
+            'payment_method' => 'qris',
             'invoice_number' => $transactionId,
             'amount' => $orderData['amount'],
             'status' => 'PENDING',
             'fallback_mode' => true,
-            'display_type' => 'popup', // Default fallback UX
-            // Default URL creates a mock payment page (or reuse success page for dev)
+            'display_type' => 'popup',
             'payment_url' => url('/checkout/success?payment_id=' . $payment->id . '&simulated=true'),
+            'qr_code_data' => [
+                'qr_string' => 'QRIS-' . $transactionId,
+                'qr_image' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock',
+                'qr_url' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock',
+                'expired_at' => now()->addHours(1)->toIso8601String()
+            ],
+            'instructions' => 'Scan QR Code untuk menyelesaikan pembayaran.',
         ];
-
-        switch ($paymentMethod) {
-            case 'qris':
-                $response['qr_code_data'] = [
-                    'qr_string' => 'QRIS-' . $transactionId,
-                    'qr_image' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock', // Mock QR
-                    'qr_url' => 'https://dummyimage.com/300x300/000/fff&text=QRIS+Mock',
-                    'expired_at' => now()->addHours(1)->toIso8601String()
-                ];
-                $response['instructions'] = 'Scan QR Code Mock di jendela popup.';
-                break;
-
-            case 'bca_va':
-            case 'bni_va':
-            case 'bri_va':
-            case 'mandiri_va':
-                $bankName = strtoupper(str_replace('_va', '', $paymentMethod));
-                $vaNumber = ($bankName === 'BCA' ? '8808' : '8809') . str_pad($payment->order_id, 6, '0', STR_PAD_LEFT);
-
-                $response['virtual_account_info'] = [
-                    'bank_name' => $bankName,
-                    'va_number' => $vaNumber,
-                    'amount' => $orderData['amount'],
-                    'expired_at' => now()->addHours(24)->toISOString()
-                ];
-                $response['instructions'] = "Transfer ke Virtual Account {$bankName}: {$vaNumber}";
-                break;
-
-            case 'dana':
-            case 'gopay':
-            case 'shopeepay':
-            case 'ovo':
-                $walletName = ucfirst($paymentMethod);
-                $response['payment_url'] = url('/checkout/success?payment_id=' . $payment->id);
-                $response['ewallet_info'] = [
-                    'deep_link' => "https://mock-{$paymentMethod}.app/pay?amount=" . $orderData['amount'],
-                    'payment_url' => url('/checkout/success?payment_id=' . $payment->id),
-                    'expired_at' => now()->addHours(1)->toISOString()
-                ];
-                $response['instructions'] = "Anda akan diarahkan ke aplikasi {$walletName} untuk menyelesaikan pembayaran";
-                break;
-
-            default:
-                $response['payment_url'] = url('/checkout/success?payment_id=' . $payment->id);
-                $response['instructions'] = 'Silahkan ikuti petunjuk pembayaran yang muncul';
-        }
-
-        return $response;
     }
 
     /**
@@ -262,10 +205,10 @@ class PaymentController extends Controller
                 'payload' => [],
             ]);
 
-            // Validate payment method
-            if (!$selectedPaymentMethod) {
+            // Validate payment method - only QRIS is allowed
+            if (!$selectedPaymentMethod || $selectedPaymentMethod !== 'qris') {
                 $payment->delete();
-                abort(422, 'Metode pembayaran harus dipilih');
+                abort(422, 'Hanya metode pembayaran QRIS yang tersedia');
             }
 
             // Prepare order data for DOKU
@@ -362,18 +305,8 @@ class PaymentController extends Controller
 
             // Add specific data based on payment method
             if (isset($dokuResponse['qr_code_data']) && $dokuResponse['qr_code_data']) {
-                $responseData['qr_code'] = $dokuResponse['qr_code_data']; // Legacy
-                $responseData['qr_code_data'] = $dokuResponse['qr_code_data']; // Consistent key
-            }
-
-            if (isset($dokuResponse['virtual_account_info']) && $dokuResponse['virtual_account_info']) {
-                $responseData['virtual_account'] = $dokuResponse['virtual_account_info']; // Legacy
-                $responseData['virtual_account_info'] = $dokuResponse['virtual_account_info']; // Consistent key
-            }
-
-            if (isset($dokuResponse['ewallet_info']) && $dokuResponse['ewallet_info']) {
-                $responseData['ewallet'] = $dokuResponse['ewallet_info']; // Legacy
-                $responseData['ewallet_info'] = $dokuResponse['ewallet_info']; // Consistent key
+                $responseData['qr_code'] = $dokuResponse['qr_code_data'];
+                $responseData['qr_code_data'] = $dokuResponse['qr_code_data'];
             }
 
             if (isset($dokuResponse['payment_url']) && $dokuResponse['payment_url']) {

@@ -73,15 +73,11 @@
                     // Fallback to legacy handling
                     if (data.payment_method === 'qris' && data.qr_code_data) {
                         this.handleQRPayment(data.qr_code_data, data.instructions, data.invoice_number);
-                    } else if (data.virtual_account_info) {
-                        this.handleVAPayment(data.virtual_account_info, data.instructions);
-                    } else if (data.ewallet_info) {
-                        this.handleEWalletPayment(data.ewallet_info, data.instructions);
                     } else if (data.payment_url) {
-                        this.handlePopupPayment(data); // Default to popup if URL exists
+                        this.handlePopupPayment(data);
                     } else {
                         console.error('Unknown payment data structure:', data);
-                        alert('Format data pembayaran tidak dikenakan.');
+                        alert('Format data pembayaran tidak dikenali.');
                     }
                 }
 
@@ -342,16 +338,8 @@
             getPaymentMethodName: function (method) {
                 const names = {
                     'qris': 'QRIS',
-                    'dana': 'DANA',
-                    'gopay': 'GoPay',
-                    'shopeepay': 'ShopeePay',
-                    'ovo': 'OVO',
-                    'bca_va': 'Virtual Account BCA',
-                    'bni_va': 'Virtual Account BNI',
-                    'bri_va': 'Virtual Account BRI',
-                    'mandiri_va': 'Virtual Account Mandiri'
                 };
-                return names[method] || method.toUpperCase();
+                return names[method] || 'QRIS';
             },
 
             getStatusText: function (status) {
