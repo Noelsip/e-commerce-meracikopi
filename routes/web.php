@@ -32,7 +32,7 @@ Route::get('/checkout/success', function () {
 })->name('doku.success');
 
 Route::get('/checkout/cancel', function () {
-    return view('pages.customer.payment-cancel');  
+    return view('pages.customer.payment-cancel');
 })->name('doku.cancel');
 
 Route::get('/checkout/error', function () {
@@ -116,6 +116,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
             ->name('tables.generateQR');
         Route::post('/tables/{id}/regenerate-qr', [TableApiController::class, 'regenerateQRCode'])
             ->name('tables.regenerateQR');
+
+        Route::post('/orders/{order}/request-pickup', [OrderAdminController::class, 'requestPickup'])
+            ->name('orders.requestPickup');
 
         Route::resource('orders', OrderAdminController::class)->except(['create', 'store']);
         Route::patch('/orders/{order}/status', [OrderAdminController::class, 'updateStatus'])

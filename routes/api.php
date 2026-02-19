@@ -13,6 +13,7 @@ use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\PaymentController;
 use App\Http\Controllers\Customers\DeliveryController;
 use App\Http\Controllers\Customers\ShippingController;
+use App\Http\Controllers\Webhooks\BiteshipWebhookController;
 
 // Admin Login (no auth required)
 Route::post('/admin/login', [AuthAdminController::class, 'login']);
@@ -31,7 +32,7 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
     Route::get('/orders', [AdminOrderController::class, 'index']);
     Route::get('/orders/{id}', [AdminOrderController::class, 'show']);
     Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus']);
-    
+
     // Delivery Management
     Route::post('/orders/{id}/delivery-request', [AdminOrderController::class, 'createDeliveryRequest']);
     Route::get('/orders/{id}/delivery', [AdminOrderController::class, 'getDelivery']);
@@ -67,6 +68,7 @@ Route::prefix('customer')->group(function () {
     // Shipping (public)
     Route::get('/shipping/providers', [ShippingController::class, 'providers'])->name('customer.shipping.providers');
     Route::post('/shipping/quote', [ShippingController::class, 'quote'])->name('customer.shipping.quote');
+    Route::get('/shipping/track', [ShippingController::class, 'track'])->name('customer.shipping.track');
     Route::get('/shipping/rajaongkir/provinces', [ShippingController::class, 'rajaOngkirProvinces'])->name('customer.shipping.rajaongkir.provinces');
     Route::get('/shipping/rajaongkir/destinations', [ShippingController::class, 'rajaOngkirDestinations'])->name('customer.shipping.rajaongkir.destinations');
 
@@ -90,13 +92,16 @@ Route::prefix('customer')->middleware('guest.token')->group(function () {
     // Payment
     Route::post('/orders/{orderId}/pay', [PaymentController::class, 'pay']);
     Route::get('/orders/{invoiceNumber}/payment-status', [PaymentController::class, 'checkPaymentStatus']);
-    
+
     // Simulate payment (for testing fallback mode only)
     Route::post('/orders/{invoiceNumber}/simulate-payment', [PaymentController::class, 'simulatePaymentComplete']);
 });
 
 // DOKU webhook
 Route::match(['get', 'post'], '/webhooks/doku', [PaymentController::class, 'dokuWebhook']);
+
+// Biteship webhook (untuk update status pengiriman)
+Route::post('/webhooks/biteship', [BiteshipWebhookController::class, 'handle']);
 
 // DOKU Token Endpoint (untuk SNAP configuration)
 Route::match(['get', 'post'], '/doku/token', [PaymentController::class, 'generateDokuToken']);

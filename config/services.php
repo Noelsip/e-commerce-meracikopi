@@ -61,4 +61,19 @@ return [
         'api_url' => env('DELIVERY_API_URL'),
         'api_key' => env('DELIVERY_API_KEY'),
     ],
+
+    'biteship' => [
+        'base_url' => env('BITESHIP_BASE_URL', 'https://api.biteship.com/v1'),
+        'api_key' => env('BITESHIP_API_KEY'),
+        'mock_mode' => env('BITESHIP_MOCK_MODE', false),
+        'default_couriers' => env('BITESHIP_COURIERS', 'jne,sicepat,jnt,anteraja,ninja,tiki'),
+        'default_weight_grams' => (int) env('BITESHIP_DEFAULT_WEIGHT_GRAMS', 1000),
+        'timeout_seconds' => (int) env('BITESHIP_TIMEOUT_SECONDS', 15),
+        // Informasi toko untuk shipper
+        'store_name' => env('BITESHIP_STORE_NAME', env('APP_NAME', 'MeraciKopi')),
+        'store_phone' => env('BITESHIP_STORE_PHONE', ''),
+        'store_email' => env('BITESHIP_STORE_EMAIL', ''),
+        'store_address' => env('BITESHIP_STORE_ADDRESS', ''),
+        'store_postal_code' => env('BITESHIP_STORE_POSTAL_CODE', ''),
+    ],
 ];
