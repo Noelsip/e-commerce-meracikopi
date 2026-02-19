@@ -12,6 +12,7 @@ use App\Models\Orders;
 use App\Models\Cart;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderProcessStatus;
 use App\Enums\StatusPayments;
 
 use App\Services\DokuService;
@@ -474,6 +475,7 @@ class PaymentController extends Controller
                         $payment->order->update([
                             'status' => OrderStatus::PAID,
                             'payment_status' => StatusPayments::PAID,
+                            'order_status' => OrderProcessStatus::PROCESSING,
                         ]);
                         $this->clearCartForOrder($payment->order);
                     }
@@ -556,6 +558,7 @@ class PaymentController extends Controller
         $payment->order->update([
             'status' => OrderStatus::PAID,
             'payment_status' => StatusPayments::PAID,
+            'order_status' => OrderProcessStatus::PROCESSING,
         ]);
 
         // Clear cart setelah pembayaran berhasil
@@ -623,6 +626,7 @@ class PaymentController extends Controller
                 $payment->order->update([
                     'status' => OrderStatus::PAID,
                     'payment_status' => StatusPayments::PAID,
+                    'order_status' => OrderProcessStatus::PROCESSING,
                 ]);
 
                 return response()->json([

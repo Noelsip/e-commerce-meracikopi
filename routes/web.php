@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TableApiController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\CatalogController;
@@ -128,6 +129,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');

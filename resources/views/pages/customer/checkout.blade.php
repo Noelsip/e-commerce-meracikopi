@@ -138,6 +138,10 @@
             const container = document.getElementById('shippingOptionsContainer');
             const section = document.getElementById('shippingOptionsSection');
 
+            // Clear stale quote from localStorage so user must re-select after new rates load
+            localStorage.removeItem('shipping_quote_id');
+            localStorage.removeItem('shipping_option_id');
+
             // Cek apakah alamat sudah lengkap
             const draft = JSON.parse(localStorage.getItem('delivery_address_draft') || '{}');
             if (!draft.address || !draft.postalCode) {

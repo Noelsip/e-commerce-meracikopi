@@ -182,24 +182,7 @@ class ShippingQuoteService
         if (!($result['success'] ?? false) || empty($result['data'])) {
             $meta['biteship_error'] = $result['message'] ?? 'Failed to fetch Biteship rates';
 
-            // DEBUG: Return error as visual feedback
-            return [
-                [
-                    'id' => 'error_debug',
-                    'provider' => 'biteship',
-                    'service' => 'ERROR',
-                    'courier_code' => 'biteship',
-                    'courier_name' => 'Biteship Error',
-                    'courier_service_code' => 'error',
-                    'price' => 0,
-                    'currency' => 'IDR',
-                    'etd' => '-',
-                    'type' => 'error',
-                    'description' => $result['error'] ?? $result['message'] ?? 'Unknown Error',
-                    // Add raw message to service name so it appears in bold
-                    'service' => 'ERR: ' . substr($result['message'] ?? 'Unknown', 0, 30),
-                ]
-            ];
+            return [];
         }
 
         $options = [];
@@ -244,7 +227,23 @@ class ShippingQuoteService
         $destinationId = (int) ($destination['rajaongkir_destination_id'] ?? 0);
         $weightGrams = (int) ($input['weight_grams'] ?? $this->defaultWeightGrams());
 
-        if (!$this->rajaOngkir->isConfigured() || empty($originId) || $destinationId <= 0) {
+        if (!$this->rajaOngkir->isConfigured() || empty($originId)) {
+            return [];
+        }
+
+        // Auto-lookup destination ID by postal code if not provided
+        if ($destinationId <= 0 && !empty($destination['postal_code'])) {
+            $cacheKey = 'rajaongkir_dest_postal:' . $destination['postal_code'];
+            $found = Cache::remember($cacheKey, now()->addDays(7), function () use ($destination) {
+                return $this->rajaOngkir->findDestinationByPostalCode((string) $destination['postal_code']);
+            });
+            if ($found && isset($found['id'])) {
+                $destinationId = (int) $found['id'];
+                $meta['rajaongkir_auto_destination'] = $found['label'] ?? '';
+            }
+        }
+
+        if ($destinationId <= 0) {
             return [];
         }
 
