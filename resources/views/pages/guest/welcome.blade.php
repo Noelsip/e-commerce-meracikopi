@@ -561,7 +561,7 @@
                 <a href="{{ url('/customer/catalogs?category=food') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
-                        background: linear-gradient(to top, #603e2a, #261810);
+                        background: #2d1e14;
                         border-radius: 24px;
                         padding: 12px;
                         text-align: center;
@@ -592,7 +592,7 @@
                 <a href="{{ url('/customer/catalogs?category=drink') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
-                        background: linear-gradient(to top, #603e2a, #261810);
+                        background: #2d1e14;
                         border-radius: 24px;
                         padding: 12px;
                         text-align: center;
@@ -623,7 +623,7 @@
                 <a href="{{ url('/customer/catalogs?category=coffee-beans') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
-                        background: linear-gradient(to top, #603e2a, #261810);
+                        background: #2d1e14;
                         border-radius: 24px;
                         padding: 12px;
                         text-align: center;
@@ -654,7 +654,7 @@
                 <a href="{{ url('/customer/catalogs?category=bottled_coffee') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
-                        background: linear-gradient(to top, #603e2a, #261810);
+                        background: #2d1e14;
                         border-radius: 24px;
                         padding: 12px;
                         text-align: center;
@@ -685,7 +685,7 @@
                 <a href="{{ url('/customer/catalogs?category=sachet_drip') }}" class="category-card"
                     style="text-decoration: none; display: block;">
                     <div class="category-card-inner" style="
-                        background: linear-gradient(to top, #603e2a, #261810);
+                        background: #2d1e14;
                         border-radius: 24px;
                         padding: 12px;
                         text-align: center;
