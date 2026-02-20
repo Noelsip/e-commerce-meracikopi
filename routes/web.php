@@ -24,6 +24,10 @@ Route::get('/', function () {
     return view('pages.guest.welcome');
 })->name('home');
 
+Route::get('/user-guide', function () {
+    return view('pages.guest.user-guide');
+})->name('user-guide');
+
 // QR Code Scan Route
 Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan');
 

@@ -239,6 +239,10 @@
                             style="color: #a89890; text-decoration: none; font-size: 14px; transition: color 0.3s;"
                             onmouseover="this.style.color='white'" onmouseout="this.style.color='#a89890'">Catalog</a>
                     </li>
+                    <li><a href="{{ url('/user-guide') }}"
+                            style="color: #a89890; text-decoration: none; font-size: 14px; transition: color 0.3s;"
+                            onmouseover="this.style.color='white'" onmouseout="this.style.color='#a89890'">User Guide</a>
+                    </li>
 
                 </ul>
             </div>
@@ -255,7 +259,7 @@
                             76114
                         </a>
                     </p>
-                    <p style="color: #a89890; font-size: 14px; margin: 0;">Phone: +62 525 1833 438</p>
+                    <p style="color: #a89890; font-size: 14px; margin: 0;">Phone: +62 517 7112 017</p>
                     <p style="color: #a89890; font-size: 14px; margin: 0;">Email: Meracikopi@gmail.com</p>
                 </div>
             </div>
