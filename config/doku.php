@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'client_id' => env('DOKU_CLIENT_ID', 'BRN-0230-1770360751626'),
+    'client_id' => env('DOKU_CLIENT_ID', 'BRN-0213-1769756224228'),
     'secret_key' => env('DOKU_SECRET_KEY', ''),
     'api_key' => env('DOKU_API_KEY', ''),
     'public_key' => env('DOKU_PUBLIC_KEY', ''),
