@@ -50,7 +50,7 @@ class OrderAdminController extends Controller
 
     public function show(Orders $order)
     {
-        $order->load(['user', 'tables', 'order_items', 'order_addresses']);
+        $order->load(['user', 'tables', 'order_items', 'order_addresses', 'deliveries']);
         return view('admin.orders.show', compact('order'));
     }
 
