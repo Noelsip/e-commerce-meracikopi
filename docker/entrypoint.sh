@@ -33,7 +33,8 @@ done
 
 echo "[OK] Moving forward with startup..."
 
-# ALWAYS recreate .env from environment variables to ensure latest config
+# Create .env from environment variables ONLY if not already mounted via volume
+if [ ! -f /var/www/html/.env ]; then
 echo "📝 Creating .env file from environment variables..."
 cat > /var/www/html/.env <<EOF
 APP_NAME="${APP_NAME:-Laravel}"
@@ -92,6 +93,9 @@ TRUSTED_PROXIES="${TRUSTED_PROXIES:-}"
 BITESHIP_API_KEY="${BITESHIP_API_KEY:-}"
 BITESHIP_MOCK_MODE="${BITESHIP_MOCK_MODE:-true}"
 EOF
+else
+    echo "✅ .env file already exists (mounted via volume), skipping creation."
+fi
 
 # Generate app key if not set
 if [ -z "$APP_KEY" ]; then
