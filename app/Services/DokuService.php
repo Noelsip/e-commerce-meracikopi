@@ -311,7 +311,7 @@ class DokuService
         return [
             'payment_method' => 'qris',
             'invoice_number' => $orderData['invoice_number'],
-            'display_type' => 'on_page', // Display directly!
+            'display_type' => 'on_page', 
             'qr_code_data' => [
                 'qr_string' => $qrContent,
                 'qr_url' => $qrUrl,

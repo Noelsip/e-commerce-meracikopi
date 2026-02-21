@@ -123,7 +123,7 @@
 
                             <div class="payment-details" style="margin-top: 30px;">
                                 <p><strong>Invoice:</strong> ${data.invoice_number}</p>
-                                <p style="font-size: 1.2em; margin-top: 8px;"><strong>Total:</strong> ${this.formatCurrency(data.amount || 0)}</p>
+                                <p style="font-size: 1.2em; margin-top: 8px;"><strong>Total:</strong> Rp ${this.formatCurrency(data.amount || 0)}</p>
                             </div>
                         </div>
                     </div>

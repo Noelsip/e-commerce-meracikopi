@@ -173,6 +173,61 @@
         display: block;
     }
 
+    /* Order Type Unavailable Toast */
+    .order-type-toast {
+        position: fixed;
+        top: 130px;
+        left: 50%;
+        transform: translateX(-50%) translateY(-20px);
+        background-color: #2A1B14;
+        border: 1px solid #ef4444;
+        border-radius: 12px;
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 9999;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        min-width: 260px;
+        max-width: 420px;
+    }
+
+    .order-type-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+        pointer-events: auto;
+    }
+
+    .order-type-toast-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-color: rgba(239, 68, 68, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .order-type-toast-icon svg { color: #ef4444; }
+
+    .order-type-toast-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #ef4444;
+        display: block;
+    }
+
+    .order-type-toast-msg {
+        font-size: 12px;
+        color: rgba(255,255,255,0.7);
+        line-height: 1.4;
+        display: block;
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .checkout-navbar {
@@ -198,6 +253,21 @@
         }
     }
 </style>
+
+<!-- Order Type Unavailable Toast -->
+<div id="orderTypeToast" class="order-type-toast">
+    <div class="order-type-toast-icon">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+    </div>
+    <div>
+        <span class="order-type-toast-title" id="orderTypeToastTitle">Layanan tidak tersedia</span>
+        <span class="order-type-toast-msg" id="orderTypeToastMsg">Jenis pesanan ini sedang tidak tersedia</span>
+    </div>
+</div>
 
 <!-- Back Button (Outside Navbar) -->
 <div class="back-button-container">
@@ -228,6 +298,7 @@
             <!-- Order Type Dropdown -->
             <div class="order-type-dropdown">
                 <select class="order-type-select" id="orderTypeNavbar" onchange="handleOrderTypeChange(this.value)">
+                    @php use App\Models\Setting; @endphp
                     <option value="takeaway">Takeaway</option>
                     <option value="dine_in">Dine In</option>
                     <option value="delivery">Delivery</option>
@@ -260,21 +331,52 @@
     let availableTables = [];
     let selectedTableId = null;
 
+    const disabledOrderTypes = {
+        takeaway: {{ \App\Models\Setting::orderTypeEnabled('takeaway') ? 'false' : 'true' }},
+        dine_in:  {{ \App\Models\Setting::orderTypeEnabled('dine_in')  ? 'false' : 'true' }},
+        delivery: {{ \App\Models\Setting::orderTypeEnabled('delivery') ? 'false' : 'true' }},
+    };
+    const orderTypeNames = { takeaway: 'Takeaway', dine_in: 'Dine In', delivery: 'Delivery' };
+
+    function showOrderTypeToast(typeName) {
+        const toast = document.getElementById('orderTypeToast');
+        document.getElementById('orderTypeToastTitle').textContent = typeName + ' tidak tersedia';
+        document.getElementById('orderTypeToastMsg').textContent =
+            'Layanan ' + typeName + ' sedang tidak tersedia saat ini. Anda dialihkan ke pilihan lain.';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
     // Load available tables on page load
     document.addEventListener('DOMContentLoaded', function () {
         loadAvailableTables();
 
-        // Initialize order type dari localStorage atau default ke takeaway
+        // Initialize order type dari localStorage atau default ke opsi pertama yang tersedia
         const savedOrderType = localStorage.getItem('selected_order_type') || 'takeaway';
         const orderTypeNavbar = document.getElementById('orderTypeNavbar');
 
         if (orderTypeNavbar) {
-            orderTypeNavbar.value = savedOrderType;
-            // Trigger sync untuk update tampilan checkout
-            syncOrderType(savedOrderType);
+            // Cek apakah saved order type masih tersedia di select (bisa saja sudah di-disable admin)
+            const availableOptions = Array.from(orderTypeNavbar.options)
+                .map(o => o.value)
+                .filter(v => !disabledOrderTypes[v]);
+            const resolvedType = availableOptions.includes(savedOrderType)
+                ? savedOrderType
+                : (availableOptions[0] || 'takeaway');
 
-            // Show/hide table selector based on saved order type
-            if (savedOrderType === 'dine_in') {
+            // Show toast if saved order type was disabled and we had to switch
+            if (savedOrderType !== resolvedType && disabledOrderTypes[savedOrderType]) {
+                const name = orderTypeNames[savedOrderType] || savedOrderType;
+                setTimeout(() => showOrderTypeToast(name), 600);
+            }
+
+            orderTypeNavbar.value = resolvedType;
+            localStorage.setItem('selected_order_type', resolvedType);
+            // Trigger sync untuk update tampilan checkout
+            syncOrderType(resolvedType);
+
+            // Show/hide table selector based on resolved order type
+            if (resolvedType === 'dine_in') {
                 const tableSelector = document.getElementById('tableSelector');
                 if (tableSelector) {
                     tableSelector.style.display = 'block';
@@ -361,6 +463,15 @@
         const tableSelector = document.getElementById('tableSelector');
         const tableSelect = document.getElementById('tableSelect');
         const tableWarning = document.getElementById('tableWarning');
+
+        // Jika order type ini di-disable admin, tampilkan toast dan batalkan perubahan
+        if (disabledOrderTypes[value]) {
+            const name = orderTypeNames[value] || value;
+            const prevValue = localStorage.getItem('selected_order_type') || 'takeaway';
+            document.getElementById('orderTypeNavbar').value = prevValue;
+            showOrderTypeToast(name);
+            return;
+        }
 
         // Simpan pilihan order type ke localStorage
         localStorage.setItem('selected_order_type', value);

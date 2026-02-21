@@ -15,9 +15,17 @@ class Deliveries extends Model
         'order_id',
         'courier_name',
         'courier_order_id',
+        'tracking_number',
+        'courier_waybill_id',
+        'courier_company',
+        'courier_type',
+        'biteship_order_id',
         'status',
         'price',
         'eta',
+        'tracking_url',
+        'picked_up_at',
+        'delivered_at',
         'raw_response',
     ];
 
@@ -25,6 +33,8 @@ class Deliveries extends Model
         'status' => StatusDelivery::class,
         'price' => 'decimal:2',
         'raw_response' => 'array',
+        'picked_up_at' => 'datetime',
+        'delivered_at' => 'datetime',
     ];
 
     public function order()

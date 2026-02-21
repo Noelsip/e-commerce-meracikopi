@@ -666,6 +666,58 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
+        .order-modal-btn-pay {
+            background: #22c55e;
+            color: white;
+            border: none;
+            font-weight: 700;
+        }
+
+        .order-modal-btn-pay:hover {
+            background: #16a34a;
+        }
+
+        /* Pay Now Button on card */
+        .order-pay-now-btn {
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 8px 20px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            animation: pulse-red 2s infinite;
+        }
+
+        .order-pay-now-btn:hover {
+            background-color: #dc2626;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+
+        /* Payment status badge colors */
+        .status-pay-pending  { background-color: #eab308; color: #1a1410; }
+        .status-pay-processing { background-color: #f97316; color: white; }
+        .status-pay-paid     { background-color: #22c55e; color: white; }
+        .status-pay-failed   { background-color: #ef4444; color: white; }
+        .status-pay-expired  { background-color: #6b7280; color: white; }
+        .status-pay-cancelled{ background-color: #ef4444; color: white; }
+
+        /* Order process status badge colors */
+        .status-order-pending     { background-color: #eab308; color: #1a1410; }
+        .status-order-processing  { background-color: #3b82f6; color: white; }
+        .status-order-ready       { background-color: #22c55e; color: white; }
+        .status-order-on_delivery { background-color: #f97316; color: white; }
+        .status-order-completed   { background-color: #22c55e; color: white; }
+        .status-order-cancelled   { background-color: #ef4444; color: white; }
+
         /* Modal Responsive - Keep as centered popup */
         @media (max-width: 768px) {
             .order-modal-overlay {
@@ -877,6 +929,18 @@
                         </div>
                     </div>
 
+                    <!-- Status Pembayaran & Status Pesanan -->
+                    <div class="order-info-box" style="margin-bottom: 16px;">
+                        <div class="order-info-item">
+                            <span class="order-info-label">Status Pembayaran</span>
+                            <span class="status-badge" :class="'status-pay-' + (selectedOrder?.payment_status || 'pending')" x-text="selectedOrder?.payment_status_label || 'Menunggu Pembayaran'"></span>
+                        </div>
+                        <div class="order-info-item">
+                            <span class="order-info-label">Status Pesanan</span>
+                            <span class="status-badge" :class="'status-order-' + (selectedOrder?.order_status || 'pending')" x-text="selectedOrder?.order_status_label || 'Menunggu Diproses'"></span>
+                        </div>
+                    </div>
+
                     <!-- Order Items -->
                     <h3 class="order-modal-section-title">Order Items</h3>
                     <div class="order-modal-items">
@@ -915,8 +979,12 @@
 
                     <!-- Buttons -->
                     <div class="order-modal-buttons">
-                        <a :href="'{{ route('catalogs.index') }}'" class="order-modal-btn order-modal-btn-primary">Order
-                            Again</a>
+                        <template x-if="selectedOrder?.status === 'pending_payment'">
+                            <a :href="'/checkout?reorder=' + selectedOrder?.id" class="order-modal-btn order-modal-btn-pay" @click.prevent="closeOrderDetail(); window.location.href = '/customer/order-history'">Bayar Sekarang</a>
+                        </template>
+                        <template x-if="selectedOrder?.status !== 'pending_payment'">
+                            <a :href="'{{ route('catalogs.index') }}'" class="order-modal-btn order-modal-btn-primary">Order Again</a>
+                        </template>
                         <button class="order-modal-btn order-modal-btn-secondary"
                             @click="closeOrderDetail()">Tutup</button>
                     </div>
@@ -955,8 +1023,8 @@
                             <div class="order-left-section">
                                 <div class="order-id-row">
                                     <span class="order-id" x-text="order.order_code"></span>
-                                    <span class="status-badge" :class="'status-' + order.status"
-                                        x-text="getStatusLabel(order.status)"></span>
+                                    <span class="status-badge" :class="'status-order-' + (order.order_status || 'pending')"
+                                        x-text="order.order_status_label || 'Menunggu Diproses'"></span>
                                 </div>
                                 <div class="order-date" x-text="formatDate(order.created_at)"></div>
                             </div>
@@ -981,7 +1049,12 @@
                             <div class="order-card-footer-left">
                                 <span class="order-view-detail">Klik untuk lihat detail</span>
                             </div>
-                            <a href="{{ route('catalogs.index') }}" class="order-again-btn" @click.stop>Order Again</a>
+                            <template x-if="order.status === 'pending_payment'">
+                                <span class="order-pay-now-btn" @click.stop="openOrderDetail(order)">Bayar Sekarang</span>
+                            </template>
+                            <template x-if="order.status !== 'pending_payment'">
+                                <a href="{{ route('catalogs.index') }}" class="order-again-btn" @click.stop>Order Again</a>
+                            </template>
                         </div>
                     </div>
                 </template>
@@ -1058,6 +1131,7 @@
             return {
                 orders: [],
                 loading: true,
+                _refreshTimer: null,
 
                 // Open order detail modal - dispatch event to modal component
                 openOrderDetail(order) {
@@ -1104,6 +1178,12 @@
                                             payment_method: this.formatPaymentMethod(order.payment?.method)
                                         };
                                     });
+
+                                    // Auto-refresh jika ada order yang masih pending payment
+                                    const hasPending = this.orders.some(o => o.status === 'pending_payment');
+                                    if (hasPending && !this._refreshTimer) {
+                                        this._refreshTimer = setInterval(() => this.refreshOrders(), 10000);
+                                    }
                                 }
                                 this.loading = false;
                             })
@@ -1114,6 +1194,45 @@
                     } else {
                         this.loading = false;
                     }
+                },
+
+                // Refresh orders silently (tanpa show loading) untuk auto-update status
+                refreshOrders() {
+                    const guestToken = localStorage.getItem('guest_token');
+                    if (!guestToken) return;
+
+                    fetch('/api/customer/orders', {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Guest-Token': guestToken
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.data && data.data.length > 0) {
+                                this.orders = data.data.map(order => ({
+                                    ...order,
+                                    order_code: this.generateOrderCode(order),
+                                    items: (order.items || []).map(item => ({
+                                        id: item.menu_id || item.id,
+                                        menu_name: item.menu_name || item.name || 'Unknown Item',
+                                        quantity: item.quantity || 1,
+                                        price: item.price || 0,
+                                        variant: item.variant || item.notes || ''
+                                    })),
+                                    payment_method: this.formatPaymentMethod(order.payment?.method)
+                                }));
+
+                                // Stop timer jika tidak ada pending lagi
+                                const hasPending = this.orders.some(o => o.status === 'pending_payment');
+                                if (!hasPending && this._refreshTimer) {
+                                    clearInterval(this._refreshTimer);
+                                    this._refreshTimer = null;
+                                }
+                            }
+                        })
+                        .catch(() => {}); // silent fail on refresh
                 },
 
                 generateOrderCode(order) {

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\OrderAdminController;
 use App\Http\Controllers\Admin\UserAdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\TableApiController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Customers\MenuController;
 use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\CatalogController;
@@ -23,6 +24,10 @@ Route::get('/', function () {
     return view('pages.guest.welcome');
 })->name('home');
 
+Route::get('/user-guide', function () {
+    return view('pages.guest.user-guide');
+})->name('user-guide');
+
 // QR Code Scan Route
 Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan');
 
@@ -32,7 +37,7 @@ Route::get('/checkout/success', function () {
 })->name('doku.success');
 
 Route::get('/checkout/cancel', function () {
-    return view('pages.customer.payment-cancel');  
+    return view('pages.customer.payment-cancel');
 })->name('doku.cancel');
 
 Route::get('/checkout/error', function () {
@@ -117,6 +122,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/tables/{id}/regenerate-qr', [TableApiController::class, 'regenerateQRCode'])
             ->name('tables.regenerateQR');
 
+        Route::post('/orders/{order}/request-pickup', [OrderAdminController::class, 'requestPickup'])
+            ->name('orders.requestPickup');
+
         Route::resource('orders', OrderAdminController::class)->except(['create', 'store']);
         Route::patch('/orders/{order}/status', [OrderAdminController::class, 'updateStatus'])
             ->name('orders.updateStatus');
@@ -125,6 +133,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
 
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');

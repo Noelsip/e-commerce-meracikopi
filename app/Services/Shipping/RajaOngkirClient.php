@@ -39,6 +39,15 @@ class RajaOngkirClient
         return $this->normalizeResponse($response->json());
     }
 
+    public function findDestinationByPostalCode(string $postalCode): ?array
+    {
+        $result = $this->searchDomesticDestination($postalCode, 1);
+        if (($result['success'] ?? false) && !empty($result['data'][0])) {
+            return $result['data'][0];
+        }
+        return null;
+    }
+
     public function calculateDomesticCost(int $originId, int $destinationId, int $weightGrams, string $courierCodes, string $priceSort = 'lowest'): array
     {
         $response = $this->client()
