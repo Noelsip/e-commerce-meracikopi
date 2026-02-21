@@ -240,7 +240,7 @@ class OrderController extends Controller
             }
 
             // Menyimpan address jika delivery
-            if ($order->order_type === OrderType::DELIVERY) {
+            if ($order->order_type === OrderType::DELIVERY->value) {
                 OrderAddresses::create([
                     'order_id' => $order->id,
                     'receiver_name' => $request->address['receiver_name'],

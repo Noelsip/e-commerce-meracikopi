@@ -24,19 +24,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                    <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Pelanggan</p>
-                    <p class="text-sm font-medium" style="color: #f0f2bd;">{{ $order->customer_name ?? $order->user?->name ?? '-' }}</p>
+                    <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">User</p>
+                    <p class="text-sm font-medium" style="color: #f0f2bd;">{{ $order->user?->name ?? '-' }}</p>
                 </div>
-                <div>
-                    <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Telepon</p>
-                    <p class="text-sm font-medium" style="color: #f0f2bd;">{{ $order->customer_phone ?? $order->user?->phone ?? '-' }}</p>
-                </div>
-                @if($order->order_type->value === 'dine_in')
                 <div>
                     <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Meja</p>
-                    <p class="text-sm font-medium" style="color: #f0f2bd;">{{ $order->tables?->table_number ?? '-' }}</p>
+                    <p class="text-sm font-medium" style="color: #f0f2bd;">{{ $order->tables?->table_number ?? '-' }}
+                    </p>
                 </div>
-                @endif
                 <div>
                     <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Tipe Pesanan</p>
                     <p class="text-sm font-medium" style="color: #D4A574;">
@@ -108,58 +103,25 @@
         </div>
 
         <!-- Delivery Address -->
-        @if($order->order_type->value === 'delivery')
-            @php $address = $order->order_addresses?->first(); @endphp
+        @if($order->order_type->value === 'delivery' && $order->order_addresses && $order->order_addresses->count() > 0)
+            @php $address = $order->order_addresses->first(); @endphp
             <div class="rounded-xl border overflow-hidden mt-6" style="background-color: #2b211e; border-color: #3e302b;">
-                <div class="px-6 py-4 flex items-center gap-2" style="background-color: #3e302b;">
-                    <svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="#D4A574" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div class="px-6 py-4" style="background-color: #3e302b;">
                     <h3 class="font-semibold" style="color: #f0f2bd;">Alamat Pengiriman</h3>
                 </div>
-                @if($address)
-                    <div class="px-6 py-4 space-y-3">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(59,130,246,0.15);">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                            </div>
-                            <div>
-                                <p class="text-sm font-semibold" style="color: #f0f2bd;">{{ $address->receiver_name ?: ($order->customer_name ?? 'Penerima') }}</p>
-                                @if($address->phone || $order->customer_phone)
-                                    <p class="text-xs" style="color: #D4A574;">{{ $address->phone ?: $order->customer_phone }}</p>
-                                @endif
-                            </div>
-                        </div>
-
-                        @if($address->full_address)
-                            <div class="flex items-start gap-3">
-                                <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(249,115,22,0.15);">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                </div>
-                                <div>
-                                    <p class="text-sm" style="color: #f0f2bd; line-height: 1.5;">{{ $address->full_address }}</p>
-                                    @if($address->city || $address->province || $address->postal_code)
-                                        <p class="text-xs mt-1" style="color: #D4A574;">
-                                            {{ collect([$address->city, $address->province, $address->postal_code])->filter()->implode(', ') }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        @endif
-
-                        @if($address->notes)
-                            <div class="flex items-start gap-3">
-                                <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(234,179,8,0.15);">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                </div>
-                                <p class="text-sm italic" style="color: #f0f2bd; opacity: 0.7;">Catatan: {{ $address->notes }}</p>
-                            </div>
-                        @endif
+                <div class="px-6 py-4 space-y-2">
+                    <div class="flex gap-2 text-sm" style="color: #f0f2bd;">
+                        <span class="font-medium">{{ $address->receiver_name }}</span>
+                        <span style="opacity: 0.5;">|</span>
+                        <span>{{ $address->phone }}</span>
                     </div>
-                @else
-                    <div class="px-6 py-8 text-center">
-                        <svg class="mx-auto mb-2" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#D4A574" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                        <p class="text-sm" style="color: #f0f2bd; opacity: 0.5;">Alamat pengiriman belum diisi</p>
-                    </div>
-                @endif
+                    <p class="text-sm" style="color: #f0f2bd; opacity: 0.85;">{{ $address->full_address }}</p>
+                    <p class="text-sm" style="color: #f0f2bd; opacity: 0.7;">{{ $address->city }}@if($address->province),
+                    {{ $address->province }}@endif {{ $address->postal_code }}</p>
+                    @if($address->notes)
+                        <p class="text-sm" style="color: #f0f2bd; opacity: 0.6;"><em>Catatan: {{ $address->notes }}</em></p>
+                    @endif
+                </div>
             </div>
         @endif
 
