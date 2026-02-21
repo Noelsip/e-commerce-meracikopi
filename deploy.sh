@@ -15,7 +15,7 @@ set -euo pipefail
 APP_NAME="meracikopi"
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 COMPOSE_FILE="${PROJECT_DIR}/docker-compose.yml"
-ENV_FILE="${PROJECT_DIR}/.env.docker"
+ENV_FILE="${PROJECT_DIR}/.env"
 BACKUP_DIR="${PROJECT_DIR}/backups"
 LOG_FILE="${PROJECT_DIR}/deploy.log"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
