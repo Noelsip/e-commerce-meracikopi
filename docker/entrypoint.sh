@@ -33,10 +33,9 @@ done
 
 echo "[OK] Moving forward with startup..."
 
-# Create .env if it doesn't exist
-if [ ! -f /var/www/html/.env ]; then
-    echo "📝 Creating .env file from environment variables..."
-    cat > /var/www/html/.env <<EOF
+# ALWAYS recreate .env from environment variables to ensure latest config
+echo "📝 Creating .env file from environment variables..."
+cat > /var/www/html/.env <<EOF
 APP_NAME="${APP_NAME:-Laravel}"
 APP_ENV="${APP_ENV:-production}"
 APP_KEY="${APP_KEY:-}"
@@ -44,7 +43,7 @@ APP_DEBUG="${APP_DEBUG:-false}"
 APP_URL="${APP_URL:-http://localhost}"
 
 LOG_CHANNEL=stack
-LOG_LEVEL=debug
+LOG_LEVEL=${LOG_LEVEL:-debug}
 
 DB_CONNECTION=mysql
 DB_HOST="${DB_HOST:-db}"
@@ -54,20 +53,45 @@ DB_USERNAME="${DB_USERNAME:-root}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 
 BROADCAST_CONNECTION=log
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=database
+FILESYSTEM_DISK=${FILESYSTEM_DISK:-local}
+QUEUE_CONNECTION=${QUEUE_CONNECTION:-database}
 
-CACHE_STORE=database
-SESSION_DRIVER=database
+CACHE_STORE=${CACHE_STORE:-database}
+SESSION_DRIVER=${SESSION_DRIVER:-database}
 SESSION_LIFETIME=120
 
 REDIS_HOST="${REDIS_HOST:-redis}"
-REDIS_PASSWORD=null
-REDIS_PORT=6379
+REDIS_PASSWORD=${REDIS_PASSWORD:-null}
+REDIS_PORT=${REDIS_PORT:-6379}
 
 MAIL_MAILER=log
+
+# DOKU Payment Gateway
+DOKU_CLIENT_ID="${DOKU_CLIENT_ID:-}"
+DOKU_SECRET_KEY="${DOKU_SECRET_KEY:-}"
+DOKU_API_KEY="${DOKU_API_KEY:-}"
+DOKU_PUBLIC_KEY="${DOKU_PUBLIC_KEY:-}"
+DOKU_IS_PRODUCTION="${DOKU_IS_PRODUCTION:-false}"
+DOKU_FALLBACK_ENABLED="${DOKU_FALLBACK_ENABLED:-false}"
+DOKU_BASE_URL="${DOKU_BASE_URL:-https://api-sandbox.doku.com}"
+
+DOKU_SNAP_TOKEN_URL="${DOKU_SNAP_TOKEN_URL:-}"
+DOKU_SNAP_RETURN_URL="${DOKU_SNAP_RETURN_URL:-}"
+DOKU_SNAP_CANCEL_URL="${DOKU_SNAP_CANCEL_URL:-}"
+DOKU_SNAP_ERROR_URL="${DOKU_SNAP_ERROR_URL:-}"
+
+MERCHANT_PRIVATE_KEY="${MERCHANT_PRIVATE_KEY:-}"
+MERCHANT_PUBLIC_KEY="${MERCHANT_PUBLIC_KEY:-}"
+
+# Service Fee
+SERVICE_FEE="${SERVICE_FEE:-0}"
+PORT="${PORT:-80}"
+TRUSTED_PROXIES="${TRUSTED_PROXIES:-}"
+
+# Biteship
+BITESHIP_API_KEY="${BITESHIP_API_KEY:-}"
+BITESHIP_MOCK_MODE="${BITESHIP_MOCK_MODE:-true}"
 EOF
-fi
 
 # Generate app key if not set
 if [ -z "$APP_KEY" ]; then
