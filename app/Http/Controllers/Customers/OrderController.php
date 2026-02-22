@@ -10,6 +10,7 @@ use App\Models\Orders;
 use App\Models\OrderItems;
 use App\Models\OrderAddresses;
 use App\Models\OrderLogs;
+use App\Models\Tables;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
 use App\Services\Shipping\ShippingQuoteService;
@@ -62,7 +63,8 @@ class OrderController extends Controller
         return response()->json([
             'data' => $orders->map(fn($order) => [
                 'id' => $order->id,
-                'order_type' => $order->order_type,
+                'order_type' => $order->order_type?->value,
+                'order_type_label' => $order->order_type?->label(),
                 'status' => $order->status,
                 'payment_status' => $order->payment_status?->value,
                 'payment_status_label' => $order->payment_status?->label(),
@@ -263,6 +265,13 @@ class OrderController extends Controller
                 'note' => 'Order created',
             ]);
 
+            // Update status meja menjadi 'occupied' jika dine_in
+            if ($request->order_type === 'dine_in' && $request->table_id) {
+                Tables::where('id', $request->table_id)->update([
+                    'status' => Tables::STATUS_OCCUPIED,
+                ]);
+            }
+
             // PENTING: Cart tidak langsung dihapus!
             // Cart items akan dihapus setelah pembayaran berhasil (di webhook handler)
             // Ini memastikan jika payment gagal, user tidak kehilangan cart-nya
@@ -312,7 +321,8 @@ class OrderController extends Controller
         return response()->json([
             'data' => [
                 'id' => $order->id,
-                'order_type' => $order->order_type,
+                'order_type' => $order->order_type?->value,
+                'order_type_label' => $order->order_type?->label(),
                 'status' => $order->status,
                 'total_price' => (int) $order->total_price,
                 'delivery_fee' => (int) $order->delivery_fee,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Orders;
+use App\Models\OrderLogs;
 use App\Models\Tables;
 use App\Models\User;
 use App\Enums\OrderStatus;
@@ -72,7 +73,28 @@ class OrderAdminController extends Controller
             'table_id' => 'nullable|exists:tables,id',
         ]);
 
+        $oldStatus = $order->order_status?->value;
+        $newStatus = $request->order_status;
+
         $order->update($request->only(['order_status', 'order_type', 'table_id']));
+
+        // Create order log if status changed
+        if ($oldStatus !== $newStatus) {
+            $statusEnum = OrderProcessStatus::from($newStatus);
+            OrderLogs::create([
+                'order_id' => $order->id,
+                'status' => $newStatus,
+                'note' => 'Status pesanan diubah menjadi: ' . $statusEnum->label(),
+            ]);
+
+            // Release table when order is completed or cancelled (dine_in)
+            $releaseStatuses = [OrderProcessStatus::COMPLETED->value, OrderProcessStatus::CANCELLED->value];
+            if (in_array($newStatus, $releaseStatuses) && $order->table_id) {
+                Tables::where('id', $order->table_id)->update([
+                    'status' => Tables::STATUS_AVAILABLE,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan berhasil diperbarui.');
     }
@@ -89,7 +111,28 @@ class OrderAdminController extends Controller
             'order_status' => 'required|in:' . implode(',', array_column(OrderProcessStatus::cases(), 'value')),
         ]);
 
-        $order->update(['order_status' => $request->order_status]);
+        $oldStatus = $order->order_status?->value;
+        $newStatus = $request->order_status;
+
+        $order->update(['order_status' => $newStatus]);
+
+        // Create order log when status changes
+        if ($oldStatus !== $newStatus) {
+            $statusEnum = OrderProcessStatus::from($newStatus);
+            OrderLogs::create([
+                'order_id' => $order->id,
+                'status' => $newStatus,
+                'note' => 'Status pesanan diubah menjadi: ' . $statusEnum->label(),
+            ]);
+
+            // Release table when order is completed or cancelled (dine_in)
+            $releaseStatuses = [OrderProcessStatus::COMPLETED->value, OrderProcessStatus::CANCELLED->value];
+            if (in_array($newStatus, $releaseStatuses) && $order->table_id) {
+                Tables::where('id', $order->table_id)->update([
+                    'status' => Tables::STATUS_AVAILABLE,
+                ]);
+            }
+        }
 
         return response()->json(['success' => true, 'message' => 'Status pesanan berhasil diubah.']);
     }

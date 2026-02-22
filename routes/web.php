@@ -84,7 +84,14 @@ Route::get('/customer/cart', function () {
 
 // Checkout
 Route::get('/customer/checkout', function () {
-    return view('pages.customer.checkout');
+    $tableInfo = null;
+    if (session()->has('table_id')) {
+        $tableInfo = [
+            'id' => session('table_id'),
+            'number' => session('table_number'),
+        ];
+    }
+    return view('pages.customer.checkout', compact('tableInfo'));
 })->name('checkout.index');
 
 // Orders
@@ -110,6 +117,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware('admin.auth')->group(function () {
         Route::get('/dashboard', [DashboardAdminController::class, 'index'])
             ->name('dashboard');
+
+        // API: Check for new paid orders (polling notifications)
+        Route::get('/api/new-paid-orders', [DashboardAdminController::class, 'checkNewPaidOrders'])
+            ->name('api.newPaidOrders');
 
         Route::resource('menus', MenuAdminController::class)->except(['show']);
         Route::resource('tables', TableAdminController::class);

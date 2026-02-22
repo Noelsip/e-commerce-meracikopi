@@ -1,4 +1,18 @@
 <x-customer.checkout-layout>
+    {{-- Sync QR session table info to localStorage for checkout --}}
+    @if(isset($tableInfo) && $tableInfo)
+        <script>
+            (function() {
+                // Only set if not already manually changed by user
+                if (!localStorage.getItem('selected_table_id')) {
+                    localStorage.setItem('selected_table_id', '{{ $tableInfo['id'] }}');
+                    localStorage.setItem('selected_table_number', '{{ $tableInfo['number'] }}');
+                    localStorage.setItem('selected_order_type', 'dine_in');
+                    console.log('Checkout: QR Table synced from session - Meja {{ $tableInfo['number'] }}');
+                }
+            })();
+        </script>
+    @endif
     <!-- Error Modal -->
     <div id="errorModal" class="error-modal-overlay">
         <div class="error-modal compact-modal">

@@ -31,7 +31,7 @@
                 <option value="">Semua Tipe</option>
                 @foreach($orderTypes as $type)
                     <option value="{{ $type->value }}" {{ request('order_type') == $type->value ? 'selected' : '' }}>
-                        {{ $type->value == 'dine_in' ? 'Dine In' : ($type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
+                        {{ $type->label() }}
                     </option>
                 @endforeach
             </select>
@@ -108,7 +108,7 @@
                             <td class="px-3 py-3 text-sm whitespace-nowrap">
                                 <span class="px-2 py-1 rounded text-xs font-medium whitespace-nowrap"
                                     style="background-color: #3e302b; color: #D4A574;">
-                                    {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
+                                    {{ $order->order_type->label() }}
                                 </span>
                             </td>
                             {{-- Status Pembayaran (Badge, otomatis dari payment) --}}

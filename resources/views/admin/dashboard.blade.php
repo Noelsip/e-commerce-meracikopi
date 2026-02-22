@@ -95,7 +95,7 @@
                                 <td class="py-3 px-4 text-sm">
                                     <span class="px-2 py-1 rounded text-xs font-medium whitespace-nowrap"
                                         style="background-color: #3e302b; color: #D4A574;">
-                                        {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
+                                        {{ $order->order_type->label() }}
                                     </span>
                                 </td>
                                 <td class="py-3 px-4 text-sm" style="color: #f0f2bd;">{{ $order->customer_name ?? 'Guest' }}</td>

@@ -515,6 +515,15 @@
                 style="font-size: 12px; text-decoration: underline; color: #f0f2ae; opacity: 0.8; margin-left: 10px;">Bukan
                 meja ini?</a>
         </div>
+        {{-- Sync QR scanned table info from server session to localStorage for checkout --}}
+        <script>
+            (function() {
+                localStorage.setItem('selected_table_id', '{{ $tableInfo['id'] }}');
+                localStorage.setItem('selected_table_number', '{{ $tableInfo['number'] }}');
+                localStorage.setItem('selected_order_type', 'dine_in');
+                console.log('QR Table synced to localStorage: Meja {{ $tableInfo['number'] }} (ID: {{ $tableInfo['id'] }})');
+            })();
+        </script>
     @endif
 
     <!-- Hero Section -->

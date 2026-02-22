@@ -28,7 +28,7 @@
                         style="background-color: #3e302b; color: #f0f2bd;" required>
                         @foreach($orderStatuses as $status)
                             <option value="{{ $status->value }}" {{ old('order_status', $order->order_status->value) == $status->value ? 'selected' : '' }}>
-                                {{ ucfirst($status->value) }}
+                                {{ $status->label() }}
                             </option>
                         @endforeach
                     </select>
@@ -47,7 +47,7 @@
                         style="background-color: #3e302b; color: #f0f2bd;" required>
                         @foreach($orderTypes as $type)
                             <option value="{{ $type->value }}" {{ old('order_type', $order->order_type->value) == $type->value ? 'selected' : '' }}>
-                                {{ $type->value == 'dine_in' ? 'Dine In' : ($type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
+                                {{ $type->label() }}
                             </option>
                         @endforeach
                     </select>

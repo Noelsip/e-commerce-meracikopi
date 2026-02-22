@@ -35,7 +35,7 @@
                 <div>
                     <p class="text-xs" style="color: #f0f2bd; opacity: 0.7;">Tipe Pesanan</p>
                     <p class="text-sm font-medium" style="color: #D4A574;">
-                        {{ $order->order_type->value == 'dine_in' ? 'Dine In' : ($order->order_type->value == 'take_away' ? 'Take Away' : 'Delivery') }}
+                        {{ $order->order_type->label() }}
                     </p>
                 </div>
                 <div>

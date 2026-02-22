@@ -261,6 +261,14 @@
 
                     <!-- User Info -->
                     <div class="flex items-center gap-3">
+                        <!-- Notification Bell -->
+                        <a href="{{ route('admin.orders.index') }}" id="adminNotifBell" class="admin-notif-bell" title="Notifikasi pesanan" onclick="resetNotifBadge()">
+                            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2z"/>
+                                <path d="M18 16v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 00-3 0v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                            </svg>
+                            <span id="bellBadge" class="bell-badge hidden">0</span>
+                        </a>
                         <div class="w-10 h-10 rounded-full" style="background-color: #6b4d3a;"></div>
                         <div class="admin-header-user-details text-right">
                             <p class="font-medium" style="color: #f0f2bd;">{{ Auth::user()->name ?? 'Admin' }}</p>
@@ -286,6 +294,194 @@
             </main>
         </div>
     </div>
+    <!-- Order Notification Toast Container -->
+    <div id="orderNotifContainer" style="position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 12px; pointer-events: none;"></div>
+
+    <style>
+        /* Notification Toast */
+        .order-notif-toast {
+            pointer-events: auto;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #2b211e 0%, #3e302b 100%);
+            border: 1px solid #CA7842;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(202,120,66,0.2);
+            min-width: 340px;
+            max-width: 420px;
+            animation: notifSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: top right;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .order-notif-toast::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #CA7842, #f0f2bd, #CA7842);
+            animation: notifShimmer 2s ease-in-out infinite;
+        }
+
+        .order-notif-toast.dismissing {
+            animation: notifSlideOut 0.4s ease-in forwards;
+        }
+
+        @keyframes notifSlideIn {
+            0% { opacity: 0; transform: translateX(100px) scale(0.8); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        @keyframes notifSlideOut {
+            0% { opacity: 1; transform: translateX(0) scale(1); }
+            100% { opacity: 0; transform: translateX(100px) scale(0.8); }
+        }
+
+        @keyframes notifShimmer {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes notifPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .order-notif-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #CA7842, #8B5E3C);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            animation: notifPulse 1s ease-in-out 2;
+        }
+
+        .order-notif-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .order-notif-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #f0f2bd;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .order-notif-title .notif-badge {
+            font-size: 10px;
+            background: #22c55e;
+            color: #fff;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .order-notif-detail {
+            font-size: 13px;
+            color: #a89890;
+            line-height: 1.4;
+        }
+
+        .order-notif-detail strong {
+            color: #f0f2bd;
+        }
+
+        .order-notif-amount {
+            font-size: 15px;
+            font-weight: 700;
+            color: #22c55e;
+            margin-top: 4px;
+        }
+
+        .order-notif-close {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #a89890;
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+            font-size: 18px;
+            transition: color 0.2s;
+        }
+
+        .order-notif-close:hover {
+            color: #f0f2bd;
+        }
+
+        .order-notif-time {
+            font-size: 11px;
+            color: #6b5d54;
+            margin-top: 2px;
+        }
+
+        /* Header notification bell */
+        .admin-notif-bell {
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            color: #f0f2bd;
+            transition: all 0.2s;
+        }
+
+        .admin-notif-bell:hover {
+            color: #CA7842;
+        }
+
+        .admin-notif-bell .bell-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ef4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            animation: notifPulse 1s ease-in-out infinite;
+        }
+
+        .admin-notif-bell .bell-badge.hidden {
+            display: none;
+        }
+
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0deg); }
+            10% { transform: rotate(14deg); }
+            20% { transform: rotate(-14deg); }
+            30% { transform: rotate(10deg); }
+            40% { transform: rotate(-10deg); }
+            50% { transform: rotate(6deg); }
+            60% { transform: rotate(-6deg); }
+            70% { transform: rotate(2deg); }
+            80% { transform: rotate(-2deg); }
+        }
+
+        .admin-notif-bell.ringing svg {
+            animation: bellRing 0.8s ease-in-out;
+        }
+    </style>
 
     <script>
         function toggleAdminSidebar() {
@@ -295,6 +491,265 @@
             overlay.classList.toggle('active');
             document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
         }
+
+        // ========== ORDER NOTIFICATION SYSTEM ==========
+        (function() {
+            const POLL_INTERVAL = 10000; // 10 seconds
+            const TOAST_DURATION = 8000; // 8 seconds
+            let lastChecked = null;
+            let audioCtx = null;
+            let bellBadgeCount = 0;
+
+            // Initialize AudioContext on first user interaction (required by browsers)
+            function getAudioContext() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                return audioCtx;
+            }
+
+            // Generate "dring" bell notification sound using Web Audio API
+            function playNotificationSound() {
+                try {
+                    const ctx = getAudioContext();
+                    if (ctx.state === 'suspended') {
+                        ctx.resume();
+                    }
+
+                    const now = ctx.currentTime;
+
+                    // === First bell tone (higher pitch) ===
+                    const osc1 = ctx.createOscillator();
+                    const gain1 = ctx.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(1200, now);
+                    osc1.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+                    gain1.gain.setValueAtTime(0.35, now);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc1.connect(gain1);
+                    gain1.connect(ctx.destination);
+                    osc1.start(now);
+                    osc1.stop(now + 0.4);
+
+                    // Harmonic overtone for richness
+                    const osc1h = ctx.createOscillator();
+                    const gain1h = ctx.createGain();
+                    osc1h.type = 'sine';
+                    osc1h.frequency.setValueAtTime(2400, now);
+                    osc1h.frequency.exponentialRampToValueAtTime(1600, now + 0.12);
+                    gain1h.gain.setValueAtTime(0.12, now);
+                    gain1h.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc1h.connect(gain1h);
+                    gain1h.connect(ctx.destination);
+                    osc1h.start(now);
+                    osc1h.stop(now + 0.25);
+
+                    // === Second bell tone (lower pitch, delayed) ===
+                    const osc2 = ctx.createOscillator();
+                    const gain2 = ctx.createGain();
+                    osc2.type = 'sine';
+                    osc2.frequency.setValueAtTime(900, now + 0.2);
+                    osc2.frequency.exponentialRampToValueAtTime(600, now + 0.45);
+                    gain2.gain.setValueAtTime(0, now);
+                    gain2.gain.setValueAtTime(0.35, now + 0.2);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                    osc2.connect(gain2);
+                    gain2.connect(ctx.destination);
+                    osc2.start(now + 0.2);
+                    osc2.stop(now + 0.7);
+
+                    // Harmonic for second tone
+                    const osc2h = ctx.createOscillator();
+                    const gain2h = ctx.createGain();
+                    osc2h.type = 'sine';
+                    osc2h.frequency.setValueAtTime(1800, now + 0.2);
+                    osc2h.frequency.exponentialRampToValueAtTime(1200, now + 0.4);
+                    gain2h.gain.setValueAtTime(0, now);
+                    gain2h.gain.setValueAtTime(0.1, now + 0.2);
+                    gain2h.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc2h.connect(gain2h);
+                    gain2h.connect(ctx.destination);
+                    osc2h.start(now + 0.2);
+                    osc2h.stop(now + 0.45);
+
+                    // === Third bell "ding" (final, slightly higher) ===
+                    const osc3 = ctx.createOscillator();
+                    const gain3 = ctx.createGain();
+                    osc3.type = 'sine';
+                    osc3.frequency.setValueAtTime(1100, now + 0.5);
+                    osc3.frequency.exponentialRampToValueAtTime(700, now + 0.8);
+                    gain3.gain.setValueAtTime(0, now);
+                    gain3.gain.setValueAtTime(0.25, now + 0.5);
+                    gain3.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
+                    osc3.connect(gain3);
+                    gain3.connect(ctx.destination);
+                    osc3.start(now + 0.5);
+                    osc3.stop(now + 1.0);
+
+                    console.log('🔔 Notification sound played');
+                } catch (e) {
+                    console.warn('Could not play notification sound:', e);
+                }
+            }
+
+            // Show toast notification
+            function showOrderNotification(order) {
+                const container = document.getElementById('orderNotifContainer');
+                if (!container) return;
+
+                const toast = document.createElement('div');
+                toast.className = 'order-notif-toast';
+
+                const tableInfo = order.table_number
+                    ? `Meja <strong>${order.table_number}</strong> · `
+                    : '';
+
+                toast.innerHTML = `
+                    <div class="order-notif-icon">
+                        <svg width="22" height="22" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2z"/>
+                            <path d="M18 16v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 00-3 0v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+                        </svg>
+                    </div>
+                    <div class="order-notif-body">
+                        <div class="order-notif-title">
+                            Pesanan Baru Dibayar! <span class="notif-badge">PAID</span>
+                        </div>
+                        <div class="order-notif-detail">
+                            ${tableInfo}<strong>${order.customer_name}</strong> · ${order.order_type}
+                        </div>
+                        <div class="order-notif-amount">${order.total}</div>
+                        <div class="order-notif-time">Dibayar pukul ${order.paid_at}</div>
+                    </div>
+                    <button class="order-notif-close" onclick="dismissNotif(this)" title="Tutup">×</button>
+                `;
+
+                container.appendChild(toast);
+
+                // Auto dismiss after TOAST_DURATION
+                setTimeout(() => {
+                    dismissNotif(toast.querySelector('.order-notif-close'));
+                }, TOAST_DURATION);
+            }
+
+            // Make dismissNotif global
+            window.dismissNotif = function(btn) {
+                const toast = btn.closest('.order-notif-toast');
+                if (!toast || toast.classList.contains('dismissing')) return;
+                toast.classList.add('dismissing');
+                setTimeout(() => toast.remove(), 400);
+            };
+
+            // Animate the bell icon
+            function ringBell() {
+                const bell = document.getElementById('adminNotifBell');
+                if (bell) {
+                    bell.classList.add('ringing');
+                    setTimeout(() => bell.classList.remove('ringing'), 1000);
+                }
+            }
+
+            // Update bell badge count
+            function updateBellBadge(count) {
+                bellBadgeCount += count;
+                const badge = document.getElementById('bellBadge');
+                if (badge) {
+                    badge.textContent = bellBadgeCount;
+                    badge.classList.toggle('hidden', bellBadgeCount <= 0);
+                }
+            }
+
+            // Reset badge on bell button click
+            window.resetNotifBadge = function() {
+                bellBadgeCount = 0;
+                const badge = document.getElementById('bellBadge');
+                if (badge) {
+                    badge.classList.add('hidden');
+                }
+            };
+
+            // Poll for new paid orders
+            async function pollNewOrders() {
+                try {
+                    const url = new URL('{{ route("admin.api.newPaidOrders") }}', window.location.origin);
+                    if (lastChecked) {
+                        url.searchParams.set('last_checked', lastChecked);
+                    }
+
+                    const response = await fetch(url.toString(), {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                        },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) {
+                        console.warn('Notification poll failed:', response.status);
+                        return;
+                    }
+
+                    const data = await response.json();
+
+                    // Update server time for next poll
+                    if (data.server_time) {
+                        lastChecked = data.server_time;
+                    }
+
+                    // Show notifications for new orders
+                    if (data.count > 0) {
+                        console.log(`🔔 ${data.count} new paid order(s) detected!`);
+
+                        // Play sound
+                        playNotificationSound();
+
+                        // Ring bell icon
+                        ringBell();
+
+                        // Update badge
+                        updateBellBadge(data.count);
+
+                        // Show toast for each new order (max 3 to avoid overflow)
+                        const ordersToShow = data.new_orders.slice(0, 3);
+                        ordersToShow.forEach((order, i) => {
+                            setTimeout(() => showOrderNotification(order), i * 300);
+                        });
+
+                        // If more than 3, show summary
+                        if (data.count > 3) {
+                            setTimeout(() => {
+                                showOrderNotification({
+                                    customer_name: `+${data.count - 3} pesanan lainnya`,
+                                    order_type: 'Lihat di halaman Orders',
+                                    table_number: null,
+                                    total: '',
+                                    paid_at: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'}),
+                                });
+                            }, 3 * 300 + 200);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Notification poll error:', e);
+                }
+            }
+
+            // Initialize Audio Context on first user interaction
+            document.addEventListener('click', function initAudio() {
+                getAudioContext();
+                document.removeEventListener('click', initAudio);
+            }, { once: true });
+
+            // Start polling when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initial poll (sets lastChecked baseline)
+                pollNewOrders();
+
+                // Start interval polling
+                setInterval(pollNewOrders, POLL_INTERVAL);
+
+                console.log('🔔 Order notification system active (polling every ' + (POLL_INTERVAL/1000) + 's)');
+            });
+        })();
     </script>
 </body>
 

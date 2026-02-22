@@ -19,7 +19,7 @@ class OrderLogs extends Model
     ];
 
     protected $casts = [
-        'status' => OrderStatus::class
+        //
     ];
 
     public function order()

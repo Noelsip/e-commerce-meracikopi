@@ -915,7 +915,7 @@
                     <div class="order-info-box">
                         <div class="order-info-item">
                             <span class="order-info-label">Order Type</span>
-                            <span class="order-info-value" x-text="getOrderTypeLabel(selectedOrder?.order_type)"></span>
+                            <span class="order-info-value" x-text="selectedOrder?.order_type_label || getOrderTypeLabel(selectedOrder?.order_type)"></span>
                         </div>
                         <div class="order-info-item">
                             <span class="order-info-label">Payment Method</span>
@@ -1101,8 +1101,8 @@
                 getOrderTypeLabel(type) {
                     const labels = {
                         'dine_in': 'Dine In',
-                        'delivery': 'Delivery',
-                        'takeaway': 'Takeaway'
+                        'take_away': 'Take Away',
+                        'delivery': 'Delivery'
                     };
                     return labels[type] || type;
                 },
@@ -1174,6 +1174,7 @@
                                         return {
                                             ...order,
                                             order_code: this.generateOrderCode(order),
+                                            order_type_label: order.order_type_label || this.getOrderTypeLabel(order.order_type),
                                             items: items,
                                             payment_method: this.formatPaymentMethod(order.payment?.method)
                                         };
@@ -1214,6 +1215,7 @@
                                 this.orders = data.data.map(order => ({
                                     ...order,
                                     order_code: this.generateOrderCode(order),
+                                    order_type_label: order.order_type_label || this.getOrderTypeLabel(order.order_type),
                                     items: (order.items || []).map(item => ({
                                         id: item.menu_id || item.id,
                                         menu_name: item.menu_name || item.name || 'Unknown Item',
