@@ -8,6 +8,7 @@ use App\Models\Menus;
 use App\Models\Orders;
 use App\Models\Tables;
 use App\Models\User;
+use App\Models\Setting;
 use App\Enums\OrderStatus;
 use App\Enums\StatusPayments;
 
@@ -34,14 +35,33 @@ class DashboardAdminController extends Controller
             ->take(5)
             ->get();
 
+        // Store open/closed status
+        $storeOpen = Setting::get('store_open', '1') === '1';
+
         return view('admin.dashboard', compact(
             'totalOrders',
             'totalMenus',
             'totalTables',
             'totalUsers',
             'totalRevenue',
-            'recentOrders'
+            'recentOrders',
+            'storeOpen'
         ));
+    }
+
+    /**
+     * Toggle store open/closed status
+     */
+    public function toggleStore(Request $request)
+    {
+        $currentStatus = Setting::get('store_open', '1');
+        $newStatus = $currentStatus === '1' ? '0' : '1';
+        Setting::set('store_open', $newStatus);
+
+        return response()->json([
+            'store_open' => $newStatus === '1',
+            'message' => $newStatus === '1' ? 'Toko berhasil dibuka!' : 'Toko berhasil ditutup.',
+        ]);
     }
 
     /**

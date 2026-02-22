@@ -19,8 +19,17 @@ use App\Http\Controllers\Customers\OrderController;
 use App\Http\Controllers\Customers\CatalogController;
 use App\Http\Controllers\QRCodeController;
 
+// Store Closed page (always accessible)
+Route::get('/store-closed', function () {
+    return view('pages.guest.store-closed');
+})->name('store.closed');
+
 // Guest Routes
 Route::get('/', function () {
+    // Check store status for home page
+    if (\App\Models\Setting::get('store_open', '1') !== '1') {
+        return view('pages.guest.store-closed');
+    }
     return view('pages.guest.welcome');
 })->name('home');
 
@@ -28,8 +37,8 @@ Route::get('/user-guide', function () {
     return view('pages.guest.user-guide');
 })->name('user-guide');
 
-// QR Code Scan Route
-Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan');
+// QR Code Scan Route (protected by store.open middleware)
+Route::get('/order/table', [QRCodeController::class, 'scan'])->name('qr.scan')->middleware('store.open');
 
 // DOKU SNAP Return Routes
 Route::get('/checkout/success', function () {
@@ -70,35 +79,36 @@ Route::middleware(['auth'])->group(function () {
 });
 
 /**
- * Customer Routes
+ * Customer Routes (protected by store.open middleware)
  */
+Route::middleware('store.open')->group(function () {
+    // Catalogs (Web Views - Public)
+    Route::get('/customer/catalogs', [CatalogController::class, 'index'])->name('catalogs.index');
+    Route::get('/customer/catalogs/{id}', [CatalogController::class, 'show'])->name('catalogs.show');
 
-// Catalogs (Web Views - Public)
-Route::get('/customer/catalogs', [CatalogController::class, 'index'])->name('catalogs.index');
-Route::get('/customer/catalogs/{id}', [CatalogController::class, 'show'])->name('catalogs.show');
+    // Cart
+    Route::get('/customer/cart', function () {
+        return view('pages.customer.cart');
+    })->name('cart.index');
 
-// Cart
-Route::get('/customer/cart', function () {
-    return view('pages.customer.cart');
-})->name('cart.index');
+    // Checkout
+    Route::get('/customer/checkout', function () {
+        $tableInfo = null;
+        if (session()->has('table_id')) {
+            $tableInfo = [
+                'id' => session('table_id'),
+                'number' => session('table_number'),
+            ];
+        }
+        return view('pages.customer.checkout', compact('tableInfo'));
+    })->name('checkout.index');
 
-// Checkout
-Route::get('/customer/checkout', function () {
-    $tableInfo = null;
-    if (session()->has('table_id')) {
-        $tableInfo = [
-            'id' => session('table_id'),
-            'number' => session('table_number'),
-        ];
-    }
-    return view('pages.customer.checkout', compact('tableInfo'));
-})->name('checkout.index');
+    // Orders
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+});
 
-// Orders
-Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
-Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
-
-// Order History
+// Order History (accessible even when store is closed, so users can track previous orders)
 Route::get('/customer/order-history', function () {
     return view('pages.customer.order-history');
 })->name('order-history.index');
@@ -147,6 +157,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+        // Store Open/Close Toggle (AJAX)
+        Route::post('/store-toggle', [DashboardAdminController::class, 'toggleStore'])->name('store.toggle');
 
         Route::post('/logout', [AuthAdminController::class, 'logout'])
             ->name('logout');

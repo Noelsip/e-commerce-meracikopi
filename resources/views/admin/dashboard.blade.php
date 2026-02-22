@@ -1,4 +1,134 @@
 <x-layouts.admin :title="'Dashboard'">
+    <!-- Store Status Toggle -->
+    <div id="storeToggleCard" class="rounded-xl border p-5 mb-6 transition-all duration-500"
+         style="border-color: #3e302b; background: {{ $storeOpen ? 'linear-gradient(135deg, #1a2e1a 0%, #2b211e 50%)' : 'linear-gradient(135deg, #2e1a1a 0%, #2b211e 50%)' }};">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-4">
+                <!-- Status Indicator -->
+                <div id="storeStatusDot" class="relative flex-shrink-0">
+                    <div class="w-4 h-4 rounded-full {{ $storeOpen ? 'bg-green-500' : 'bg-red-500' }} transition-colors duration-500"
+                         id="statusDot"></div>
+                    <div class="absolute inset-0 w-4 h-4 rounded-full {{ $storeOpen ? 'bg-green-500' : 'bg-red-500' }} animate-ping opacity-30"
+                         id="statusDotPing"></div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold" style="color: #f0f2bd;">Status Webstore</h2>
+                    <p class="text-sm mt-0.5" id="storeStatusText">
+                        <span style="color: {{ $storeOpen ? '#4ade80' : '#f87171' }};">
+                            {{ $storeOpen ? '● Toko sedang BUKA — pelanggan dapat memesan' : '● Toko sedang TUTUP — pelanggan tidak bisa memesan' }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium" style="color: rgba(240,242,189,0.7);" id="toggleLabel">
+                    {{ $storeOpen ? 'Buka' : 'Tutup' }}
+                </span>
+                <button id="storeToggleBtn" type="button" onclick="toggleStore()" 
+                        class="store-toggle-switch {{ $storeOpen ? 'active' : '' }}"
+                        title="{{ $storeOpen ? 'Klik untuk tutup toko' : 'Klik untuk buka toko' }}">
+                    <span class="store-toggle-knob"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .store-toggle-switch {
+            position: relative;
+            width: 64px;
+            height: 34px;
+            border-radius: 34px;
+            background: #4b3a32;
+            border: 2px solid #5a463c;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+        }
+        .store-toggle-switch:hover {
+            border-color: #CA7842;
+        }
+        .store-toggle-switch.active {
+            background: #22c55e;
+            border-color: #16a34a;
+        }
+        .store-toggle-knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #f0f2bd;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .store-toggle-switch.active .store-toggle-knob {
+            left: 33px;
+        }
+        .store-toggle-switch:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+
+    <script>
+        async function toggleStore() {
+            const btn = document.getElementById('storeToggleBtn');
+            const card = document.getElementById('storeToggleCard');
+            const statusText = document.getElementById('storeStatusText');
+            const toggleLabel = document.getElementById('toggleLabel');
+            const statusDot = document.getElementById('statusDot');
+            const statusDotPing = document.getElementById('statusDotPing');
+
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('{{ route("admin.store.toggle") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                    },
+                    credentials: 'same-origin',
+                });
+
+                const data = await response.json();
+
+                if (data.store_open) {
+                    btn.classList.add('active');
+                    card.style.background = 'linear-gradient(135deg, #1a2e1a 0%, #2b211e 50%)';
+                    statusText.innerHTML = '<span style="color: #4ade80;">● Toko sedang BUKA — pelanggan dapat memesan</span>';
+                    toggleLabel.textContent = 'Buka';
+                    btn.title = 'Klik untuk tutup toko';
+                    statusDot.className = 'w-4 h-4 rounded-full bg-green-500 transition-colors duration-500';
+                    statusDotPing.className = 'absolute inset-0 w-4 h-4 rounded-full bg-green-500 animate-ping opacity-30';
+                } else {
+                    btn.classList.remove('active');
+                    card.style.background = 'linear-gradient(135deg, #2e1a1a 0%, #2b211e 50%)';
+                    statusText.innerHTML = '<span style="color: #f87171;">● Toko sedang TUTUP — pelanggan tidak bisa memesan</span>';
+                    toggleLabel.textContent = 'Tutup';
+                    btn.title = 'Klik untuk buka toko';
+                    statusDot.className = 'w-4 h-4 rounded-full bg-red-500 transition-colors duration-500';
+                    statusDotPing.className = 'absolute inset-0 w-4 h-4 rounded-full bg-red-500 animate-ping opacity-30';
+                }
+
+                // Brief success flash
+                card.style.boxShadow = data.store_open 
+                    ? '0 0 20px rgba(34, 197, 94, 0.3)' 
+                    : '0 0 20px rgba(248, 113, 113, 0.3)';
+                setTimeout(() => card.style.boxShadow = 'none', 2000);
+
+            } catch (e) {
+                console.error('Toggle store error:', e);
+                alert('Gagal mengubah status toko. Coba lagi.');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <!-- Card Total Pesanan -->
         <div class="rounded-xl border p-6" style="background-color: #2b211e; border-color: #3e302b;">

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin.auth' => \App\Http\Middleware\AdminAuth::class,
             'guest.token' => \App\Http\Middleware\GuestTokenMiddleware::class,
+            'store.open' => \App\Http\Middleware\StoreOpen::class,
         ]);
 
         // Exclude API routes and admin routes from CSRF verification

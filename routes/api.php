@@ -47,8 +47,8 @@ Route::prefix('admin')->middleware('admin.auth')->group(function () {
     Route::patch('/tables/{id}/status', [TableApiController::class, 'updateStatus']);
 });
 
-// Customer API - Catalogs (Public)
-Route::prefix('customer')->group(function () {
+// Customer API - Catalogs (Public, but respects store open/close)
+Route::prefix('customer')->middleware('store.open')->group(function () {
     // GET /api/customer/catalogs - Get All Catalogs
     // GET /api/customer/catalogs?is_available=true - Get Available Catalogs Only
     // GET /api/customer/catalogs?search=kopi - Search Catalog by Name
@@ -76,8 +76,8 @@ Route::prefix('customer')->group(function () {
     Route::get('/checkout/settings', [OrderController::class, 'getCheckoutSettings'])->name('customer.checkout.settings');
 });
 
-// Customer API - Cart & Orders (Guest Token Required)
-Route::prefix('customer')->middleware('guest.token')->group(function () {
+// Customer API - Cart & Orders (Guest Token Required, store must be open)
+Route::prefix('customer')->middleware(['guest.token', 'store.open'])->group(function () {
     // Cart Management
     Route::get('/cart', [CartController::class, 'show'])->name('customer.cart.show');
     Route::post('/cart/items', [CartItemController::class, 'store'])->name('customer.cart.items.store');
