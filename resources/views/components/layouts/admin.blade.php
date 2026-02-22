@@ -498,93 +498,155 @@
             const TOAST_DURATION = 8000; // 8 seconds
             let lastChecked = null;
             let audioCtx = null;
+            let audioUnlocked = false;
             let bellBadgeCount = 0;
+            const notifiedIds = new Set(); // Track which order IDs we already notified
 
-            // Initialize AudioContext on first user interaction (required by browsers)
-            function getAudioContext() {
-                if (!audioCtx) {
+            // Try to create and unlock AudioContext
+            function initAudioContext() {
+                if (audioCtx) return audioCtx;
+                try {
                     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    // Try to resume immediately
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume().then(() => {
+                            audioUnlocked = true;
+                            hideEnableSoundBanner();
+                            console.log('🔊 Audio unlocked');
+                        });
+                    } else {
+                        audioUnlocked = true;
+                    }
+                } catch(e) {
+                    console.warn('AudioContext not supported:', e);
                 }
                 return audioCtx;
             }
 
-            // Generate "dring" bell notification sound using Web Audio API
-            function playNotificationSound() {
+            // Unlock audio on any user interaction
+            function unlockAudio() {
+                initAudioContext();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => {
+                        audioUnlocked = true;
+                        hideEnableSoundBanner();
+                        console.log('🔊 Audio unlocked via user interaction');
+                        // Play a test beep to confirm
+                        playTestBeep();
+                    });
+                } else if (audioCtx) {
+                    audioUnlocked = true;
+                    hideEnableSoundBanner();
+                }
+            }
+
+            // Tiny silent beep to confirm audio works
+            function playTestBeep() {
+                if (!audioCtx) return;
                 try {
-                    const ctx = getAudioContext();
-                    if (ctx.state === 'suspended') {
-                        ctx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                } catch(e) {}
+            }
+
+            // Show a banner asking user to enable sound
+            function showEnableSoundBanner() {
+                if (document.getElementById('enableSoundBanner')) return;
+                const banner = document.createElement('div');
+                banner.id = 'enableSoundBanner';
+                banner.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9998;background:linear-gradient(135deg,#2b211e,#3e302b);border:1px solid #CA7842;border-radius:12px;padding:12px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.4);animation:notifSlideIn 0.4s ease;';
+                banner.innerHTML = `
+                    <svg width="20" height="20" fill="none" stroke="#CA7842" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.08"/>
+                    </svg>
+                    <span style="color:#f0f2bd;font-size:13px;font-weight:500;">Klik untuk mengaktifkan suara notifikasi</span>
+                `;
+                banner.addEventListener('click', function() {
+                    unlockAudio();
+                    banner.remove();
+                });
+                document.body.appendChild(banner);
+            }
+
+            function hideEnableSoundBanner() {
+                const banner = document.getElementById('enableSoundBanner');
+                if (banner) banner.remove();
+            }
+
+            // Generate "dring" bell notification sound
+            function playNotificationSound() {
+                if (!audioCtx || !audioUnlocked) {
+                    console.warn('🔇 Audio not unlocked yet, showing enable banner');
+                    showEnableSoundBanner();
+                    return;
+                }
+
+                try {
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
                     }
 
-                    const now = ctx.currentTime;
+                    const now = audioCtx.currentTime;
 
                     // === First bell tone (higher pitch) ===
-                    const osc1 = ctx.createOscillator();
-                    const gain1 = ctx.createGain();
+                    const osc1 = audioCtx.createOscillator();
+                    const gain1 = audioCtx.createGain();
                     osc1.type = 'sine';
                     osc1.frequency.setValueAtTime(1200, now);
                     osc1.frequency.exponentialRampToValueAtTime(800, now + 0.15);
-                    gain1.gain.setValueAtTime(0.35, now);
+                    gain1.gain.setValueAtTime(0.4, now);
                     gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
                     osc1.connect(gain1);
-                    gain1.connect(ctx.destination);
+                    gain1.connect(audioCtx.destination);
                     osc1.start(now);
                     osc1.stop(now + 0.4);
 
-                    // Harmonic overtone for richness
-                    const osc1h = ctx.createOscillator();
-                    const gain1h = ctx.createGain();
+                    // Harmonic overtone
+                    const osc1h = audioCtx.createOscillator();
+                    const gain1h = audioCtx.createGain();
                     osc1h.type = 'sine';
                     osc1h.frequency.setValueAtTime(2400, now);
                     osc1h.frequency.exponentialRampToValueAtTime(1600, now + 0.12);
-                    gain1h.gain.setValueAtTime(0.12, now);
+                    gain1h.gain.setValueAtTime(0.15, now);
                     gain1h.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
                     osc1h.connect(gain1h);
-                    gain1h.connect(ctx.destination);
+                    gain1h.connect(audioCtx.destination);
                     osc1h.start(now);
                     osc1h.stop(now + 0.25);
 
                     // === Second bell tone (lower pitch, delayed) ===
-                    const osc2 = ctx.createOscillator();
-                    const gain2 = ctx.createGain();
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
                     osc2.type = 'sine';
-                    osc2.frequency.setValueAtTime(900, now + 0.2);
-                    osc2.frequency.exponentialRampToValueAtTime(600, now + 0.45);
+                    osc2.frequency.setValueAtTime(900, now + 0.25);
+                    osc2.frequency.exponentialRampToValueAtTime(600, now + 0.5);
                     gain2.gain.setValueAtTime(0, now);
-                    gain2.gain.setValueAtTime(0.35, now + 0.2);
-                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+                    gain2.gain.setValueAtTime(0.4, now + 0.25);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.75);
                     osc2.connect(gain2);
-                    gain2.connect(ctx.destination);
-                    osc2.start(now + 0.2);
-                    osc2.stop(now + 0.7);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start(now + 0.25);
+                    osc2.stop(now + 0.75);
 
                     // Harmonic for second tone
-                    const osc2h = ctx.createOscillator();
-                    const gain2h = ctx.createGain();
+                    const osc2h = audioCtx.createOscillator();
+                    const gain2h = audioCtx.createGain();
                     osc2h.type = 'sine';
-                    osc2h.frequency.setValueAtTime(1800, now + 0.2);
-                    osc2h.frequency.exponentialRampToValueAtTime(1200, now + 0.4);
+                    osc2h.frequency.setValueAtTime(1800, now + 0.25);
+                    osc2h.frequency.exponentialRampToValueAtTime(1200, now + 0.45);
                     gain2h.gain.setValueAtTime(0, now);
-                    gain2h.gain.setValueAtTime(0.1, now + 0.2);
-                    gain2h.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    gain2h.gain.setValueAtTime(0.12, now + 0.25);
+                    gain2h.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
                     osc2h.connect(gain2h);
-                    gain2h.connect(ctx.destination);
-                    osc2h.start(now + 0.2);
-                    osc2h.stop(now + 0.45);
-
-                    // === Third bell "ding" (final, slightly higher) ===
-                    const osc3 = ctx.createOscillator();
-                    const gain3 = ctx.createGain();
-                    osc3.type = 'sine';
-                    osc3.frequency.setValueAtTime(1100, now + 0.5);
-                    osc3.frequency.exponentialRampToValueAtTime(700, now + 0.8);
-                    gain3.gain.setValueAtTime(0, now);
-                    gain3.gain.setValueAtTime(0.25, now + 0.5);
-                    gain3.gain.exponentialRampToValueAtTime(0.01, now + 1.0);
-                    osc3.connect(gain3);
-                    gain3.connect(ctx.destination);
-                    osc3.start(now + 0.5);
-                    osc3.stop(now + 1.0);
+                    gain2h.connect(audioCtx.destination);
+                    osc2h.start(now + 0.25);
+                    osc2h.stop(now + 0.5);
 
                     console.log('🔔 Notification sound played');
                 } catch (e) {
@@ -634,6 +696,7 @@
 
             // Make dismissNotif global
             window.dismissNotif = function(btn) {
+                if (!btn) return;
                 const toast = btn.closest('.order-notif-toast');
                 if (!toast || toast.classList.contains('dismissing')) return;
                 toast.classList.add('dismissing');
@@ -675,6 +738,10 @@
                     if (lastChecked) {
                         url.searchParams.set('last_checked', lastChecked);
                     }
+                    // Send already-notified IDs so backend can exclude them
+                    if (notifiedIds.size > 0) {
+                        url.searchParams.set('exclude_ids', [...notifiedIds].join(','));
+                    }
 
                     const response = await fetch(url.toString(), {
                         headers: {
@@ -696,9 +763,14 @@
                         lastChecked = data.server_time;
                     }
 
-                    // Show notifications for new orders
-                    if (data.count > 0) {
-                        console.log(`🔔 ${data.count} new paid order(s) detected!`);
+                    // Filter out any orders we've already notified about (double safety)
+                    const trulyNewOrders = (data.new_orders || []).filter(o => !notifiedIds.has(o.id));
+
+                    if (trulyNewOrders.length > 0) {
+                        console.log(`🔔 ${trulyNewOrders.length} new paid order(s) detected!`);
+
+                        // Mark these orders as notified IMMEDIATELY to prevent duplicates
+                        trulyNewOrders.forEach(o => notifiedIds.add(o.id));
 
                         // Play sound
                         playNotificationSound();
@@ -707,19 +779,19 @@
                         ringBell();
 
                         // Update badge
-                        updateBellBadge(data.count);
+                        updateBellBadge(trulyNewOrders.length);
 
                         // Show toast for each new order (max 3 to avoid overflow)
-                        const ordersToShow = data.new_orders.slice(0, 3);
+                        const ordersToShow = trulyNewOrders.slice(0, 3);
                         ordersToShow.forEach((order, i) => {
                             setTimeout(() => showOrderNotification(order), i * 300);
                         });
 
                         // If more than 3, show summary
-                        if (data.count > 3) {
+                        if (trulyNewOrders.length > 3) {
                             setTimeout(() => {
                                 showOrderNotification({
-                                    customer_name: `+${data.count - 3} pesanan lainnya`,
+                                    customer_name: `+${trulyNewOrders.length - 3} pesanan lainnya`,
                                     order_type: 'Lihat di halaman Orders',
                                     table_number: null,
                                     total: '',
@@ -728,19 +800,31 @@
                             }, 3 * 300 + 200);
                         }
                     }
+
+                    // Clean up old notified IDs (keep only last 100 to prevent memory growth)
+                    if (notifiedIds.size > 100) {
+                        const arr = [...notifiedIds];
+                        arr.slice(0, arr.length - 100).forEach(id => notifiedIds.delete(id));
+                    }
+
                 } catch (e) {
                     console.warn('Notification poll error:', e);
                 }
             }
 
-            // Initialize Audio Context on first user interaction
-            document.addEventListener('click', function initAudio() {
-                getAudioContext();
-                document.removeEventListener('click', initAudio);
-            }, { once: true });
+            // Unlock audio on ANY user interaction with the page
+            ['click', 'touchstart', 'keydown'].forEach(evt => {
+                document.addEventListener(evt, function onInteraction() {
+                    unlockAudio();
+                    document.removeEventListener(evt, onInteraction);
+                }, { once: true });
+            });
 
             // Start polling when page loads
             document.addEventListener('DOMContentLoaded', function() {
+                // Try to init audio context early
+                initAudioContext();
+
                 // Initial poll (sets lastChecked baseline)
                 pollNewOrders();
 

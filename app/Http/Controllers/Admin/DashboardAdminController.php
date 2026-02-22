@@ -50,23 +50,30 @@ class DashboardAdminController extends Controller
     public function checkNewPaidOrders(Request $request)
     {
         $lastChecked = $request->query('last_checked');
+        $excludeIds = $request->query('exclude_ids'); // comma-separated IDs already notified
 
-        $query = Orders::with('tables')
-            ->where('payment_status', StatusPayments::PAID);
-
-        if ($lastChecked) {
-            // Get orders that were updated to PAID after last check
-            $query->where('updated_at', '>', $lastChecked);
-        } else {
-            // First check: don't show old orders, only start tracking from now
+        if (!$lastChecked) {
+            // First check: don't show old orders, only return server_time as baseline
             return response()->json([
                 'new_orders' => [],
                 'count' => 0,
-                'server_time' => now()->toIso8601String(),
+                'server_time' => now()->format('Y-m-d H:i:s'),
             ]);
         }
 
-        $newOrders = $query->orderBy('updated_at', 'desc')->get();
+        $query = Orders::with('tables')
+            ->where('payment_status', StatusPayments::PAID)
+            ->where('updated_at', '>', $lastChecked);
+
+        // Exclude already-notified order IDs to prevent duplicates
+        if ($excludeIds) {
+            $ids = array_filter(explode(',', $excludeIds), fn($id) => is_numeric($id));
+            if (!empty($ids)) {
+                $query->whereNotIn('id', $ids);
+            }
+        }
+
+        $newOrders = $query->orderBy('updated_at', 'desc')->limit(10)->get();
 
         return response()->json([
             'new_orders' => $newOrders->map(fn($order) => [
@@ -78,7 +85,7 @@ class DashboardAdminController extends Controller
                 'paid_at' => $order->updated_at->format('H:i'),
             ]),
             'count' => $newOrders->count(),
-            'server_time' => now()->toIso8601String(),
+            'server_time' => now()->format('Y-m-d H:i:s'),
         ]);
     }
 }
