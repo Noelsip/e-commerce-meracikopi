@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
@@ -117,6 +118,14 @@ Route::get('/customer/order-history', function () {
  * Admin Routes
  */
 Route::prefix('admin')->name('admin.')->group(function () {
+
+    // Smart redirect: /admin → dashboard (if logged in) or login (if not)
+    Route::get('/', function () {
+        if (Auth::check() && Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+        return redirect()->route('admin.login');
+    });
 
     // Auth Routes (Guest)
     Route::get('/login', [AuthAdminController::class, 'showLoginForm'])
