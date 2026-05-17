@@ -88,7 +88,7 @@ class Menus extends Model
 
     public function orderItems()
     {
-        return $this->hasMany(OrderItems::class);
+        return $this->hasMany(OrderItems::class, 'menu_id');
     }
 
     public function cartItems()
