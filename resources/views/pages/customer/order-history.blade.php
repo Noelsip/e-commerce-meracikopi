@@ -1288,8 +1288,20 @@
                 formatPaymentMethod(method) {
                     const paymentMethods = {
                         'qris': 'QRIS',
+                        'va_bca': 'VA BCA',
+                        'va_mandiri': 'VA Mandiri',
+                        'va_bni': 'VA BNI',
+                        'va_bri': 'VA BRI',
+                        'va_permata': 'VA Permata',
+                        'va_cimb': 'VA CIMB',
+                        'va_danamon': 'VA Danamon',
+                        'va_doku': 'VA DOKU',
+                        'ewallet_shopeepay': 'ShopeePay',
+                        'ewallet_ovo': 'OVO',
+                        'ewallet_dana': 'DANA',
+                        'ewallet_linkaja': 'LinkAja',
                     };
-                    return paymentMethods[method] || method || 'QRIS';
+                    return paymentMethods[method] || method || '-';
                 }
             }
         }

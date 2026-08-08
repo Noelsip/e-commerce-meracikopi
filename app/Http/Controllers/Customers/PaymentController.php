@@ -122,7 +122,7 @@ class PaymentController extends Controller
     private function generateFallbackResponse(string $paymentMethod, string $transactionId, array $orderData, Payments $payment): array
     {
         return [
-            'payment_method' => 'qris',
+            'payment_method' => $paymentMethod,
             'invoice_number' => $transactionId,
             'amount' => $orderData['amount'],
             'status' => 'PENDING',
@@ -206,10 +206,10 @@ class PaymentController extends Controller
                 'payload' => [],
             ]);
 
-            // Validate payment method - only QRIS is allowed
-            if (!$selectedPaymentMethod || $selectedPaymentMethod !== 'qris') {
+            // Validate payment method against catalog
+            if (!$selectedPaymentMethod || !DokuService::isSupportedMethod($selectedPaymentMethod)) {
                 $payment->delete();
-                abort(422, 'Hanya metode pembayaran QRIS yang tersedia');
+                abort(422, 'Metode pembayaran tidak valid atau tidak didukung');
             }
 
             // Prepare order data for DOKU

@@ -7,9 +7,9 @@ services:
     container_name: meracikopi-app
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "8001:80"
     volumes:
-      - ./.env:/var/www/html/.env
+      - ./.env.docker:/var/www/html/.env
       - app-storage:/var/www/html/storage/app
       - app-logs:/var/www/html/storage/logs
     depends_on:

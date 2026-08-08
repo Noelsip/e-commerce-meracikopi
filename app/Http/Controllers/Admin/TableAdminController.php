@@ -53,7 +53,7 @@ class TableAdminController extends Controller
 
     public function update(Request $request, Tables $table)
     {
-        $request->validate([
+        $data = $request->validate([
             'table_number' => 'required|string|max:50|unique:tables,table_number,' . $table->id,
             'capacity' => 'required|integer|min:1|max:20',
             'status' => 'required|in:available,occupied,reserved',

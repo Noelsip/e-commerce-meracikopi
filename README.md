@@ -919,7 +919,7 @@ POST /api/orders/{order_id}/payments
 
 ```json
 {
-  "payment_gateway": "midtrans",
+  "payment_gateway": "doku",
   "payment_method": "qris"
 }
 ```
@@ -932,7 +932,7 @@ POST /api/orders/{order_id}/payments
   "data": {
     "id": 500,
     "order_id": 1001,
-    "payment_gateway": "midtrans",
+    "payment_gateway": "doku",
     "payment_method": "qris",
     "gateway_transaction_id": "trx123",
     "reference_id": "INV-1001",

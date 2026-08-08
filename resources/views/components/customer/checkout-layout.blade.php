@@ -105,6 +105,9 @@
                     `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`
                 );
 
+                // Simpan referensi popup supaya bisa di-close otomatis saat pembayaran sukses
+                this.dokuPopup = popup;
+
                 const content = `
                     <div class="popup-payment-waiting">
                         <div style="text-align: center; padding: 40px;">
@@ -289,6 +292,12 @@
             },
 
             onPaymentSuccess: function (data) {
+                // Tutup popup DOKU otomatis kalau masih terbuka — user tidak perlu close manual
+                if (this.dokuPopup && !this.dokuPopup.closed) {
+                    try { this.dokuPopup.close(); } catch (e) { console.warn('Tidak bisa menutup popup DOKU:', e); }
+                }
+                this.dokuPopup = null;
+
                 // Update main content to show success animation
                 const successContent = `
                     <div class="payment-success-animation" style="padding: 40px; text-align: center;">
@@ -338,8 +347,20 @@
             getPaymentMethodName: function (method) {
                 const names = {
                     'qris': 'QRIS',
+                    'va_bca': 'Virtual Account BCA',
+                    'va_mandiri': 'Virtual Account Mandiri',
+                    'va_bni': 'Virtual Account BNI',
+                    'va_bri': 'Virtual Account BRI',
+                    'va_permata': 'Virtual Account Permata',
+                    'va_cimb': 'Virtual Account CIMB Niaga',
+                    'va_danamon': 'Virtual Account Danamon',
+                    'va_doku': 'Virtual Account DOKU',
+                    'ewallet_shopeepay': 'ShopeePay',
+                    'ewallet_ovo': 'OVO',
+                    'ewallet_dana': 'DANA',
+                    'ewallet_linkaja': 'LinkAja',
                 };
-                return names[method] || 'QRIS';
+                return names[method] || method;
             },
 
             getStatusText: function (status) {

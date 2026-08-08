@@ -1049,6 +1049,7 @@
                     <p class="section-title">Metode Pembayaran</p>
 
                     <!-- QRIS -->
+                    <p style="color:#FFFFFF; opacity:0.7; font-size:12px; margin:12px 0 6px;">QRIS</p>
                     <label class="payment-method-card" onclick="toggleRadio(event, 'payment_method', 'qris')"
                         style="display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; align-items: center;">
@@ -1058,6 +1059,54 @@
                         <img src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Logo_QRIS.svg" alt="QRIS"
                             class="payment-logo" style="height: 22px; width: auto; filter: brightness(0) invert(1);">
                     </label>
+
+                    <!-- Virtual Account -->
+                    <p style="color:#FFFFFF; opacity:0.7; font-size:12px; margin:16px 0 6px;">Virtual Account</p>
+                    @php
+                        $vaOptions = [
+                            'va_bca' => 'BCA',
+                            'va_mandiri' => 'Mandiri',
+                            'va_bni' => 'BNI',
+                            'va_bri' => 'BRI',
+                            'va_permata' => 'Permata',
+                            'va_cimb' => 'CIMB Niaga',
+                            'va_danamon' => 'Danamon',
+                            'va_doku' => 'DOKU VA',
+                        ];
+                    @endphp
+                    @foreach ($vaOptions as $value => $label)
+                        <label class="payment-method-card"
+                            onclick="toggleRadio(event, 'payment_method', '{{ $value }}')"
+                            style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="radio" name="payment_method" value="{{ $value }}" class="payment-radio">
+                                <span class="payment-method-name" style="color: #FFFFFF;">{{ $label }}</span>
+                            </div>
+                            <span style="color:#FFFFFF; opacity:0.6; font-size:12px;">VA</span>
+                        </label>
+                    @endforeach
+
+                    <!-- E-Wallet -->
+                    <p style="color:#FFFFFF; opacity:0.7; font-size:12px; margin:16px 0 6px;">E-Wallet</p>
+                    @php
+                        $ewalletOptions = [
+                            'ewallet_shopeepay' => 'ShopeePay',
+                            'ewallet_ovo' => 'OVO',
+                            'ewallet_dana' => 'DANA',
+                            'ewallet_linkaja' => 'LinkAja',
+                        ];
+                    @endphp
+                    @foreach ($ewalletOptions as $value => $label)
+                        <label class="payment-method-card"
+                            onclick="toggleRadio(event, 'payment_method', '{{ $value }}')"
+                            style="display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display: flex; align-items: center;">
+                                <input type="radio" name="payment_method" value="{{ $value }}" class="payment-radio">
+                                <span class="payment-method-name" style="color: #FFFFFF;">{{ $label }}</span>
+                            </div>
+                            <span style="color:#FFFFFF; opacity:0.6; font-size:12px;">E-Wallet</span>
+                        </label>
+                    @endforeach
                 </div>
             </div>
 
@@ -1626,6 +1675,18 @@
             // Payment method display names
             const paymentNames = {
                 'qris': 'QRIS',
+                'va_bca': 'Virtual Account BCA',
+                'va_mandiri': 'Virtual Account Mandiri',
+                'va_bni': 'Virtual Account BNI',
+                'va_bri': 'Virtual Account BRI',
+                'va_permata': 'Virtual Account Permata',
+                'va_cimb': 'Virtual Account CIMB Niaga',
+                'va_danamon': 'Virtual Account Danamon',
+                'va_doku': 'Virtual Account DOKU',
+                'ewallet_shopeepay': 'ShopeePay',
+                'ewallet_ovo': 'OVO',
+                'ewallet_dana': 'DANA',
+                'ewallet_linkaja': 'LinkAja',
             };
 
             // Format order type

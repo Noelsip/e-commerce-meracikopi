@@ -83,7 +83,7 @@
                     </select>
                     
                     <div class="flex gap-2">
-                        <button onclick="showQRCode({{ $table->id }}, '{{ $table->table_number }}', '{{ $table->qr_code_path ? asset('storage/' . $table->qr_code_path) : '' }}')"
+                        <button onclick="showQRCode({{ $table->id }}, {{ Js::from($table->table_number) }}, {{ Js::from($table->qr_code_path ? asset('storage/' . $table->qr_code_path) : '') }})"
                                 class="flex-1 px-3 py-2 text-xs rounded-lg text-center"
                                 style="background-color: #3e302b; color: #D4A574; border: 1px solid #D4A574;">
                             QR Code
